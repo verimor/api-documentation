@@ -1,0 +1,1242 @@
+---
+openapi: 3.0.1
+info:
+  title: Verimor SMS API
+  description: '<div><p>Verimor SMS API, uygulamalarınız veya sunucu taraflı yazılımlarınız
+    üzerinden SMS gönderimi ve yönetimi yapmanızı sağlayan bir HTTP arayüzüdür. API,
+    farklı amaçlara yönelik (toplu gönderim, raporlama, bakiye sorgulama vb.) çeşitli
+    endpoint''ler sunar.<h3>Kimlik Doğrulama (Authentication)</h3><p>API''ye yapılan
+    istekler, Verimor kullanıcı adı ve API şifreniz ile doğrulanır. Kimlik doğrulama
+    yöntemi, isteğin türüne göre değişir:<ul><li><strong>POST İstekleri (örn: /v2/send.json):</strong>
+    <code>username</code> ve <code>password</code> bilgileri, isteğin gövdesinde (request
+    body) JSON formatında gönderilir.<li><strong>GET İstekleri (örn: /v2/report):</strong>
+    <code>username</code> ve <code>password</code> bilgileri, isteğin URL''ine query
+    string parametresi olarak eklenir.</ul><p>API şifrenizi Verimor Online İşlem Merkezi
+    (OİM) üzerinden oluşturabilirsiniz.<h3>Temel Yetenekler</h3><p>API, aşağıdaki
+    temel işlevleri desteklemektedir:<ul><li>Tekil veya toplu SMS gönderimi<li>İleri
+    tarihli SMS gönderimlerini programlama<li>Gönderilen mesajların iletim durumlarını
+    detaylı olarak sorgulama<li>Hesapta kalan SMS kredisini öğrenme<li>Zamanlanmış
+    gönderimleri iptal etme<li>Onaylanmış gönderici başlıklarını (alfanümerik) listeleme</ul><h3>Teknik
+    Formatlar</h3><p>API, operasyona göre farklı veri formatları kullanır. Mesaj gönderme
+    gibi <strong>POST</strong> işlemleri <code>application/json</code> formatında
+    veri kabul eder ve yanıt döner. Raporlama gibi <strong>GET</strong> işlemleri
+    ise parametreleri URL üzerinden alır ve yanıtı, isteğe bağlı olarak, varsayılan
+    olarak <strong>boşluklarla ayrılmış düz metin (plain text)</strong> veya belirtilirse
+    <strong>JSON</strong> formatında döndürebilir. <p><a href ="https://god.gw.postman.com/run-collection/14669756-4e4aa0c8-f4e2-4e7d-b5ad-d99c62a45b28?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D14669756-4e4aa0c8-f4e2-4e7d-b5ad-d99c62a45b28%26entityType%3Dcollection%26workspaceId%3De4084846-4b47-49e8-81bc-3d20f047ba0e"><img
+    src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px;
+    height: 32px;"></a></p></div>'
+  version: v2
+paths:
+  "/v2/send":
+    get:
+      summary: Birden Çok Numara Bir Mesaj Gönderebilme
+      tags:
+      - SMS Kampanyası
+      description: Smsapi gönderim için iki yöntemi destekler. Bunlar HTTP(S) GET
+        (Plain de denir) ve HTTP(S) POST JSON’dır. İkisi de cevabını düz metin olarak
+        döndürür.
+      parameters:
+      - name: username
+        in: query
+        required: true
+        description: API kullanıcı adı
+        schema:
+          type: string
+      - name: password
+        in: query
+        required: true
+        description: API şifresi
+        schema:
+          type: string
+      - name: dest
+        in: query
+        required: true
+        description: " Mesajın gönderileceği telefon numaraları. Birden fazla numara
+          varsa virgül ile ayrılmalıdır. Yurt dışı numaralarının başına 00 veya +
+          eklenmelidir. Örnek: 0049xxxxxxxx veya +49xxxxxxxx (+ işareti URL'lerde
+          boşluk olarak yorumlanacağı için %2B olarak encode etmelisiniz, örn: %2B49xxxxxxxx).
+          (zorunlu)"
+        schema:
+          type: string
+      - name: msg
+        in: query
+        required: true
+        description: " Gönderilecek mesaj. Türkçe harf içerebilir. Maksimum uzunluğu
+          Türkçe harf içeriyorsa 1043, içermiyorsa 1071 karakter’dir. (zorunlu). Encoding
+          her zaman UTF8 beklenir."
+        schema:
+          type: string
+      - name: source_addr
+        in: query
+        required: false
+        description: Gönderici kimliği (Başlık). Source_addr boş ise sistemde kayıtlı
+          ilk başlığınız kullanılır.
+        schema:
+          type: string
+      - name: valid_for
+        in: query
+        required: false
+        description: Mesajın geçerlilik süresi. SS:DD (veya S:DD) formatında olmalı.
+          (Varsayılan değer 24:00, Minumum değer 00:01, Maksimum değer 48:00)
+        schema:
+          type: string
+      - name: datacoding
+        in: query
+        required: false
+        description: Mesaj metni için kullanılacak karakter kodlaması. 0, 1 ve 2 değerlerini
+          alabilir. Mesajda kullanılabilecek harfleri ve mesajın boy limitlerini belirler.
+          Boş ise mesaj metnine bakılır, türkçe harf varsa 1, yoksa 0 kaydedilir.
+          Mesaj boyları tablosu için dokümanın sonuna bakınız. Yurt dışına sms gönderiminde
+          değeri 1 olarak gönderilmemelidir.
+        enum:
+        - 0
+        - 1
+        schema:
+          type: integer
+      - name: is_commercial
+        in: query
+        required: false
+        description: Opsiyonel. true | false değeri alır. Ticari gönderimlerde true
+          olarak belirlemelisiniz.
+        schema:
+          type: bool
+      - name: iys_recipient_type
+        in: query
+        required: false
+        description: BIREYSEL | TACIR değeri alır. Ticari gönderimlerde mutlaka belirlemelisiniz.
+        schema:
+          type: string
+      - name: send_at
+        in: query
+        required: false
+        description: Mesajın gönderilmesini istediğiniz tarih saat. ‘2015-02-20 16:06:00’
+          şeklinde veya ISO 8601 standardındaki formatlar kabul edilir (http://en.wikipedia.org/wiki/ISO_8601).
+          Boş ise mesaj hemen gönderilir.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Başarılı
+          content:
+            text/plain:
+              examples:
+                success:
+                  value: '123456'
+              schema:
+                type: integer
+        '400':
+          description: Başarısız İstek
+          content:
+            text/plain:
+              examples:
+                MISSING_MESSAGE:
+                  value: Mesaj eksik
+                MISSING_DESTINATION_ADDRESS:
+                  value: Hedef Numara eksik
+                INVALID_DATACODING:
+                  value: Geçersiz veri kodlama
+                INVALID_DELIVERY_TIME:
+                  value: Geçersiz gönderim zamanı
+                INVALID_SOURCE_ADDRESS:
+                  value: Geçersiz gönderici başlığı
+                INVALID_DESTINATION_ADDRESS:
+                  value: Geçersiz hedef numara
+                INVALID_IYS_RECIPIENT_TYPE:
+                  value: Geçersiz İYS alıcı tipi
+                INVALID_IS_COMMERCIAL:
+                  value: Geçersiz ticari mesaj durumu
+                INVALID_VALID_FOR:
+                  value: Geçersiz geçerlilik süresi
+                INVALID_SEND_AT:
+                  value: Geçersiz gönderim zamanı
+                INVALID_SHORT_MESSAGE:
+                  value: Geçersiz kısa mesaj
+                INVALID_DESTINATION_ADDRESSES:
+                  value: Geçersiz hedef numaralar
+                INVALID_IYS_OPTION:
+                  value: Geçersiz İYS seçeneği
+              schema:
+                type: string
+        '403':
+          description: İzinsiz DNS veya İzinsiz IP
+          content:
+            text/plain:
+              examples:
+                izinsiz_ip:
+                  value: 'İzinsiz DNS veya İzinsiz IP: 127.0.0.1'
+              schema:
+                type: string
+        '401':
+          description: Eksik kullanıcı adı/şifre
+          content:
+            text/plain:
+              examples:
+                eksik_parametre:
+                  value: Eksik kullanıcı adı/şifre
+                gecersiz_username:
+                  value: Geçersiz kullanıcı adı/şifre
+              schema:
+                type: string
+  "/v2/send.json":
+    post:
+      summary: Birden Çok Numara Farklı Mesajlar Gönderebilme
+      tags:
+      - SMS Kampanyası
+      description: JSON formatında toplu SMS gönderimi için kullanılır. Birden fazla
+        farklı mesajı farklı numaralara gönderebilirsiniz.
+      operationId: createFlexibleBlog
+      parameters: []
+      responses:
+        '200':
+          description: Başarılı
+          content:
+            text/plain:
+              examples:
+                success:
+                  value: '123456'
+              schema:
+                type: string
+                description: Kampanya ID'si
+        '400':
+          description: Başarısız İstek
+          content:
+            text/plain:
+              examples:
+                MISSING_MESSAGE:
+                  value: Eksik Mesaj
+                MISSING_DESTINATION_ADDRESS:
+                  value: Eksik Mesaj
+                INVALID_JSON:
+                  value: Eksik Mesaj
+                MESSAGE_COUNT_LIMIT_EXCEEDED:
+                  value: Eksik Mesaj
+                INVALID_DATACODING:
+                  value: Eksik Mesaj
+                INVALID_DELIVERY_TIME:
+                  value: Eksik Mesaj
+                INVALID_UTF8:
+                  value: Eksik Mesaj
+              schema:
+                type: string
+        '401':
+          description: Yetkisiz Erişim
+          content:
+            text/plain:
+              examples:
+                INVALID_UTF8:
+                  value: Eksik Mesaj
+              schema:
+                type: string
+        '403':
+          description: İzinsiz İP Adresi
+          content:
+            text/plain:
+              schema:
+                type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: API kullanıcı adı
+                  example: '9085000000'
+                password:
+                  type: string
+                  description: API şifresi
+                  example: '111111'
+                source_addr:
+                  type: string
+                  description: Gönderici başlığı
+                  example: VERIMOR
+                valid_for:
+                  type: string
+                  description: 'Mesajın geçerlilik süresi (varsayılan: 24:00)'
+                  example: ''
+                datacoding:
+                  type: integer
+                  description: 'Veri kodlama (0: GSM Basic, 1: GSM Turkish, 2: UCS2)'
+                  enum:
+                  - 0
+                  - 1
+                  - 2
+                  example: 0
+                is_commercial:
+                  type: boolean
+                  description: Ticari mesaj mı
+                  example: true
+                iys_recipient_type:
+                  type: string
+                  description: İYS alıcı tipi (BIREYSEL/TACIR)
+                  example: BIREYSEL
+                send_at:
+                  type: string
+                  description: Gönderim zamanı (ISO 8601 formatında)
+                  example: '111111'
+                custom_id:
+                  type: string
+                  description: Özel kampanya ID'si
+                  example: '123456'
+                messages:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      dest:
+                        type: string
+                        description: Hedef telefon numaraları (virgülle ayrılmış)
+                        example: '905312345678,905551234568'
+                      msg:
+                        type: string
+                        description: Gönderilecek mesaj
+                        example: Deneme Mesaj
+                      id:
+                        type: string
+                        description: Mesaj özel ID'si
+                        example: '1234567'
+                      iys_recipient_type:
+                        type: string
+                        description: Mesaj bazında İYS alıcı tipi
+                        example: BIREYSEL
+                    required:
+                    - dest
+                    - msg
+              required:
+              - username
+              - password
+              - messages
+  "/v2/cancel/{id}":
+    post:
+      summary: İleri Tarihli Mesaj Gönderimi İptali
+      tags:
+      - SMS Kampanyası
+      description: "<p>İleri tarihli mesaj gönderimini iptal etmek için örnekte olduğu
+        gibi bir JSON string POST edilir.</p>"
+      parameters:
+      - name: id
+        in: path
+        description: Kampanya ID'si
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Campaign successfully canceled
+          content:
+            text/plain:
+              examples:
+                success:
+                  value: 'Kampanya silindi: 123456'
+              schema:
+                type: string
+                description: Cevap mesajı
+        '400':
+          description: Campaign not found
+          content:
+            text/plain:
+              examples:
+                not_found:
+                  value: 'Kampanya bulunamadı: 123456'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: API kullanıcı adı
+                  example: '9085000000'
+                password:
+                  type: string
+                  description: API şifresi
+                  example: '111111'
+  "/v2/balance":
+    get:
+      summary: SMS Kalan Kredi Sorgulama
+      tags:
+      - Bakiye Sorgulamaları
+      description: SMS kalan kredi sorgulama için bu servis kullanılıe. İşlem için
+        kullanıcı adı ve şifre gereklidir.
+      parameters:
+      - name: username
+        in: query
+        description: Kullanıcı Adı
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: Şifre
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: başarılı
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: '100'
+        '401':
+          description: Unauthorized access
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Geçersiz kullanıcı adı veya şifre
+  "/v2/blacklists":
+    get:
+      summary: Karalistedeki Numaraların Alımı
+      tags:
+      - Karaliste
+      description: "<p>Karaliste’deki numaraları listelemek için kullanılır.</p><p>Bu
+        endpoint, kullanıcı adı ve şifre ile kimlik doğrulaması gerektirir.</p><p><strong>Total</strong>&nbsp;değeri
+        toplam kayıt sayısını verir, bir sorguda en fazla 100 adet kayıt dönülür.
+        Devamını almak için offset değerini yükseltip tekrar sorgulamalısınız.</p>"
+      parameters:
+      - name: username
+        in: query
+        description: Kullanıcı adı
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: Şifre
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        description: Sayfalama Taban Değeri
+        required: false
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: Sayfa Kayıt Sayısı
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Başarılı
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    description: Karaliste toplam numara sayısı
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        phone:
+                          type: string
+                          description: Karalisteye alınmış Numara
+                        source:
+                          type: string
+                          description: Kaynak
+                        created_at:
+                          type: string
+                          format: date_time
+                          description: Karalisteye eklenme Tarih saati
+                example:
+                  total: 2
+                  records:
+                  - created_at: '2019-11-25T11:13:24.988+03:00'
+                    phone: '905444876543'
+                    source: ret_web
+                  - created_at: '2020-06-02T16:59:56.957+03:00'
+                    phone: '905335876543'
+                    source: oim
+        '400':
+          description: Bad request
+          content:
+            text/plain:
+              examples:
+                example_key:
+                  value: 'invalid limit: 200'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              examples:
+                example_key:
+                  value: geçersiz kullanıcı adı veya şifre
+    post:
+      summary: Karalisteye Numara Eklenmesi
+      tags:
+      - Karaliste
+      description: "<p>Karalisteye numara eklemek için kullanılır.</p><p>Bu endpoint,
+        kullanıcı adı ve şifre ile kimlik doğrulaması gerektirir.</p>"
+      parameters:
+      - name: username
+        in: query
+        description: Kullanıcı adı
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: Şifre
+        required: true
+        schema:
+          type: string
+      - name: phones
+        in: query
+        description: 'Karalisteye eklenmeleri istenen numaralar, virgülle ayrılmış
+          liste olarak girilmelidir. Örnek: 905444876543,905335876543'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Başarılı
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+        '400':
+          description: Bad request
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: 'Invalid phone number: 0532'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Geçersiz kullanıcı adı/şifre
+  "/v2/blacklists/{phones}":
+    delete:
+      summary: Karalisteden Numaraların Silinmesi
+      tags:
+      - Karaliste
+      description: "<p>Karalisteden numara(lar)ı silmek için kullanılır.</p><p>Bu
+        endpoint, kullanıcı adı ve şifre ile kimlik doğrulaması gerektirir.</p>"
+      parameters:
+      - name: username
+        in: query
+        description: kullanıcı adı
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: Şifre
+        required: true
+        schema:
+          type: string
+      - name: phones
+        in: path
+        description: 'Karalisteden silinmesi istenen numaralar, virgülle ayrılmış
+          liste olarak girilmelidir. Örnek: 905444876543,905335876543'
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Başarılı
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: 'Invalid phone number: 0532'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Geçersiz kullanıcı adı/şifre
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: 905450123456 is not blacklisted
+  "/v2/status?id":
+    get:
+      summary: Gönderilen SMSlerden API’nin ürettiği ID ile sorma
+      tags:
+      - Raporlar
+      description: '<p>Gönderim Raporu almak için kullanılır.</p><ul dir="auto"><li>id:
+        Kampanya’ya API tarafından verilen ID’dir. id veya custom_id zorunludur.</li><li>custom_id:
+        Kampanya’ya sizin tarafınızdan verilen ID’dir. id veya custom_id zorunludur.</li><li>dest:
+        Zorunlu değil. Kampanya’da belirli telefon numaralarına gönderilmiş mesajları
+        sorgular.</li><li>greater_than: Verilen message_id’den büyük mesajları sorgular.
+        Bu parametre, içinde çok mesaj olan kampanyaların sorgulanması için zorunludur.
+        Bu sorgu 100 mesaj döndürür, mesajların devamını almak için sonuçtaki son
+        mesaj id’sini vererek ikinci bir sorgu yapmalısınız.</li></ul>'
+      parameters:
+      - name: username
+        in: query
+        description: kullanıcı adı
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: Şifre
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: query
+        description: Kampanya ID’si. Bu parametre zorunludur. Kampanya ID’si, API’nin
+          gönderim sırasında ürettiği ID’dir. Bu ID ile sorgulama yapabilirsiniz.
+        required: true
+        schema:
+          type: integer
+      - name: dest
+        in: query
+        description: Zorunlu değil. Kampanya’da belirli telefon numaralarına gönderilmiş
+          mesajları sorgular
+        schema:
+          type: string
+      - name: greater_than
+        in: query
+        description: Verilen message_id’den büyük mesajları sorgular. Bu parametre,
+          içinde çok mesaj olan kampanyaların sorgulanması için zorunludur. Bu sorgu
+          100 mesaj döndürür, mesajların devamını almak için sonuçtaki son mesaj id’sini
+          vererek ikinci bir sorgu yapmalısınız.
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Başarılı
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    campaign_id:
+                      type: integer
+                      example: 1213
+                    campaign_custom_id:
+                      type: string
+                      example: 1213
+                    message_id:
+                      type: integer
+                      example: 1213
+                    message_custom_id:
+                      type: string
+                    dest:
+                      type: string
+                    size:
+                      type: integer
+                    international_multiplier:
+                      type: integer
+                    credits:
+                      type: integer
+                    status:
+                      type: string
+                    gsm_error:
+                      type: string
+                      nullable: true
+                    sent_at:
+                      type: string
+                      format: date_time
+                    done_at:
+                      type: string
+                      format: date_time
+                      nullable: true
+        '400':
+          description: Başarısız istek
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              examples:
+                UNAUTHORIZED:
+                  value: Geçersiz kullanıcı adı/şifre
+                FORBIDDEN:
+                  value: Bu kampanya size ait değil
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Bu idye sahip kampanya bulunamadı
+  "/v2/status?custom_id":
+    get:
+      summary: Gönderilen SMSlerden Custom ID ile sorma
+      tags:
+      - Raporlar
+      description: '<p>Gönderim Raporu almak için kullanılır.</p><ul dir="auto"><li>id:
+        Kampanya’ya API tarafından verilen ID’dir. id veya custom_id zorunludur.</li><li>custom_id:
+        Kampanya’ya sizin tarafınızdan verilen ID’dir. id veya custom_id zorunludur.</li><li>dest:
+        Zorunlu değil. Kampanya’da belirli telefon numaralarına gönderilmiş mesajları
+        sorgular.</li><li>greater_than: Verilen message_id’den büyük mesajları sorgular.
+        Bu parametre, içinde çok mesaj olan kampanyaların sorgulanması için zorunludur.
+        Bu sorgu 100 mesaj döndürür, mesajların devamını almak için sonuçtaki son
+        mesaj id’sini vererek ikinci bir sorgu yapmalısınız.</li></ul>'
+      parameters:
+      - name: username
+        in: query
+        description: kullanıcı adı
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: Şifre
+        required: true
+        schema:
+          type: string
+      - name: custom_id
+        in: query
+        description: Kampanya Custom ID’si. Bu parametre zorunludur. Kampanya Custom
+          ID’si, API’nin gönderim sırasında ürettiği Custom ID’dir. Bu ID ile sorgulama
+          yapabilirsiniz.
+        required: true
+        schema:
+          type: string
+      - name: dest
+        in: query
+        description: Zorunlu değil. Kampanya’da belirli telefon numaralarına gönderilmiş
+          mesajları sorgular
+        schema:
+          type: string
+      - name: greater_than
+        in: query
+        description: Verilen message_id’den büyük mesajları sorgular. Bu parametre,
+          içinde çok mesaj olan kampanyaların sorgulanması için zorunludur. Bu sorgu
+          100 mesaj döndürür, mesajların devamını almak için sonuçtaki son mesaj id’sini
+          vererek ikinci bir sorgu yapmalısınız.
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Başarılı
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    campaign_id:
+                      type: integer
+                      example: 1213
+                    campaign_custom_id:
+                      type: string
+                      example: 1213
+                    message_id:
+                      type: integer
+                      example: 1213
+                    message_custom_id:
+                      type: string
+                    dest:
+                      type: string
+                    size:
+                      type: integer
+                    international_multiplier:
+                      type: integer
+                    credits:
+                      type: integer
+                    status:
+                      type: string
+                    gsm_error:
+                      type: string
+                      nullable: true
+                    sent_at:
+                      type: string
+                      format: date_time
+                    done_at:
+                      type: string
+                      format: date_time
+                      nullable: true
+        '400':
+          description: Başarısız istek
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Geçersiz parametreler
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              examples:
+                UNAUTHORIZED:
+                  value: Geçersiz kullanıcı adı/şifre
+                FORBIDDEN:
+                  value: Bu kampanya size ait değil
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Bu idye sahip kampanya bulunamadı
+  "/v2/inbound_messages":
+    get:
+      summary: Gelen SMS Raporu
+      tags:
+      - Raporlar
+      description: "<p>Bu API, gelen SMS’lerinizi sorgulamak için kullanılır.</p><p>Smsapi
+        hesabınıza gelen sms’leri iki farklı yöntemle teslim edebilir. Bunlar PUSH
+        ve GET yöntemleridir.</p><p>Bu servis&nbsp;<strong>HTTP GET ile Gelen SMS
+        Alımı</strong>&nbsp;hizmetini sağlar<br></p><p>Sorgulama, belirli bir zaman
+        aralığında veya belirli bir message_id’den büyük mesajları almak için yapılabilir.</p>"
+      parameters:
+      - name: username
+        in: query
+        description: Kullanıcı adı
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: Şifre
+        required: true
+        schema:
+          type: string
+      - name: from_time
+        in: query
+        description: Sorgulanacak zaman aralığının başlangıcı (YYYY-MM-DD HH:MM:SS)
+        schema:
+          type: string
+      - name: to_time
+        in: query
+        description: Sorgulanacak zaman aralığının bitişi (YYYY-MM-DD HH:MM:SS)
+        schema:
+          type: string
+      - name: greater_than
+        in: query
+        description: Verilen message_id’den büyük mesajları sorgular. Bu sorgu 100
+          mesaj döndürür, mesajların devamını almak için sonuçtaki son mesaj id’sini
+          vererek ikinci bir sorgu yapmalısınız.
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Başarılı
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    message_id:
+                      type: integer
+                      example: 12345
+                    created_at:
+                      type: string
+                      format: date_time
+                      example: '2017-01-01T10:00:00+03:00'
+                    network:
+                      type: string
+                      example: TURKCELL
+                    source_addr:
+                      type: string
+                      example: '908500000000'
+                    destination_addr:
+                      type: string
+                      example: '4609'
+                    keyword:
+                      type: string
+                      example: verimor
+                    content:
+                      type: string
+                      example: verimor deneme
+                    received_at:
+                      type: string
+                      format: date_time
+                      example: '2017-01-01T10:00:00+03:00'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Geçersiz kullanıcı adı ve / veya şifre
+  "/v2/headers":
+    get:
+      summary: Liste
+      tags:
+      - Başlıklar
+      description: Tanımlı SMS Başlıklarını listeler.
+      parameters:
+      - name: username
+        in: query
+        description: Kullanıcı Adı
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: Şifre
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Başarılı
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example:
+                - verimor
+                - bulutsantralim
+        '401':
+          description: Unauthorized access
+          content:
+            text/plain:
+              examples:
+                example_key:
+                  value: geçersiz kullanıcı adı veya şifre
+  "/v2/iys_consents.json":
+    post:
+      summary: İYS İzni Gönderimi
+      tags:
+      - İYS Hizmetleri
+      description: <p>Ticari ileti göndermek için markalarınızı İYSye (İleti Yönetim
+        Sistemi) kaydettirmiş olmalı ve&nbsp;<a href="https://oim.verimor.com.tr/headers"
+        rel="nofollow">OİM Başlık Yönetiminden</a>&nbsp;ilgili başlığa İYS kodlarını
+        girmiş olmanız gerekir. Bu işlemleri yaptıktan sonra müşterilerinizden aldığınız
+        izinleri bu yöntemle İYSye bildirebilirsiniz.</p><p>Aşağıdaki örnekte olduğu
+        gibi bir JSON string POST edilir.</p><p>Daha sonra istenirse, "İYS İZİNLERİ
+        RAPORU" başlığı altındaki dökümandan faydalanılarak, gönderilen izinlerin
+        durumları alınabilir.</p>
+      parameters: []
+      responses:
+        '200':
+          description: Başarılı-İzin Oluşturuldu
+          content:
+            text/plain:
+              schema:
+                type: integer
+                example: 20212
+        '400':
+          description: Hatalı İstek
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Hatalı İstek
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Kullanıcı Adı
+                password:
+                  type: string
+                  description: Şifre
+                source_addr:
+                  type: string
+                  description: Başlık
+                consents:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        description: İzin tipi (e.g., MESAJ, ARAMA, EPOSTA)
+                      source:
+                        type: string
+                        description: İzin Kaynağı (e.g., HS_WEB, HS_MESAJ)
+                      status:
+                        type: string
+                        description: İzin Durumu (e.g., ONAY, RET)
+                      recipient_type:
+                        type: string
+                        description: Alıcı Tipi (e.g., BIREYSEL)
+                      consent_date:
+                        type: string
+                        format: date_time
+                        description: İzin Tarihi (e.g., 2022-04-14 13:30:30)
+                      recipient:
+                        type: string
+                        description: Alıcı (Telefon no veya e-post adresi)
+                    required:
+                    - type
+                    - source
+                    - status
+                    - recipient_type
+                    - consent_date
+                    - recipient
+              example:
+                username: '908501234567'
+                password: xxxxxxx
+                source_addr: BASLIGIM
+                consents:
+                - type: MESAJ
+                  source: HS_WEB
+                  status: ONAY
+                  recipient_type: BIREYSEL
+                  consent_date: '2022-04-14 13:30:30'
+                  recipient: '905311234567'
+                - type: ARAMA
+                  source: HS_MESAJ
+                  status: RET
+                  recipient_type: BIREYSEL
+                  consent_date: '2022-04-14 13:30:30'
+                  recipient: '905311234568'
+                - type: EPOSTA
+                  source: HS_MESAJ
+                  status: RET
+                  recipient_type: BIREYSEL
+                  consent_date: '2022-04-14 13:30:30'
+                  recipient: arge@verimor.com.tr
+              required:
+              - username
+              - password
+              - source_addr
+              - consents
+  "/v2/iys/campaigns":
+    get:
+      summary: İYS Kampanyalarını Listele
+      tags:
+      - İYS Hizmetleri
+      description: "<p>Gönderilen İYS izinleri ve İYS günlük vatandaş izin değişiklikleri
+        için kampanyalar oluşturulur. Bu kampanyalar bu servisi kullanarak görülebilir.</p><p><strong>Total</strong>&nbsp;değeri
+        toplam kayıt sayısını verir, bir sorguda en fazla 100 adet kayıt dönülür.
+        Devamını almak için offset değerini yükseltip tekrar sorgulamalısınız.</p>"
+      parameters:
+      - name: username
+        in: query
+        description: Kullanıcı adı
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: Şifre
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        description: Sayfalama başlangıcı
+        required: false
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: Sayfalama limiti
+        required: false
+        schema:
+          type: integer
+      - name: source
+        in: query
+        description: Kaynak (e.g., list, csv, api, sms, web, iys)
+        required: false
+        enum:
+        - list
+        - csv
+        - api
+        - sms
+        - web
+        - iys
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Başarılı
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        header_name:
+                          type: string
+                        iys_code:
+                          type: integer
+                        iys_brand_code:
+                          type: integer
+                        source:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date_time
+                  total:
+                    type: integer
+                example:
+                  records:
+                  - id: 103
+                    header_name: VERIMOR
+                    iys_code: 627033
+                    iys_brand_code: 627033
+                    source: iys
+                    created_at: '2021-02-10T11:58:57.508+03:00'
+                  - id: 104
+                    header_name: VERIMOR
+                    iys_code: 627033
+                    iys_brand_code: 627033
+                    source: iys
+                    created_at: '2021-02-10T11:59:16.895+03:00'
+                  total: 2
+                required:
+                - records
+                - total
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              examples:
+                INVALID_PAGINATION_LIMIT_PARAMETER:
+                  value: Sayfalama limiti parametre değeri geçersiz
+                NO_IYS_MODULE_AVAILABLE:
+                  value: İYS Modülü Tanımlı Değil
+  "/v2/iys/campaigns/{id}/consents":
+    get:
+      summary: İYS İzinleri Raporu
+      tags:
+      - İYS Hizmetleri
+      description: "<p>Gönderilen İYS izinleri ve İYS günlük vatandaş izin değişikliklerini
+        kampanya idsi ile sorgulayabilirsiniz.</p><p><strong>Total</strong>&nbsp;değeri
+        toplam kayıt sayısını verir, bir sorguda en fazla 100 adet kayıt dönülür.
+        Devamını almak için offset değerini yükseltip tekrar sorgulamalısınız.</p>"
+      parameters:
+      - name: username
+        in: query
+        description: Kullanıcı adı
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: şifre
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        description: Kapmanya ID
+        required: true
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        description: Sayfalama başlangıcı
+        required: false
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: Sayfalama limiti
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Başarılı
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  source_addr:
+                    type: string
+                  status:
+                    type: string
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        source:
+                          type: string
+                        recipient:
+                          type: string
+                        status:
+                          type: string
+                        consent_date:
+                          type: string
+                          format: date_time
+                        recipient_type:
+                          type: string
+                        request_status:
+                          type: string
+                        request_error:
+                          type: string
+                          nullable: true
+                example:
+                  total: 2
+                  source_addr: BASLIGIM
+                  status: Tamamlandı
+                  records:
+                  - type: MESAJ
+                    source: HS_WEB
+                    recipient: '905331001727'
+                    status: ONAY
+                    consent_date: '2020-06-11T22:14:00.000+03:00'
+                    recipient_type: BIREYSEL
+                    request_status: Başarılı
+                  - type: MESAJ
+                    source: HS_WEB
+                    recipient: '905331001017'
+                    status: RET
+                    consent_date: '2020-06-11T22:14:00.000+03:00'
+                    recipient_type: BIREYSEL
+                    request_status: Başarısız
+                    request_error: H175 İlk defa kaydedilen bir iznin durum (status)
+                      bilgisi RET olmamalıdır.
+                required:
+                - total
+                - source_addr
+                - status
+                - records
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              examples:
+                INVALID_PAGINATION_LIMIT_PARAMETER:
+                  value: Sayfalama limiti parametre değeri geçersiz
+                NO_IYS_MODULE_AVAILABLE:
+                  value: İYS Modülü Tanımlı Değil
+servers:
+- url: https://sms.verimor.com.tr
+- url: http://dev.smsapi.com:3002/

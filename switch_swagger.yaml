@@ -1,0 +1,190 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+  description: "<div><p>Verimor Bulutsantralim API'si, işletmelerin mevcut yazılımlarını
+    (CRM, ERP vb.) Bulut Santral hizmetleriyle entegre etmelerini sağlayan güçlü bir
+    arayüzdür. Bu API sayesinde, santral yönetimi ve çağrı operasyonları otomatize
+    edilebilir ve iş süreçleri daha verimli hale getirilebilir.<h3>Kimlik Doğrulama
+    (Authentication)</h3><p>API'ye yapılan tüm istekler, size özel olarak oluşturulmuş
+    bir API anahtarı ile doğrulanır. Bu anahtarı, her bir API isteğinde <strong>query
+    parametresi olarak <code>key</code></strong> adıyla göndermeniz gerekmektedir.<p>API
+    anahtarınızı (key) <strong>Verimor Online İşlem Merkezi (OİM)</strong> > <strong>Bulut
+    Santralim</strong> > <strong>Santral Ayarlarım</strong> menüsü altından öğrenebilirsiniz.<h3>Temel
+    Yetenekler</h3><h4>Çağrı Yönetimi</h4><ul><li><strong>Çağrı Başlatma (Click-to-Call):</strong>
+    Yazılımınız üzerinden tek bir tıklama ile dış aramalar başlatın.<li><strong>Gelen
+    Çağrı Bilgisi (Pop-up):</strong> Gelen aramalarda, arayan kişiye ait bilgileri
+    anında kendi yazılımınızın ekranında görüntüleyin.<li><strong>Çağrı Kontrolü:</strong>
+    Aktif çağrıları sonlandırma, sessize alma, bekletme ve başka bir dahiliye veya
+    harici numaraya aktarma (katılımlı/katılımsız) işlemlerini gerçekleştirin.</ul><h4>Veri
+    ve Kayıt Yönetimi</h4><ul><li><strong>Arama Kayıtları (CDR):</strong> Tüm arama
+    geçmişine ve detaylarına (arayan, aranan, süre, durum vb.) anlık olarak erişin.<li><strong>Ses
+    Kayıtları:</strong> Yapılan görüşmelerin ses kayıtlarını listeleyin, dinleyin
+    veya indirin. Google Drive entegrasyonu ile ses kayıtlarınızı kendi bulut depolama
+    alanınızda arşivleyin.</ul><h4>Otomasyon ve IVR</h4><ul><li><strong>Otomatik Arama
+    & IVR Kampanyaları:</strong> Anket, borç hatırlatma, duyuru veya onay alma gibi
+    amaçlarla toplu ve otomatik dış aramalar (IVR) oluşturun ve yönetin.<li><strong>Sesli
+    Mesaj Gönderimi:</strong> Hedef kitlelerinize toplu olarak sesli mesajlar iletin.</ul><h4>Gelişmiş
+    Özellikler</h4><ul><li><strong>Numara Maskeleme:</strong> İki tarafın birbirinin
+    telefon numarasını görmeden güvenli bir şekilde görüşmesini sağlayın. Bu özellik,
+    özellikle hizmet ve pazaryeri platformları için idealdir.<li><strong>Santral Programlama:</strong>
+    Dahili ve kuyruk ayarları gibi temel santral konfigürasyonlarını API üzerinden
+    yönetin.<li><strong>Text-to-Speech (TTS) ve Speech-to-Text (STT):</strong> Yazı
+    metinlerini sese dönüştürerek dinamik anonslar oluşturun veya müşterilerden gelen
+    sesli komutları metne çevirerek yazılımınıza aktarın.</ul><p>Bu API, HTTP GET/POST
+    istekleri ile kolayca kullanılabilir ve JSON formatında yanıtlar döner. Detaylı
+    bilgi ve endpoint dokümantasyonu için ilgili bölümleri inceleyebilirsiniz.</div>"
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: key
+      in: query
+paths:
+  "/originate":
+    get:
+      summary: Bir çağrı başlat
+      tags:
+      - Çağrı
+      description: Geçersiz istek. Gerekli bir parametre eksik veya geçersiz olabilir
+        (örneğin, eksik dahili numara, geçersiz hedef).
+      parameters:
+      - name: extension
+        in: query
+        required: true
+        description: Aramanın bağlanacağı dahili numaradır.
+        example: '1001'
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        description: Aranacak olan numara (yurtiçi çağrılar için 908505320000, yurtdışı
+          çağrılar için 00493027590915 formatında olmalı).
+        example: '908505320000'
+        schema:
+          type: string
+      - name: caller_id
+        in: query
+        required: false
+        description: " Aramada kullanılacak olan dış numara (908505320000 formatında
+          olmalı. Bu parametre verilmezse dahilide seçili olan dış no kullanılacaktır)."
+        example: '23123'
+        schema:
+          type: string
+      - name: manual_answer
+        in: query
+        required: false
+        description: Değeri true olarak gönderilirse dahilinin telefonu açmasını bekler
+          (Normalde otomatik olarak dahili açılır ve karşı numara aranır).
+        schema:
+          type: boolean
+      - name: timeout
+        in: query
+        required: false
+        description: Opsiyonel. Telefon çaldırma süresidir. 10 ile 60 sn. arasında
+          bir değer olmalı. Varsayılan 30'dur.
+        example: 30
+        schema:
+          type: integer
+      - name: announcement_to_caller
+        in: query
+        required: false
+        description: Opsiyonel. Cevaplanma anında aranan tarafa bu anons dinletilir.
+          Ses dosyası ID’lerinizi API ile veya Online İşlem Merkezi üzerinden görebilirsiniz.
+        schema:
+          type: integer
+      - name: announcement_to_callee
+        in: query
+        required: false
+        description: Opsiyonel. Cevaplanma anında arayan tarafa bu anons dinletilir.
+          Ses dosyası ID’lerinizi API ile veya Online İşlem Merkezi üzerinden görebilirsiniz.
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: başarılı
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        '400':
+          description: hatalı istek
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: dahili numara gerekli
+    post:
+      summary: Originate a call (POST)
+      tags:
+      - Çağrı
+      description: Invalid request. A required parameter might be missing or invalid.
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+        '400':
+          description: bad request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                extension:
+                  type: string
+                  example: '1001'
+                destination:
+                  type: string
+                  example: '908505320000'
+                caller_id:
+                  type: string
+                  example: '908505320000'
+                manual_answer:
+                  type: boolean
+                  example: false
+                timeout:
+                  type: integer
+                  example: 30
+                announcement_to_caller:
+                  type: integer
+                announcement_to_callee:
+                  type: integer
+              required:
+              - extension
+              - destination
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                extension:
+                  type: string
+                  example: '1001'
+                destination:
+                  type: string
+                  example: '908505320000'
+                caller_id:
+                  type: string
+                  example: '908505320000'
+                manual_answer:
+                  type: boolean
+                  example: false
+                timeout:
+                  type: integer
+                  example: 30
+                announcement_to_caller:
+                  type: integer
+                announcement_to_callee:
+                  type: integer
+              required:
+              - extension
+              - destination
+security:
+- api_key: []
+servers:
+- url: http://dev.switch.com:3003
