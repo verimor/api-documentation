@@ -205,17 +205,17 @@ paths:
                 MISSING_MESSAGE:
                   value: Eksik Mesaj
                 MISSING_DESTINATION_ADDRESS:
-                  value: Eksik Mesaj
+                  value: Hedef Numara Eksik
                 INVALID_JSON:
-                  value: Eksik Mesaj
+                  value: Geçersiz JSON
                 MESSAGE_COUNT_LIMIT_EXCEEDED:
-                  value: Eksik Mesaj
+                  value: Mesaj sayısı limiti aşıldı
                 INVALID_DATACODING:
-                  value: Eksik Mesaj
+                  value: Geçersiz veri kodlaması
                 INVALID_DELIVERY_TIME:
-                  value: Eksik Mesaj
+                  value: Geçersiz gönderim zamanı
                 INVALID_UTF8:
-                  value: Eksik Mesaj
+                  value: Geçersiz UTF-8
               schema:
                 type: string
         '401':
@@ -224,7 +224,7 @@ paths:
             text/plain:
               examples:
                 INVALID_UTF8:
-                  value: Eksik Mesaj
+                  value: Geçersiz UTF-8
               schema:
                 type: string
         '403':
@@ -633,13 +633,10 @@ paths:
                   properties:
                     campaign_id:
                       type: integer
-                      example: 1213
                     campaign_custom_id:
                       type: string
-                      example: 1213
                     message_id:
                       type: integer
-                      example: 1213
                     message_custom_id:
                       type: string
                     dest:
@@ -662,15 +659,28 @@ paths:
                       type: string
                       format: date_time
                       nullable: true
+                example:
+                - campaign_id: 25388
+                  campaign_custom_id: 
+                  message_id: 23009861
+                  message_custom_id: 
+                  dest: '905539235763'
+                  size: 1
+                  international_multiplier: 1
+                  credits: 1
+                  status: EXPIRED
+                  gsm_error: 
+                  sent_at: 
+                  done_at: '2025-03-19T15:27:37.348+03:00'
         '400':
-          description: Başarısız istek
+          description: Bad Request
           content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+            text/plain:
+              examples:
+                INVALID_PARAMETER_GREATER_THAN:
+                  value: 'greater_than parametresi anlasilamadi: -87444'
+                INVALID_PARAMETER_DEST:
+                  value: 'dest parametresi anlasilamadi: 21255599'
         '401':
           description: Unauthorized
           content:
@@ -678,6 +688,11 @@ paths:
               examples:
                 UNAUTHORIZED:
                   value: Geçersiz kullanıcı adı/şifre
+        '403':
+          description: Forbidden
+          content:
+            text/plain:
+              examples:
                 FORBIDDEN:
                   value: Bu kampanya size ait değil
         '404':
@@ -747,13 +762,10 @@ paths:
                   properties:
                     campaign_id:
                       type: integer
-                      example: 1213
                     campaign_custom_id:
                       type: string
-                      example: 1213
                     message_id:
                       type: integer
-                      example: 1213
                     message_custom_id:
                       type: string
                     dest:
@@ -776,13 +788,28 @@ paths:
                       type: string
                       format: date_time
                       nullable: true
+                example:
+                - campaign_id: 25388
+                  campaign_custom_id: 
+                  message_id: 23009861
+                  message_custom_id: 
+                  dest: '905539235763'
+                  size: 1
+                  international_multiplier: 1
+                  credits: 1
+                  status: EXPIRED
+                  gsm_error: 
+                  sent_at: 
+                  done_at: '2025-03-19T15:27:37.348+03:00'
         '400':
-          description: Başarısız istek
+          description: Bad Request
           content:
-            application/json:
-              schema:
-                type: string
-                example: Geçersiz parametreler
+            text/plain:
+              examples:
+                INVALID_PARAMETER_GREATER_THAN:
+                  value: 'greater_than parametresi anlasilamadi: -87444'
+                INVALID_PARAMETER_DEST:
+                  value: 'dest parametresi anlasilamadi: 21255599'
         '401':
           description: Unauthorized
           content:
@@ -790,6 +817,11 @@ paths:
               examples:
                 UNAUTHORIZED:
                   value: Geçersiz kullanıcı adı/şifre
+        '403':
+          description: Forbidden
+          content:
+            text/plain:
+              examples:
                 FORBIDDEN:
                   value: Bu kampanya size ait değil
         '404':
