@@ -378,16 +378,16 @@ paths:
           description: başarılı
           content:
             text/plain:
-              schema:
-                type: string
-                example: '100'
+              examples:
+                SUCCESS:
+                  value: 100
         '401':
           description: Unauthorized access
           content:
             text/plain:
-              schema:
-                type: string
-                example: Geçersiz kullanıcı adı veya şifre
+              examples:
+                INVALID_CREDENTIALS:
+                  value: Geçersiz kullanıcı adı veya şifre
   "/v2/blacklists":
     get:
       summary: Karalistedeki Numaraların Alımı
@@ -1271,4 +1271,3 @@ paths:
                   value: İYS Modülü Tanımlı Değil
 servers:
 - url: https://sms.verimor.com.tr
-- url: http://dev.smsapi.com:3002/
