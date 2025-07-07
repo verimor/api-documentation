@@ -42,6 +42,666 @@ components:
       name: key
       in: query
 paths:
+  "/agent_statuses":
+    get:
+      summary: List agent statuses with filtering
+      tags:
+      - Agent Statuses
+      description: Retrieves real-time status information for call center agents.
+        Requires callcenter module to be enabled for the domain. Provides filtering
+        by agent number, queue, and status.
+      operationId: listAgentStatuses
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: agent
+        in: query
+        required: false
+        description: Filter by agent number (partial match supported)
+        schema:
+          type: string
+      - name: queue
+        in: query
+        required: false
+        description: Filter by queue number (partial match supported)
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        description: "Filter by agent status:\n * `AVAILABLE` \n * `TALKING` \n *
+          `LOGGED_OUT` \n * `ON_BREAK` \n "
+        enum:
+        - AVAILABLE
+        - TALKING
+        - LOGGED_OUT
+        - ON_BREAK
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Filtered agent statuses
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                  - agent: '1001'
+                    queues:
+                    - '200'
+                    - '201'
+                    status: AVAILABLE
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    agent:
+                      type: string
+                      description: Agent number (user number)
+                    queues:
+                      type: array
+                      items:
+                        type: string
+                      description: List of queue numbers this agent belongs to
+                    status:
+                      type: string
+                      enum:
+                      - AVAILABLE
+                      - TALKING
+                      - LOGGED_OUT
+                      - ON_BREAK
+                      description: Current agent status from Redis
+                    break_description:
+                      type: string
+                      description: Break reason description (only present when status
+                        is ON_BREAK)
+                  required:
+                  - agent
+                  - queues
+                  - status
+        '400':
+          description: Bad request - Module not enabled or invalid status
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: invalid status
+            application/json:
+              schema:
+                type: string
+                description: Error message describing the failure
+  "/announcements":
+    get:
+      summary: Get list of announcements
+      tags:
+      - Announcements
+      description: Retrieves a list of all announcements (audio files) available in
+        the domain
+      operationId: getAnnouncements
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Announcements retrieved successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Announcements list:
+                      value:
+                      - id: 1
+                        name: Welcome Message
+                      - id: 2
+                        name: Hold Music
+                      - id: 3
+                        name: Queue Announcement
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: Announcement ID
+                    name:
+                      type: string
+                      description: Announcement name
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Authentication error message
+    post:
+      summary: Create a new announcement
+      tags:
+      - Announcements
+      description: Creates a new announcement by uploading an audio file
+      operationId: createAnnouncement
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Announcement created successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Announcement created:
+                      value: '123'
+              schema:
+                type: string
+                description: Created announcement ID
+        '400':
+          description: Bad request - validation error or plan limit reached
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Missing required fields:
+                      value: Name can't be blank
+              schema:
+                type: string
+                description: Error message describing the validation failure
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Authentication error message
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: string
+        required: true
+        description: Announcement name
+  "/announcements/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Announcement ID
+      required: true
+      schema:
+        type: string
+    patch:
+      summary: Update an existing announcement
+      tags:
+      - Announcements
+      description: Updates an existing announcement name and/or audio file
+      operationId: updateAnnouncement
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Announcement updated successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Announcement updated:
+                      value: OK
+              schema:
+                type: string
+                description: Success message
+        '400':
+          description: Bad request - validation error or announcement not found
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Validation error:
+                      value: Name can't be blank
+              schema:
+                type: string
+                description: Error message describing the failure
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Authentication error message
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: string
+        description: New announcement name
+    delete:
+      summary: Delete an announcement
+      tags:
+      - Announcements
+      description: Deletes an existing announcement from the domain
+      operationId: deleteAnnouncement
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Announcement deleted successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Announcement deleted:
+                      value: OK
+              schema:
+                type: string
+                description: Success message
+        '400':
+          description: Bad request - announcement not found or deletion failed
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Deletion failed:
+                      value: Cannot delete announcement that is currently in use
+              schema:
+                type: string
+                description: Error message describing the failure
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Authentication error message
+  "/blocked_numbers":
+    get:
+      summary: List blocked numbers
+      tags:
+      - Blocked Numbers
+      description: Retrieves a paginated list of blocked numbers for the domain
+      operationId: listBlockedNumbers
+      parameters:
+      - name: page
+        in: query
+        required: false
+        description: Page number for pagination (defaults to 1)
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: Number of records per page (must be within configured min/max
+          limits)
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Blocked numbers retrieved successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    blocked_numbers:
+                    - id: 1
+                      number: '905551234567'
+                    - id: 2
+                      number: '905559876543'
+                    - id: 3
+                      number: '90212555000'
+                    pagination:
+                      page: 1
+                      total_count: 25
+                      total_pages: 3
+                      limit: 10
+              schema:
+                type: object
+                properties:
+                  blocked_numbers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: Unique identifier of the blocked number entry
+                        number:
+                          type: string
+                          description: Normalized phone number that is blocked
+                      required:
+                      - id
+                      - number
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        description: Current page number
+                      total_count:
+                        type: integer
+                        description: Total number of blocked numbers
+                      total_pages:
+                        type: integer
+                        description: Total number of pages
+                      limit:
+                        type: integer
+                        description: Number of records per page
+                    required:
+                    - page
+                    - total_count
+                    - total_pages
+                    - limit
+                required:
+                - blocked_numbers
+                - pagination
+        '400':
+          description: Bad request - Invalid pagination parameters
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'invalid limit: 1000'
+            application/json:
+              schema:
+                type: string
+    post:
+      summary: Add number to blocked list
+      tags:
+      - Blocked Numbers
+      description: Adds a phone number to the blocked numbers list. The number will
+        be normalized before storage.
+      operationId: createBlockedNumber
+      parameters:
+      - name: number
+        in: query
+        required: true
+        description: Phone number to block (will be normalized)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Number added to blocked list successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: '42'
+              schema:
+                type: string
+                description: ID of the created blocked number entry
+        '400':
+          description: Bad request - Invalid or missing number, or number already
+            blocked
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: Number has already been taken
+              schema:
+                type: string
+    delete:
+      summary: Remove number from blocked list
+      tags:
+      - Blocked Numbers
+      description: Removes a phone number from the blocked numbers list. The number
+        will be normalized before lookup.
+      operationId: deleteBlockedNumber
+      parameters:
+      - name: number
+        in: query
+        required: true
+        description: Phone number to unblock (will be normalized)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Number removed from blocked list successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: OK
+              schema:
+                type: string
+                description: Success message
+        '400':
+          description: Bad request - Invalid, missing, or not blocked number
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 905559998888 is not in blocked numbers
+              schema:
+                type: string
+  "/bridges":
+    post:
+      summary: Create a bridge connection between two phone numbers
+      tags:
+      - Bridges
+      description: Creates a bridge connection between source and destination phone
+        numbers with optional announcements and recording
+      operationId: createBridge
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: source
+        in: query
+        required: true
+        description: Source phone number to bridge from
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        description: Destination phone number to bridge to
+        schema:
+          type: string
+      - name: caller_id
+        in: query
+        required: false
+        description: Caller ID to display (must be authorized for domain)
+        schema:
+          type: string
+      - name: timeout
+        in: query
+        required: false
+        description: 'Call timeout in seconds (10-60, default: 29)'
+        schema:
+          type: integer
+      - name: announcement_to_caller
+        in: query
+        required: false
+        description: Announcement ID to play to caller
+        schema:
+          type: string
+      - name: announcement_to_callee
+        in: query
+        required: false
+        description: Announcement ID to play to callee
+        schema:
+          type: string
+      - name: recording_enabled
+        in: query
+        required: false
+        description: Enable call recording (true/false, default based on domain settings)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Bridge created successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Successful bridge creation:
+                      value: bridge_id_12345
+            text/plain:
+              schema:
+                type: string
+                description: Bridge ID or success message
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Invalid caller ID:
+                      value: 'invalid caller_id: unauthorized_number'
+            text/plain:
+              schema:
+                type: string
+                description: Error message describing the validation failure
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Authentication error message
+  "/call_transfer":
+    post:
+      summary: Transfer an active call to another user
+      tags:
+      - Call Transfer
+      description: Transfers an active call identified by call UUID to another user
+        within the same domain
+      operationId: transferCall
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: id
+        in: query
+        required: true
+        description: Call UUID to transfer
+        schema:
+          type: string
+      - name: user_number
+        in: query
+        required: true
+        description: Target user number to transfer the call to (must be a valid user
+          in the domain)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Call transferred successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Successfully transferred call:
+                      value: Call transferred successfully to user 1001
+                    Transfer completed:
+                      value: Transfer operation completed
+            text/plain:
+              schema:
+                type: string
+                description: Success message or transfer result
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Transfer failed:
+                      value: Transfer failed - user busy or unavailable
+            text/plain:
+              schema:
+                type: string
+                description: Error message describing the validation failure
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Authentication error message
+  "/caller_ids":
+    get:
+      summary: Get list of available Caller IDs
+      tags:
+      - Caller IDs
+      description: Retrieves a list of all available Caller ID numbers for the domain.
+        Includes numbers from Bulutsantralim authentications and SIP trunks (if SIP
+        trunk module is available).
+      operationId: getCallerIds
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Caller IDs retrieved successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Caller IDs list:
+                      value:
+                      - "+905551234567"
+                      - "+905559876543"
+                      - "+905551111111"
+                      - "+905552222222"
+                    Empty caller IDs list:
+                      value: []
+                    Single caller ID:
+                      value:
+                      - "+905551234567"
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Caller ID number
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Authentication error message
   "/originate":
     get:
       summary: Bir çağrı başlat
@@ -118,7 +778,7 @@ paths:
                 type: string
                 example: dahili numara gerekli
     post:
-      summary: Originate a call (POST)
+      summary: Bir Çağrı Başlat (POST)
       tags:
       - Çağrı
       description: Invalid request. A required parameter might be missing or invalid.
@@ -184,6 +844,2977 @@ paths:
               required:
               - extension
               - destination
+  "/hangup/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Call UUID to hangup
+      required: true
+      schema:
+        type: string
+    delete:
+      summary: Hangup an active call
+      tags:
+      - Çağrı
+      description: Aktif bir çağrıyı sonlandırmak için kullanılır. Call UUID kullanarak
+        çağrıyı kapatır.
+      operationId: hangupCall
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Call hung up successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Call terminated successfully:
+                      value: Call terminated
+                    Call ended:
+                      value: OK
+              schema:
+                type: string
+                description: Success message or operation result
+        '400':
+          description: Bad request - hangup failed
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Call not found:
+                      value: Call not found or already ended
+              schema:
+                type: string
+                description: Error message when hangup operation fails
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Authentication error message
+  "/cdrs":
+    get:
+      summary: Get list of Call Detail Records (CDRs)
+      tags:
+      - CDRs (Call Detail Records)
+      description: Retrieves a paginated list of Call Detail Records with various
+        filtering options
+      operationId: getCdrs
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: start_stamp_from
+        in: query
+        required: false
+        description: Start date/time filter (ISO format)
+        schema:
+          type: string
+      - name: start_stamp_to
+        in: query
+        required: false
+        description: End date/time filter (ISO format)
+        schema:
+          type: string
+      - name: recording_present
+        in: query
+        required: false
+        description: "Filter by recording presence:\n * `true` \n * `false` \n * `deleted`
+          \n "
+        enum:
+        - 'true'
+        - 'false'
+        - deleted
+        schema:
+          type: string
+      - name: direction
+        in: query
+        required: false
+        description: Call direction filter
+        enum:
+        - inbound
+        - outbound
+        - internal
+        schema:
+          type: string
+      - name: caller_id_number
+        in: query
+        required: false
+        description: Filter by caller ID number
+        schema:
+          type: string
+      - name: destination_number
+        in: query
+        required: false
+        description: Filter by destination number
+        schema:
+          type: string
+      - name: missed
+        in: query
+        required: false
+        description: Filter by missed calls
+        enum:
+        - 'true'
+        - 'false'
+        schema:
+          type: string
+      - name: queue
+        in: query
+        required: false
+        description: Filter by queue name
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Page number for pagination (default: 1)'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: Number of records per page
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: CDRs retrieved successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    CDRs list with pagination:
+                      value:
+                        cdrs:
+                        - start_stamp: '2025-01-01 10:30:15'
+                          direction: Gelen
+                          caller_id_number: "+905551234567"
+                          caller_id_name: John Doe
+                          destination_number: '1001'
+                          destination_name: Extension 1001
+                          duration: '00:05:30'
+                          talk_duration: '00:05:10'
+                          queue_wait_seconds: '00:00:20'
+                          queue: support
+                          result: Cevaplandı
+                          missed: false
+                          return_uuid: return-uuid-123
+                          recording_present: Var
+                          sip_hangup_disposition: Normal
+                          call_uuid: call-uuid-12345
+                          answer_stamp: '2025-01-01 10:30:35'
+                          end_stamp: '2025-01-01 10:35:45'
+                        pagination:
+                          page: 1
+                          total_count: 150
+                          total_pages: 3
+                          limit: 50
+              schema:
+                type: object
+                properties:
+                  cdrs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start_stamp:
+                          type: string
+                          description: Call start timestamp
+                        direction:
+                          type: string
+                          description: Call direction (human readable)
+                        caller_id_number:
+                          type: string
+                          description: Caller ID number
+                        caller_id_name:
+                          type: string
+                          description: Caller ID name
+                        destination_number:
+                          type: string
+                          description: Filter by destination number
+                        destination_name:
+                          type: string
+                          description: Destination name
+                        duration:
+                          type: string
+                          description: Call duration (HH:MM:SS)
+                        talk_duration:
+                          type: string
+                          description: Talk duration (HH:MM:SS)
+                        queue_wait_seconds:
+                          type: string
+                          description: Queue wait time (HH:MM:SS)
+                        queue:
+                          type: string
+                          description: Queue number
+                        result:
+                          type: string
+                          description: Human-readable call result in Turkish
+                          enum:
+                          - Meşgul
+                          - Vazgeçildi
+                          - Cevapsız
+                          - Cevaplandı
+                          - Reddedildi
+                          - Ses kodekleri uyumsuz
+                          - Hatalı Numara
+                          - Ulaşılamıyor
+                          - İYS izni yok
+                          - Hata
+                          - Genel Hata
+                          - Cihaz yönlendirmesi
+                          - Çağrı bağlanamadı
+                          - RTP zamanaşımı
+                          - Santral kapatılıyor
+                          - Katılımlı aktarım
+                          - Çağrısı çekildi
+                          - Cihazla iletişim sorunu
+                          - İletişim sorunu
+                          - Zamanaşımı
+                          - Sesli görüşme yapamayan numara
+                          - Diğer dahili cevapladı
+                          - Desteklenmeyen kanal tipi
+                          - Arama için santral uygun durumda değil
+                          - Tanınmayan Çağrı ID numarası
+                          - Geçersiz JSON kullanımı
+                        missed:
+                          type: boolean
+                          description: Whether call was missed
+                        return_uuid:
+                          type: string
+                          description: Return UUID
+                        recording_present:
+                          type: string
+                          description: Recording presence status
+                        sip_hangup_disposition:
+                          type: string
+                          description: SIP hangup disposition
+                        hangup_cause:
+                          type: string
+                          description: SIP hangup cause code
+                          enum:
+                          - USER_BUSY
+                          - ORIGINATOR_CANCEL
+                          - NO_ANSWER
+                          - NORMAL_CLEARING
+                          - CALL_REJECTED
+                          - INCOMPATIBLE_DESTINATION
+                          - INCOMING_CALL_BARRED
+                          - UNALLOCATED_NUMBER
+                          - NO_ROUTE_DESTINATION
+                          - NO_USER_RESPONSE
+                          - NORMAL_UNSPECIFIED
+                          - INVALID_NUMBER_FORMAT
+                          - NOT_ALLOWED_BY_IYS
+                          - FACILITY_REJECTED
+                          - SERVICE_NOT_IMPLEMENTED
+                          - FACILITY_NOT_IMPLEMENTED
+                          - SERVICE_UNAVAILABLE
+                          - INTERWORKING
+                          - REDIRECTION_TO_NEW_DESTINATION
+                          - EXCHANGE_ROUTING_ERROR
+                          - MEDIA_TIMEOUT
+                          - SYSTEM_SHUTDOWN
+                          - ATTENDED_TRANSFER
+                          - PICKED_OFF
+                          - DESTINATION_OUT_OF_ORDER
+                          - NORMAL_TEMPORARY_FAILURE
+                          - NETWORK_OUT_OF_ORDER
+                          - RECOVERY_ON_TIMER_EXPIRE
+                          - ALLOTTED_TIMEOUT
+                          - BEARERCAPABILITY_NOTIMPL
+                          - LOSE_RACE
+                          - CHAN_NOT_IMPLEMENTED
+                          - NORMAL_CIRCUIT_CONGESTION
+                          - INVALID_CALL_REFERENCE
+                        call_uuid:
+                          type: string
+                          description: Call UUID
+                        answer_stamp:
+                          type: string
+                          description: Call answer timestamp
+                          nullable: true
+                        end_stamp:
+                          type: string
+                          description: Call end timestamp
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        description: Current page number
+                      total_count:
+                        type: integer
+                        description: Total number of records
+                      total_pages:
+                        type: integer
+                        description: Total number of pages
+                      limit:
+                        type: integer
+                        description: Records per page
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Invalid recording_present:
+                      value: 'invalid recording_present : invalid_value'
+              schema:
+                type: string
+                description: Error message describing the validation failure
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Authentication error message
+  "/cdrs/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Call UUID
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Get detailed Call Detail Record by Call UUID
+      tags:
+      - CDRs (Call Detail Records)
+      description: Retrieves detailed information about a specific call including
+        call flow details
+      operationId: getCdr
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: CDR details retrieved successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    CDR details with call flow:
+                      value:
+                        cdr:
+                          direction: Gelen
+                          caller_id_number: "+905551234567"
+                          destination_number: '1001'
+                          result: Cevaplandı
+                          sip_hangup_disposition: Normal
+                          missed: false
+                          return_uuid: return-uuid-123
+                          call_uuid: call-uuid-12345-67890
+                          start_stamp: '2025-01-01 10:30:15'
+                          answer_stamp: '2025-01-01 10:30:35'
+                          end_stamp: '2025-01-01 10:35:45'
+                          duration: '00:05:30'
+                          talk_duration: '00:05:10'
+                          queue_wait_seconds: '00:00:20'
+                          recording_present: Var
+                        call_flow:
+                        - destination_number: '1001'
+                          start_stamp: '2025-01-01 10:30:15'
+                          answer_stamp: '2025-01-01 10:30:35'
+                          end_stamp: '2025-01-01 10:35:45'
+                          duration: '00:05:30'
+                          ip_address: 192.168.1.100
+                          sip_user_agent: Yealink T46G
+                          write_codec: PCMU
+                          read_codec: PCMU
+                          result: Cevaplandı
+              schema:
+                type: object
+                properties:
+                  cdr:
+                    type: object
+                    properties:
+                      direction:
+                        type: string
+                        description: Call direction (human readable)
+                      caller_id_number:
+                        type: string
+                        description: Caller ID number
+                      destination_number:
+                        type: string
+                        description: Destination number
+                      result:
+                        type: string
+                        description: Call result (human readable)
+                      sip_hangup_disposition:
+                        type: string
+                        description: SIP hangup disposition
+                      missed:
+                        type: boolean
+                        description: Whether call was missed
+                      return_uuid:
+                        type: string
+                        description: Return UUID
+                      call_uuid:
+                        type: string
+                        description: Call UUID
+                      start_stamp:
+                        type: string
+                        description: Call start timestamp
+                      answer_stamp:
+                        type: string
+                        description: Call answer timestamp
+                        nullable: true
+                      end_stamp:
+                        type: string
+                        description: Call end timestamp
+                      duration:
+                        type: string
+                        description: Call duration (HH:MM:SS)
+                      talk_duration:
+                        type: string
+                        description: Talk duration (HH:MM:SS)
+                      queue_wait_seconds:
+                        type: string
+                        description: Queue wait time (HH:MM:SS)
+                      recording_present:
+                        type: string
+                        description: Recording presence status
+                  call_flow:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        destination_number:
+                          type: string
+                          description: Destination number for this leg
+                        start_stamp:
+                          type: string
+                          description: Start timestamp for this leg
+                        answer_stamp:
+                          type: string
+                          description: Answer timestamp for this leg
+                          nullable: true
+                        end_stamp:
+                          type: string
+                          description: End timestamp for this leg
+                        duration:
+                          type: string
+                          description: Duration for this leg (HH:MM:SS)
+                        ip_address:
+                          type: string
+                          description: IP address used
+                        sip_user_agent:
+                          type: string
+                          description: SIP User Agent
+                        write_codec:
+                          type: string
+                          description: Write codec used
+                        read_codec:
+                          type: string
+                          description: Read codec used
+                        result:
+                          type: string
+                          description: Result for this leg
+        '400':
+          description: CDR not found
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    CDR not found:
+                      value: Couldn't find cdr that you was requested
+              schema:
+                type: string
+                description: Error message when CDR cannot be found
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Authentication error message
+  "/contact_groups":
+    get:
+      summary: List contact groups
+      tags:
+      - Contact Groups
+      description: Retrieves all contact groups for the domain account
+      operationId: listContactGroups
+      responses:
+        '200':
+          description: Contact groups retrieved successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                  - id: 1
+                    name: VIP Customers
+                  - id: 2
+                    name: Support Team
+                  - id: 3
+                    name: Sales Prospects
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: Unique identifier of the contact group
+                    name:
+                      type: string
+                      description: Name of the contact group
+                  required:
+                  - id
+                  - name
+    post:
+      summary: Create a new contact group
+      tags:
+      - Contact Groups
+      description: Creates a new contact group. Requires Google Contacts integration
+        to be disabled.
+      operationId: createContactGroup
+      parameters:
+      - name: name
+        in: query
+        required: true
+        description: Name of the contact group to create
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Contact group created successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: '42'
+              schema:
+                type: string
+                description: ID of the created contact group
+        '400':
+          description: Bad request - Validation error or Google Contacts integration
+            active
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: Name can't be blank
+              schema:
+                type: string
+  "/contact_groups/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: ID of the contact group
+      schema:
+        type: integer
+    patch:
+      summary: Update contact group
+      tags:
+      - Contact Groups
+      description: Updates an existing contact group. Requires Google Contacts integration
+        to be disabled.
+      operationId: updateContactGroup
+      parameters:
+      - name: name
+        in: query
+        required: true
+        description: New name for the contact group
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Contact group updated successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: OK
+              schema:
+                type: string
+                description: Success message
+        '400':
+          description: Bad request - Group not found, validation error, or Google
+            Contacts integration active
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: Name can't be blank
+              schema:
+                type: string
+    delete:
+      summary: Delete contact group
+      tags:
+      - Contact Groups
+      description: Deletes an existing contact group. Requires Google Contacts integration
+        to be disabled.
+      operationId: deleteContactGroup
+      responses:
+        '200':
+          description: Contact group deleted successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: OK
+              schema:
+                type: string
+                description: Success message
+        '400':
+          description: Bad request - Group not found, deletion error, or Google Contacts
+            integration active
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: Cannot delete group with associated contacts
+              schema:
+                type: string
+  "/contacts":
+    get:
+      summary: List contacts
+      tags:
+      - Contacts
+      description: Retrieves a paginated list of contacts for the domain account
+      operationId: listContacts
+      parameters:
+      - name: page
+        in: query
+        required: false
+        description: Page number for pagination (defaults to 1)
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: Number of records per page (must be within configured min/max
+          limits)
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Contacts retrieved successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    contacts:
+                    - id: 1
+                      name: John
+                      surname: Doe
+                      tckn: '12345678901'
+                      description: VIP Customer
+                      phone: '5551234567'
+                      phone1: '5559876543'
+                      email: john.doe@example.com
+                      title: CEO
+                      phone2: '5555555555'
+                      fax: '2121234567'
+                      gender: Male
+                      birthday: '1980-01-15'
+                      birthday_sms: true
+                      weddingday: '2010-06-20'
+                      weddingday_sms: true
+                      note1: Important client
+                      note2: Prefers email contact
+                      note3: Morning meetings only
+                      note4: Annual contract renewal
+                      company_name: Acme Corp
+                      monthly_sms_day: 1
+                      monthly_sms_message: Monthly newsletter
+                      group_ids:
+                      - 1
+                      - 3
+                    pagination:
+                      page: 1
+                      total_count: 150
+                      total_pages: 15
+                      limit: 10
+              schema:
+                type: object
+                properties:
+                  contacts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: Unique identifier of the contact
+                        name:
+                          type: string
+                          description: First name of the contact
+                        surname:
+                          type: string
+                          description: Last name of the contact
+                        tckn:
+                          type: string
+                          description: Turkish national ID number
+                        description:
+                          type: string
+                          description: Contact description
+                        phone:
+                          type: string
+                          description: Primary phone number
+                        phone1:
+                          type: string
+                          description: Secondary phone number
+                        email:
+                          type: string
+                          description: Email address
+                        title:
+                          type: string
+                          description: Job title
+                        phone2:
+                          type: string
+                          description: Third phone number
+                        fax:
+                          type: string
+                          description: Fax number
+                        gender:
+                          type: string
+                          description: Gender (human readable)
+                        birthday:
+                          type: string
+                          format: date
+                          description: Birthday date
+                        birthday_sms:
+                          type: boolean
+                          description: Send birthday SMS reminder
+                        weddingday:
+                          type: string
+                          format: date
+                          description: Wedding anniversary date
+                        weddingday_sms:
+                          type: boolean
+                          description: Send wedding anniversary SMS reminder
+                        note1:
+                          type: string
+                          description: First note field
+                        note2:
+                          type: string
+                          description: Second note field
+                        note3:
+                          type: string
+                          description: Third note field
+                        note4:
+                          type: string
+                          description: Fourth note field
+                        company_name:
+                          type: string
+                          description: Company name
+                        monthly_sms_day:
+                          type: integer
+                          description: Day of month for monthly SMS
+                        monthly_sms_message:
+                          type: string
+                          description: Monthly SMS message text
+                        group_ids:
+                          type: array
+                          items:
+                            type: integer
+                          description: Array of contact group IDs
+                      required:
+                      - id
+                      - name
+                      - surname
+                      - phone
+                      - email
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        description: Current page number
+                      total_count:
+                        type: integer
+                        description: Total number of contacts
+                      total_pages:
+                        type: integer
+                        description: Total number of pages
+                      limit:
+                        type: integer
+                        description: Number of records per page
+                    required:
+                    - page
+                    - total_count
+                    - total_pages
+                    - limit
+                required:
+                - contacts
+                - pagination
+        '400':
+          description: Bad request - Invalid pagination parameters
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'invalid limit: 1000'
+            application/json:
+              schema:
+                type: string
+    post:
+      summary: Create a new contact
+      tags:
+      - Contacts
+      description: Creates a new contact. Requires Google Contacts integration to
+        be disabled.
+      operationId: createContact
+      parameters:
+      - name: salutation
+        in: query
+        required: false
+        description: Salutation (Mr., Mrs., etc.)
+        schema:
+          type: string
+      - name: name
+        in: query
+        required: true
+        description: First name of the contact
+        schema:
+          type: string
+      - name: surname
+        in: query
+        required: true
+        description: Last name of the contact
+        schema:
+          type: string
+      - name: tckn
+        in: query
+        required: false
+        description: Turkish national ID number
+        schema:
+          type: string
+      - name: description
+        in: query
+        required: false
+        description: Contact description
+        schema:
+          type: string
+      - name: phone
+        in: query
+        required: true
+        description: Primary phone number
+        schema:
+          type: string
+      - name: phone1
+        in: query
+        required: false
+        description: Secondary phone number
+        schema:
+          type: string
+      - name: email
+        in: query
+        required: false
+        description: Email address
+        schema:
+          type: string
+      - name: title
+        in: query
+        required: false
+        description: Job title
+        schema:
+          type: string
+      - name: phone2
+        in: query
+        required: false
+        description: Third phone number
+        schema:
+          type: string
+      - name: fax
+        in: query
+        required: false
+        description: Fax number
+        schema:
+          type: string
+      - name: gender
+        in: query
+        required: false
+        description: Gender
+        schema:
+          type: string
+      - name: birthday
+        in: query
+        format: date
+        required: false
+        description: Birthday date
+        schema:
+          type: string
+      - name: birthday_sms
+        in: query
+        required: false
+        description: Send birthday SMS reminder
+        schema:
+          type: boolean
+      - name: weddingday
+        in: query
+        format: date
+        required: false
+        description: Wedding anniversary date
+        schema:
+          type: string
+      - name: weddingday_sms
+        in: query
+        required: false
+        description: Send wedding anniversary SMS reminder
+        schema:
+          type: boolean
+      - name: address
+        in: query
+        required: false
+        description: Contact address
+        schema:
+          type: string
+      - name: note1
+        in: query
+        required: false
+        description: First note field
+        schema:
+          type: string
+      - name: note2
+        in: query
+        required: false
+        description: Second note field
+        schema:
+          type: string
+      - name: note3
+        in: query
+        required: false
+        description: Third note field
+        schema:
+          type: string
+      - name: note4
+        in: query
+        required: false
+        description: Fourth note field
+        schema:
+          type: string
+      - name: company_name
+        in: query
+        required: false
+        description: Company name
+        schema:
+          type: string
+      - name: monthly_sms_day
+        in: query
+        required: false
+        description: Day of month for monthly SMS (1-31)
+        schema:
+          type: integer
+      - name: monthly_sms_message
+        in: query
+        required: false
+        description: Monthly SMS message text
+        schema:
+          type: string
+      - name: group_ids
+        in: query
+        items:
+          type: integer
+        required: false
+        description: Array of contact group IDs to assign contact to
+        schema:
+          type: array
+      responses:
+        '200':
+          description: Contact created successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: '42'
+              schema:
+                type: string
+                description: ID of the created contact
+        '400':
+          description: Bad request - Validation error, invalid group IDs, or Google
+            Contacts integration active
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: Name can't be blank
+              schema:
+                type: string
+  "/contacts/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: ID of the contact
+      schema:
+        type: integer
+    patch:
+      summary: Update contact
+      tags:
+      - Contacts
+      description: Updates an existing contact. Requires Google Contacts integration
+        to be disabled.
+      operationId: updateContact
+      parameters:
+      - name: salutation
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: name
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: surname
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: tckn
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: description
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: phone
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: phone1
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: email
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: title
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: phone2
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: fax
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: gender
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: birthday
+        in: query
+        format: date
+        required: false
+        schema:
+          type: string
+      - name: birthday_sms
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: weddingday
+        in: query
+        format: date
+        required: false
+        schema:
+          type: string
+      - name: weddingday_sms
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: address
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: note1
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: note2
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: note3
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: note4
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: company_name
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: monthly_sms_day
+        in: query
+        required: false
+        schema:
+          type: integer
+      - name: monthly_sms_message
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: group_ids
+        in: query
+        items:
+          type: integer
+        required: false
+        schema:
+          type: array
+      responses:
+        '200':
+          description: Contact updated successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: OK
+              schema:
+                type: string
+                description: Success message
+        '400':
+          description: Bad request - Contact not found, validation error, invalid
+            group IDs, or Google Contacts integration active
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: Email is invalid
+              schema:
+                type: string
+    delete:
+      summary: Delete contact
+      tags:
+      - Contacts
+      description: Deletes an existing contact. Requires Google Contacts integration
+        to be disabled.
+      operationId: deleteContact
+      responses:
+        '200':
+          description: Contact deleted successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: OK
+              schema:
+                type: string
+                description: Success message
+        '400':
+          description: Bad request - Contact not found, deletion error, or Google
+            Contacts integration active
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: Cannot delete contact with active campaigns
+              schema:
+                type: string
+  "/crm_integrations":
+    get:
+      summary: Get CRM integration settings
+      tags:
+      - CRM Integrations
+      description: Retrieves current CRM webhook integration settings for call events
+        (ringing, answered, hangup).
+      operationId: getCrmIntegrations
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: CRM integration settings retrieved successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    CRM integration settings:
+                      value:
+                        ringing: 'on'
+                        answered: 'on'
+                        hangup: 'off'
+                        notification_url: https://crm.example.com/webhook
+              schema:
+                type: object
+                properties:
+                  ringing:
+                    type: string
+                    enum:
+                    - 'on'
+                    - 'off'
+                    description: Webhook notification for ringing events
+                  answered:
+                    type: string
+                    enum:
+                    - 'on'
+                    - 'off'
+                    description: Webhook notification for answered events
+                  hangup:
+                    type: string
+                    enum:
+                    - 'on'
+                    - 'off'
+                    description: Webhook notification for hangup events
+                  notification_url:
+                    type: string
+                    description: Webhook URL for CRM notifications
+                required:
+                - ringing
+                - answered
+                - hangup
+                - notification_url
+    post:
+      summary: Update CRM integration settings
+      tags:
+      - CRM Integrations
+      description: Updates CRM webhook integration settings for call events. Enables
+        or disables notifications for ringing, answered, and hangup events.
+      operationId: updateCrmIntegrations
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: ringing
+        in: query
+        required: false
+        description: "Enable/disable ringing event notifications:\n * `on` \n * `off`
+          \n "
+        enum:
+        - 'on'
+        - 'off'
+        schema:
+          type: string
+      - name: answered
+        in: query
+        required: false
+        description: Enable/disable answered event notifications
+        enum:
+        - 'on'
+        - 'off'
+        schema:
+          type: string
+      - name: hangup
+        in: query
+        required: false
+        description: Enable/disable hangup event notifications
+        enum:
+        - 'on'
+        - 'off'
+        schema:
+          type: string
+      - name: notification_url
+        in: query
+        required: false
+        description: Webhook URL for CRM notifications
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Partial update of CRM settings
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: Ok
+              schema:
+                type: string
+                description: Success confirmation message
+        '400':
+          description: Bad request - Validation error
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: Notification url can't be blank
+              schema:
+                type: string
+                description: Validation error message
+  "/dnds":
+    post:
+      summary: Set Do Not Disturb (DND) state for a user extension
+      tags:
+      - DND (Do Not Disturb)
+      description: Controls the Do Not Disturb state for a user extension. When DND
+        is enabled (on), the user will not receive incoming calls.
+      operationId: createDnd
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: id
+        in: query
+        required: true
+        description: User extension number to set DND state for
+        schema:
+          type: string
+      - name: state
+        in: query
+        required: true
+        description: "DND state: \"on\" to enable DND, \"off\" to disable DND:\n *
+          `on` \n * `off` \n "
+        enum:
+        - 'on'
+        - 'off'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: DND disabled successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    DND enabled successfully:
+                      value: Changed DND of 1001 to on.
+                    DND disabled successfully:
+                      value: Changed DND of 1002 to off.
+            text/plain:
+              schema:
+                type: string
+                description: Success message confirming DND was disabled
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Invalid state value:
+                      value: state should be on or off
+            text/plain:
+              schema:
+                type: string
+                description: Error message describing the validation failure
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Authentication error message
+  "/fax_document_urls":
+    post:
+      summary: Generate temporary download URL for fax document
+      tags:
+      - Fax Document URLs
+      description: Creates a temporary download URL for a successfully transmitted
+        fax document. The URL is valid for 1 hour and provides access to the PDF version
+        of the fax.
+      operationId: createFaxDocumentUrl
+      parameters:
+      - name: call_uuid
+        in: query
+        required: true
+        description: UUID of the fax transmission call to get document for
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Fax document URL generated successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: https://api.example.com/fax_documents/download/F12345678-abcd-1234-efgh-987654321abc
+              schema:
+                type: string
+                description: Temporary download URL for the fax document PDF (valid
+                  for 1 hour)
+        '400':
+          description: Bad request - Invalid or missing parameters
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: fax is unsuccessful, document can not be loaded
+              schema:
+                type: string
+  "/fax_document/{id}":
+    get:
+      summary: Download fax document file
+      tags:
+      - Fax Documents
+      description: Downloads a fax document file using a download ticket code. The
+        document is automatically fetched from FTP if not already cached locally.
+        No authentication required as security is handled via the secure ticket system.
+      operationId: downloadFaxDocument
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Download ticket code for the fax document (typically starts with
+          "F" prefix)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Fax document file downloaded successfully
+          content:
+            application/pdf:
+              examples:
+                example_0:
+                  value:
+                    description: Binary PDF file content
+                    value: "(Binary PDF data)"
+              schema:
+                type: string
+                format: binary
+                description: The fax document file content (PDF or TIFF format)
+            image/tiff:
+              schema:
+                type: string
+                format: binary
+                description: The fax document file content (PDF or TIFF format)
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+                description: The fax document file content (PDF or TIFF format)
+        '400':
+          description: Bad request - Invalid or expired ticket
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: download ticket is expired
+            application/pdf:
+              schema:
+                type: string
+                description: Error message describing the failure
+            image/tiff:
+              schema:
+                type: string
+                description: Error message describing the failure
+            application/octet-stream:
+              schema:
+                type: string
+                description: Error message describing the failure
+        '500':
+          description: Internal server error - FTP or file system error
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: Unable to fetch file from FTP server
+            application/pdf:
+              schema:
+                type: string
+                description: Error message when file cannot be fetched or processed
+            image/tiff:
+              schema:
+                type: string
+                description: Error message when file cannot be fetched or processed
+            application/octet-stream:
+              schema:
+                type: string
+                description: Error message when file cannot be fetched or processed
+  "/fax_orders":
+    get:
+      summary: List fax orders
+      tags:
+      - Fax Orders
+      description: Retrieves a paginated list of incomplete fax orders from the last
+        week
+      operationId: listFaxOrders
+      parameters:
+      - name: page
+        in: query
+        required: false
+        description: Page number for pagination (defaults to 1)
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: Number of records per page (must be within configured min/max
+          limits)
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Fax orders retrieved successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    fax_orders:
+                    - id: 123
+                      created_at: '2024-01-15 14:30:25'
+                      local_station_id: '12345678'
+                      remote_station_id: '905551234567'
+                      status: Processing
+                    - id: 124
+                      created_at: '2024-01-15 13:15:42'
+                      local_station_id: '12345678'
+                      remote_station_id: '905559876543'
+                      status: Queued
+                    pagination:
+                      page: 1
+                      total_count: 15
+                      total_pages: 2
+                      limit: 10
+              schema:
+                type: object
+                properties:
+                  fax_orders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: Unique identifier of the fax order
+                        created_at:
+                          type: string
+                          format: datetime
+                          description: When the fax order was created
+                        local_station_id:
+                          type: string
+                          description: Local fax station identifier
+                        remote_station_id:
+                          type: string
+                          description: Remote fax number to send to
+                        status:
+                          type: string
+                          description: Human-readable status of the fax order
+                      required:
+                      - id
+                      - created_at
+                      - local_station_id
+                      - remote_station_id
+                      - status
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        description: Current page number
+                      total_count:
+                        type: integer
+                        description: Total number of fax orders
+                      total_pages:
+                        type: integer
+                        description: Total number of pages
+                      limit:
+                        type: integer
+                        description: Number of records per page
+                    required:
+                    - page
+                    - total_count
+                    - total_pages
+                    - limit
+                required:
+                - fax_orders
+                - pagination
+        '400':
+          description: Bad request - Invalid pagination parameters
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'invalid limit: 1000'
+            application/json:
+              schema:
+                type: string
+    post:
+      summary: Create a new fax order
+      tags:
+      - Fax Orders
+      description: Creates a new fax order with file data. The file will be processed
+        and queued for transmission via FTP and background job.
+      operationId: createFaxOrder
+      parameters:
+      - name: local_station_id
+        in: query
+        required: false
+        description: Local fax station ID (if not provided, domain default will be
+          used)
+        schema:
+          type: string
+      - name: local_station_header
+        in: query
+        required: false
+        description: Header text to appear on the fax
+        schema:
+          type: string
+      - name: remote_station_id
+        in: query
+        required: true
+        description: Remote fax number to send the fax to
+        schema:
+          type: string
+      - name: filedata
+        in: query
+        required: true
+        description: Base64 encoded file data with MIME type prefix (e.g., "data:application/pdf;base64,JVBERi0xLjQ...")
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Fax order created successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: '123'
+              schema:
+                type: string
+                description: ID of the created fax order
+        '400':
+          description: Bad request - Invalid parameters or file data
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: Remote station id can't be blank
+              schema:
+                type: string
+  "/fdrs":
+    get:
+      summary: List fax detail records (FDRs)
+      tags:
+      - Fax Detail Records
+      description: Retrieves a paginated list of fax detail records with filtering
+        options for date range, direction, caller information, and transmission success
+      operationId: listFdrs
+      parameters:
+      - name: start_stamp_from
+        in: query
+        format: datetime
+        required: false
+        description: Start date for filtering records (defaults to beginning of day
+          for start_stamp_to)
+        schema:
+          type: string
+      - name: start_stamp_to
+        in: query
+        format: datetime
+        required: false
+        description: End date for filtering records (defaults to end of current day)
+        schema:
+          type: string
+      - name: direction
+        in: query
+        required: false
+        description: "Filter by fax direction:\n * `outbound` \n * `inbound` \n *
+          `internal` \n "
+        enum:
+        - outbound
+        - inbound
+        - internal
+        schema:
+          type: string
+      - name: caller_id_number
+        in: query
+        required: false
+        description: Filter by caller ID number (supports LIKE search)
+        schema:
+          type: string
+      - name: original_destination
+        in: query
+        required: false
+        description: Filter by destination fax number (supports LIKE search)
+        schema:
+          type: string
+      - name: success
+        in: query
+        required: false
+        description: Filter by transmission success status
+        enum:
+        - 'true'
+        - 'false'
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: Page number for pagination (must be > 0, defaults to 1)
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: Number of records per page (must be within configured min/max
+          limits)
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Fax detail records retrieved successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    fdrs:
+                    - call_uuid: abc123-def456-ghi789
+                      direction: Outbound
+                      caller_id_number: '12345678'
+                      local_station_header: ACME Corp Fax
+                      original_destination: '905551234567'
+                      pages_count: 3 / 3
+                      transfer_rate: 14400
+                      start_stamp: '2024-01-15 14:30:25'
+                      answer_stamp: '2024-01-15 14:30:30'
+                      end_stamp: '2024-01-15 14:32:15'
+                      duration: 105
+                      success: Success
+                      result: Normal termination
+                    - call_uuid: xyz987-uvw654-rst321
+                      direction: Inbound
+                      caller_id_number: '905559876543'
+                      local_station_header: 
+                      original_destination: '87654321'
+                      pages_count: 0 / 2
+                      transfer_rate: 9600
+                      start_stamp: '2024-01-15 13:15:42'
+                      answer_stamp: '2024-01-15 13:15:45'
+                      end_stamp: '2024-01-15 13:16:30'
+                      duration: 45
+                      success: Failed
+                      result: Remote disconnection
+                    pagination:
+                      page: 1
+                      total_count: 85
+                      total_pages: 9
+                      limit: 10
+              schema:
+                type: object
+                properties:
+                  fdrs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        call_uuid:
+                          type: string
+                          description: Unique identifier of the fax transmission call
+                        direction:
+                          type: string
+                          description: Human-readable direction of the fax (Outbound,
+                            Inbound, Internal)
+                        caller_id_number:
+                          type: string
+                          description: Caller ID number of the sender
+                        local_station_header:
+                          type: string
+                          description: Header text displayed on the fax
+                        original_destination:
+                          type: string
+                          description: Destination fax number
+                        pages_count:
+                          type: string
+                          description: Pages transferred vs total pages (e.g., "3
+                            / 5")
+                        transfer_rate:
+                          type: integer
+                          description: Transmission speed in baud rate
+                        start_stamp:
+                          type: string
+                          format: datetime
+                          description: When the fax transmission started
+                        answer_stamp:
+                          type: string
+                          format: datetime
+                          description: When the fax call was answered (null if not
+                            answered)
+                        end_stamp:
+                          type: string
+                          format: datetime
+                          description: When the fax transmission ended (null if ongoing)
+                        duration:
+                          type: integer
+                          description: Duration of the fax transmission in seconds
+                        success:
+                          type: string
+                          description: Human-readable success status
+                        result:
+                          type: string
+                          description: Human-readable result code description
+                      required:
+                      - call_uuid
+                      - direction
+                      - caller_id_number
+                      - original_destination
+                      - pages_count
+                      - start_stamp
+                      - success
+                      - result
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        description: Current page number
+                      total_count:
+                        type: integer
+                        description: Total number of fax detail records
+                      total_pages:
+                        type: integer
+                        description: Total number of pages
+                      limit:
+                        type: integer
+                        description: Number of records per page
+                    required:
+                    - page
+                    - total_count
+                    - total_pages
+                    - limit
+                required:
+                - fdrs
+                - pagination
+        '400':
+          description: Bad request - Invalid parameters
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'invalid page : 0'
+            application/json:
+              schema:
+                type: string
+  "/ivr_campaigns.json":
+    post:
+      summary: Create a new IVR Campaign
+      tags:
+      - IVR Campaigns
+      description: Creates a new IVR (Interactive Voice Response) campaign for automated
+        outbound calling with digit collection and routing
+      operationId: createIvrCampaign
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: name
+        in: query
+        required: true
+        description: Campaign name
+        schema:
+          type: string
+      - name: date_range_begin
+        in: query
+        required: false
+        description: Campaign start date
+        schema:
+          type: string
+      - name: date_range_end
+        in: query
+        required: false
+        description: Campaign end date
+        schema:
+          type: string
+      - name: time_range_begin
+        in: query
+        required: false
+        description: Daily start time
+        schema:
+          type: string
+      - name: time_range_end
+        in: query
+        required: false
+        description: Daily end time
+        schema:
+          type: string
+      - name: ring_timeout
+        in: query
+        required: false
+        description: Ring timeout in seconds
+        schema:
+          type: integer
+      - name: cli
+        in: query
+        required: false
+        description: Caller ID number
+        schema:
+          type: string
+      - name: welcome_announcement_id
+        in: query
+        required: false
+        description: Welcome announcement ID
+        schema:
+          type: integer
+      - name: call_retries
+        in: query
+        required: false
+        description: Number of call retries
+        schema:
+          type: integer
+      - name: webhook_url
+        in: query
+        required: false
+        description: Webhook URL for notifications
+        schema:
+          type: string
+      - name: digit_target_0
+        in: query
+        required: false
+        description: Target for digit 0
+        schema:
+          type: string
+      - name: digit_target_1
+        in: query
+        required: false
+        description: Target for digit 1
+        schema:
+          type: string
+      - name: digit_target_2
+        in: query
+        required: false
+        description: Target for digit 2
+        schema:
+          type: string
+      - name: digit_target_3
+        in: query
+        required: false
+        description: Target for digit 3
+        schema:
+          type: string
+      - name: digit_target_4
+        in: query
+        required: false
+        description: Target for digit 4
+        schema:
+          type: string
+      - name: digit_target_5
+        in: query
+        required: false
+        description: Target for digit 5
+        schema:
+          type: string
+      - name: digit_target_6
+        in: query
+        required: false
+        description: Target for digit 6
+        schema:
+          type: string
+      - name: digit_target_7
+        in: query
+        required: false
+        description: Target for digit 7
+        schema:
+          type: string
+      - name: digit_target_8
+        in: query
+        required: false
+        description: Target for digit 8
+        schema:
+          type: string
+      - name: digit_target_9
+        in: query
+        required: false
+        description: Target for digit 9
+        schema:
+          type: string
+      - name: digit_target_star
+        in: query
+        required: false
+        description: Target for * key
+        schema:
+          type: string
+      - name: digit_target_square
+        in: query
+        required: false
+        description: 'Target for # key'
+        schema:
+          type: string
+      - name: timeout_target
+        in: query
+        required: false
+        description: Target for timeout
+        schema:
+          type: string
+      - name: invalid_target
+        in: query
+        required: false
+        description: Target for invalid input
+        schema:
+          type: string
+      - name: digit_retries
+        in: query
+        required: false
+        description: Number of digit input retries
+        schema:
+          type: integer
+      - name: digit_timeout
+        in: query
+        required: false
+        description: Digit input timeout
+        schema:
+          type: integer
+      - name: is_commercial
+        in: query
+        required: false
+        description: Whether campaign is commercial
+        schema:
+          type: boolean
+      - name: max_thread_count
+        in: query
+        required: false
+        description: Maximum concurrent threads
+        schema:
+          type: integer
+      - name: call_type
+        in: query
+        required: false
+        description: Type of call
+        schema:
+          type: string
+      - name: queue_number
+        in: query
+        required: false
+        description: Queue number for routing
+        schema:
+          type: string
+      - name: thread_multiplier
+        in: query
+        required: false
+        description: Thread multiplier
+        schema:
+          type: integer
+      - name: recording_enabled
+        in: query
+        required: false
+        description: Enable call recording
+        schema:
+          type: boolean
+      - name: phone_list
+        in: query
+        items:
+          type: object
+        required: false
+        description: List of phone numbers and phrases
+        schema:
+          type: array
+      - name: active_days
+        in: query
+        items:
+          type: string
+        required: false
+        description: Active days of the week
+        schema:
+          type: array
+      - name: iys_recipient_type
+        in: query
+        required: false
+        description: IYS recipient type (for commercial campaigns)
+        schema:
+          type: string
+      - name: iys_brand_code
+        in: query
+        required: false
+        description: IYS brand code (for commercial campaigns)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: IVR Campaign created successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Campaign created:
+                      value: '12345'
+              schema:
+                type: string
+                description: Campaign ID
+        '400':
+          description: Bad request - validation error
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Missing required fields:
+                      value: Name can't be blank
+              schema:
+                type: string
+                description: Validation error messages
+        '403':
+          description: Forbidden - module not purchased
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Module not available:
+                      value: You need to purchase Otomatik IVR module
+              schema:
+                type: string
+                description: Module access error
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Authentication error message
+  "/ivr_campaigns/{id}.json":
+    parameters:
+    - name: id
+      in: path
+      description: IVR Campaign ID
+      required: true
+      schema:
+        type: string
+    patch:
+      summary: Update IVR Campaign status
+      tags:
+      - IVR Campaigns
+      description: Updates the status of an existing IVR campaign (start/stop)
+      operationId: updateIvrCampaign
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: true
+        description: "Campaign status: \"on\" to start, \"off\" to stop:\n * `on`
+          \n * `off` \n "
+        enum:
+        - 'on'
+        - 'off'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Campaign status updated successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Status updated:
+                      value: Ok
+              schema:
+                type: string
+                description: Success message
+        '400':
+          description: Bad request - validation error
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Campaign finished:
+                      value: ivr_campaign is over
+              schema:
+                type: string
+                description: Error message describing the validation failure
+        '404':
+          description: Campaign not found
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Campaign not found:
+                      value: Cannot find ivr_campaign with ID non-existent-id
+              schema:
+                type: string
+                description: Error message when campaign cannot be found
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Authentication error message
+    delete:
+      summary: Delete IVR Campaign
+      tags:
+      - IVR Campaigns
+      description: Deletes an existing IVR campaign
+      operationId: deleteIvrCampaign
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Campaign deleted successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Campaign deleted:
+                      value: OK
+              schema:
+                type: string
+                description: Success message
+        '400':
+          description: Bad request - deletion failed
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Deletion failed:
+                      value: Cannot delete campaign with active calls
+              schema:
+                type: string
+                description: Error message when deletion fails
+        '404':
+          description: Campaign not found
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Campaign not found:
+                      value: Cannot find ivr_campaign with ID non-existent-id
+              schema:
+                type: string
+                description: Error message when campaign cannot be found
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Authentication error message
+  "/mutings":
+    post:
+      summary: Mute or unmute an active call
+      tags:
+      - Mutings
+      description: Controls the mute state of an active call by call UUID. Can mute
+        (on) or unmute (off) the call audio.
+      operationId: createMuting
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: id
+        in: query
+        required: true
+        description: Call UUID to mute/unmute
+        schema:
+          type: string
+      - name: state
+        in: query
+        required: true
+        description: "Mute state: \"on\" to mute, \"off\" to unmute:\n * `on` \n *
+          `off` \n "
+        enum:
+        - 'on'
+        - 'off'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Unmute state changed successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Successfully muted call:
+                      value: Call muted successfully
+                    Successfully unmuted call:
+                      value: Call unmuted successfully
+            text/plain:
+              schema:
+                type: string
+                description: Success message or operation result
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Call not found:
+                      value: Call not found or already ended
+            text/plain:
+              schema:
+                type: string
+                description: Error message describing the validation failure
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Authentication error message
+  "/queues":
+    get:
+      summary: Get list of queues
+      tags:
+      - Queues
+      description: Retrieves a list of all queues available in the domain
+      operationId: getQueues
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Queues retrieved successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Queues list:
+                      value:
+                      - number: support
+                        name: Customer Support
+                      - number: sales
+                        name: Sales Team
+                      - number: tech
+                        name: Technical Support
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    number:
+                      type: string
+                      description: Queue number
+                    name:
+                      type: string
+                      description: Queue name
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Authentication error message
+  "/queues/pending":
+    get:
+      summary: Get pending queue calls
+      tags:
+      - Queues
+      description: Retrieves real-time information about pending calls in all queues,
+        fetched from Redis
+      operationId: getQueuesPending
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Pending queue calls retrieved successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Pending calls in queues:
+                      value:
+                      - joined_at: '1641123456'
+                        caller_id: "+905551234567"
+                        queue_number: support
+                        wait_time: 45
+                      - joined_at: '1641123789'
+                        caller_id: "+905559876543"
+                        queue_number: sales
+                        wait_time: 12
+                    No pending calls:
+                      value: []
+              schema:
+                type: array
+                items:
+                  type: object
+                  description: Pending call information from Redis queue data
+                  properties:
+                    joined_at:
+                      type: string
+                      description: Timestamp when call joined queue
+                    caller_id:
+                      type: string
+                      description: Caller ID number
+                    queue_number:
+                      type: string
+                      description: Queue number
+                    wait_time:
+                      type: integer
+                      description: Wait time in seconds
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Authentication error message
+  "/queue/manage_users":
+    post:
+      summary: Manage queue user members
+      tags:
+      - Queues
+      description: Updates the list of users assigned to a specific queue
+      operationId: manageQueueUsers
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: queue_number
+        in: query
+        required: true
+        description: Queue number to manage
+        schema:
+          type: string
+      - name: user_list
+        in: query
+        required: true
+        description: Comma-separated list of user extensions to assign to queue
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Queue users updated successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Users assigned to queue:
+                      value: OK
+              schema:
+                type: string
+                description: Success message
+        '400':
+          description: Bad request - validation error
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Invalid user in list:
+                      value: User value null or none 9999
+              schema:
+                type: string
+                description: Error message describing the validation failure
+        '404':
+          description: Queue not found
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Queue not found:
+                      value: Queue_number value null or none non-existent-queue
+              schema:
+                type: string
+                description: Error message when queue cannot be found
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Authentication error message
+  "/queue/user_list":
+    get:
+      summary: Get queue user members
+      tags:
+      - Queues
+      description: Retrieves the list of users currently assigned to a specific queue
+      operationId: getQueueUserList
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: queue_number
+        in: query
+        required: true
+        description: Queue number to get user list for
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Queue user list retrieved successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Queue user members:
+                      value:
+                      - user: '1001'
+                        name: John Doe
+                      - user: '1002'
+                        name: Jane Smith
+                      - user: '1003'
+                        name: Mike Johnson
+                    Empty queue:
+                      value: []
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    user:
+                      type: string
+                      description: User extension number
+                    name:
+                      type: string
+                      description: User full name
+        '404':
+          description: Queue not found
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Queue not found:
+                      value: Queue_number value null or none non-existent-queue
+            application/json:
+              schema:
+                type: string
+                description: Error message when queue cannot be found
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Authentication error message
+  "/recording_urls":
+    post:
+      summary: Generate a temporary download URL for call recording
+      tags:
+      - Recording URLs
+      description: Creates a temporary download URL for a call recording file identified
+        by call UUID. The URL expires after 1 hour.
+      operationId: createRecordingUrl
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: call_uuid
+        in: query
+        required: true
+        description: UUID of the call to get recording URL for
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Recording URL generated successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Recording download URL:
+                      value: https://api.example.com/recordings/download/R12345678-1234-5678-9abc-123456789def
+                    Another recording URL:
+                      value: https://api.example.com/recordings/download/R87654321-8765-4321-dcba-987654321fed
+            text/plain:
+              schema:
+                type: string
+                description: Temporary download URL for the recording file (expires
+                  in 1 hour)
+        '400':
+          description: Bad request - validation or resource error
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Recording file not found:
+                      value: cannot find recording file for call call-uuid-file-missing
+            text/plain:
+              schema:
+                type: string
+                description: Error message describing the failure
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Authentication error message
+  "/user_statuses":
+    get:
+      summary: List user statuses with filtering
+      tags:
+      - User Statuses
+      description: Retrieves real-time registration and call status information for
+        users. Provides filtering by user number and status. Includes DND (Do Not
+        Disturb) status handling.
+      operationId: listUserStatuses
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: user
+        in: query
+        required: false
+        description: Filter by specific user number
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        description: "Filter by user status:\n * `AVAILABLE` \n * `UNREGISTERED` \n
+          * `TALKING` \n * `SS_DND` \n "
+        enum:
+        - AVAILABLE
+        - UNREGISTERED
+        - TALKING
+        - SS_DND
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Filtered user statuses
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                  - user: '1003'
+                    status: SS_DND
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    user:
+                      type: string
+                      description: User number (extension number)
+                    status:
+                      type: string
+                      enum:
+                      - AVAILABLE
+                      - UNREGISTERED
+                      - TALKING
+                      - SS_DND
+                      description: Current user status based on registration and call
+                        state
+                  required:
+                  - user
+                  - status
+        '400':
+          description: Bad request - Invalid status filter
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: status should be AVAILABLE, UNREGISTERED, TALKING, SS_DND
+            application/json:
+              schema:
+                type: string
+                description: Error message listing valid status values
+  "/update_outbound_caller_id":
+    post:
+      summary: Update user outbound caller ID
+      tags:
+      - Users
+      description: Updates the outbound caller ID number for a specific user extension.
+        The caller ID must be one of the available caller IDs for the domain.
+      operationId: updateOutboundCallerId
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: extension
+        in: query
+        required: true
+        description: User extension number
+        schema:
+          type: string
+      - name: caller_id
+        in: query
+        required: true
+        description: New outbound caller ID number (must be available for domain)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Outbound caller ID updated successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Caller ID updated:
+                      value: OK
+              schema:
+                type: string
+                description: Success message
+        '400':
+          description: Bad request - validation error
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Save validation error:
+                      value: Outbound caller id number is invalid
+              schema:
+                type: string
+                description: Error message describing the validation failure
+        '401':
+          description: Unauthorized - invalid API key
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Authentication error message
+  "/voicemail_messages":
+    get:
+      summary: List voicemail messages
+      tags:
+      - Voicemail Messages
+      description: Retrieves a paginated list of voicemail messages with optional
+        filtering by date range, read status, and user number
+      parameters:
+      - name: start_stamp_from
+        in: query
+        format: datetime
+        required: false
+        description: Start date for filtering messages (defaults to beginning of day
+          for start_stamp_to)
+        schema:
+          type: string
+      - name: start_stamp_to
+        in: query
+        format: datetime
+        required: false
+        description: End date for filtering messages (defaults to end of current day)
+        schema:
+          type: string
+      - name: read
+        in: query
+        required: false
+        description: "Filter by read status:\n * `true` \n * `false` \n "
+        enum:
+        - 'true'
+        - 'false'
+        schema:
+          type: string
+      - name: user_number
+        in: query
+        required: false
+        description: Filter by specific user number/username
+        schema:
+          type: string
+      - name: uuid
+        in: query
+        required: false
+        description: Filter by specific message UUID
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: Page number for pagination (must be > 0, defaults to 1)
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: Number of records per page (must be within configured min/max
+          limits)
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Voicemail messages retrieved successfully
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    messages:
+                    - start_stamp: '2024-01-15 14:30:25'
+                      read_stamp: '2024-01-15 15:45:12'
+                      user_number: '1001'
+                      uuid: abc123-def456-ghi789
+                      caller_id_name: John Doe
+                      caller_id_number: '5551234567'
+                      duration: '00:02:30'
+                    - start_stamp: '2024-01-15 10:15:42'
+                      read_stamp: '1970-01-01 00:00:00'
+                      user_number: '1002'
+                      uuid: xyz987-uvw654-rst321
+                      caller_id_name: Jane Smith
+                      caller_id_number: '5559876543'
+                      duration: '00:01:45'
+                    pagination:
+                      page: 1
+                      total_count: 25
+                      total_pages: 3
+                      limit: 10
+        '400':
+          description: Bad request - Invalid parameters
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value: 'invalid page : 0'
+  "/voicemail_recording_urls":
+    post:
+      summary: Generate temporary download URL for voicemail recording
+      tags:
+      - Voicemail Recording URLs
+      description: Creates a temporary download URL for a voicemail recording file.
+        The URL is valid for 1 hour and automatically marks the voicemail as read.
+      operationId: createVoicemailRecordingUrl
+      parameters:
+      - name: uuid
+        in: query
+        required: true
+        description: UUID of the voicemail message to get recording for
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Recording URL generated successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: https://api.example.com/recordings/download/R12345678-abcd-1234-efgh-987654321abc
+              schema:
+                type: string
+                description: Temporary download URL for the voicemail recording (valid
+                  for 1 hour)
+        '400':
+          description: Bad request - Invalid or missing parameters
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: cannot find recording file for voicemail voicemail-without-recording-789
+              schema:
+                type: string
+  "/webphone_tokens":
+    post:
+      summary: Create webphone authentication token
+      tags:
+      - Webphone Tokens
+      description: Creates a temporary authentication token for webphone access. Requires
+        the user to be an employee in the system. Token is valid for 24 hours.
+      operationId: createWebphoneToken
+      parameters:
+      - name: key
+        in: query
+        required: true
+        description: API authentication key
+        schema:
+          type: string
+      - name: extension
+        in: query
+        required: true
+        description: User extension number for webphone access
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Webphone token created successfully
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: W12345678-abcd-1234-efgh-987654321abc
+              schema:
+                type: string
+                description: Temporary webphone authentication token (valid for 24
+                  hours)
+        '400':
+          description: Bad request - Invalid or missing parameters
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: cannot find employee for extension 1002
+              schema:
+                type: string
+                description: Error message describing the failure
 security:
 - api_key: []
 servers:
