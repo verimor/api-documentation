@@ -2249,7 +2249,7 @@ paths:
     post:
       summary: Generate temporary download URL for fax document
       tags:
-      - Fax Document URLs
+      - Faks Yönetimi
       description: Creates a temporary download URL for a successfully transmitted
         fax document. The URL is valid for 1 hour and provides access to the PDF version
         of the fax.
@@ -2286,7 +2286,7 @@ paths:
     get:
       summary: Download fax document file
       tags:
-      - Fax Documents
+      - Faks Yönetimi
       description: Downloads a fax document file using a download ticket code. The
         document is automatically fetched from FTP if not already cached locally.
         No authentication required as security is handled via the secure ticket system.
@@ -2365,7 +2365,7 @@ paths:
     get:
       summary: List fax orders
       tags:
-      - Fax Orders
+      - Faks Yönetimi
       description: Retrieves a paginated list of incomplete fax orders from the last
         week
       operationId: listFaxOrders
@@ -2473,7 +2473,7 @@ paths:
     post:
       summary: Create a new fax order
       tags:
-      - Fax Orders
+      - Faks Yönetimi
       description: Creates a new fax order with file data. The file will be processed
         and queued for transmission via FTP and background job.
       operationId: createFaxOrder
@@ -2527,7 +2527,7 @@ paths:
     get:
       summary: List fax detail records (FDRs)
       tags:
-      - Fax Detail Records
+      - Faks Yönetimi
       description: Retrieves a paginated list of fax detail records with filtering
         options for date range, direction, caller information, and transmission success
       operationId: listFdrs
