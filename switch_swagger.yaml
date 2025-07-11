@@ -44,37 +44,38 @@ components:
 paths:
   "/agent_statuses":
     get:
-      summary: List agent statuses with filtering
+      summary: MT durumlarını ve üyeliklerini listeleme
       tags:
-      - Agent Statuses
-      description: Retrieves real-time status information for call center agents.
-        Requires callcenter module to be enabled for the domain. Provides filtering
-        by agent number, queue, and status.
+      - Kullanıcı Yönetimi
+      description: Müşteri Temsilcilerinizin durumunu ve hangi kuyruklara üye olduklarını
+        listelemek için kullanılır. HTTP GET metodu ile api.bulutsantralim.com/agent_statuses
+        adresi parametrelerle çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu
+        ile mesajın Body&#39;sinde mesajlar döner. İstek başarısız olduğunda ise ilgili
+        HTTP Status kodu ile mesajın Body&#39;sinde hata mesajı döner. API ile dakikada
+        iki istek (request) gönderebilirsiniz.
       operationId: listAgentStatuses
+      security:
+      - api_key: []
       parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       - name: agent
         in: query
         required: false
-        description: Filter by agent number (partial match supported)
+        description: Belirli bir MT'nin durumunu öğrenmek için kullanılır
+        example: '1010'
         schema:
           type: string
       - name: queue
         in: query
         required: false
-        description: Filter by queue number (partial match supported)
+        description: Belirli kuyruktaki MT'lerin durumlarını listelemek için kullanılır
+        example: '204'
         schema:
           type: string
       - name: status
         in: query
         required: false
-        description: "Filter by agent status:\n * `AVAILABLE` \n * `TALKING` \n *
-          `LOGGED_OUT` \n * `ON_BREAK` \n "
+        description: "Belirli durumdaki MT'leri listelemek için kullanılır:\n * `AVAILABLE`
+          \n * `TALKING` \n * `LOGGED_OUT` \n * `ON_BREAK` \n "
         enum:
         - AVAILABLE
         - TALKING
@@ -84,16 +85,16 @@ paths:
           type: string
       responses:
         '200':
-          description: Filtered agent statuses
+          description: Filtrelenmiş MT durumları
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                  - agent: '1001'
+                  - agent: '1010'
                     queues:
-                    - '200'
-                    - '201'
+                    - '204'
+                    - '205'
                     status: AVAILABLE
               schema:
                 type: array
@@ -102,12 +103,12 @@ paths:
                   properties:
                     agent:
                       type: string
-                      description: Agent number (user number)
+                      description: MT numarası
                     queues:
                       type: array
                       items:
                         type: string
-                      description: List of queue numbers this agent belongs to
+                      description: MT'nin üye olduğu kuyruklar
                     status:
                       type: string
                       enum:
@@ -115,17 +116,18 @@ paths:
                       - TALKING
                       - LOGGED_OUT
                       - ON_BREAK
-                      description: Current agent status from Redis
+                      description: MT durumu (AVAILABLE=Müsait, TALKING=Çağrıda, LOGGED_OUT=Çevrimdışı,
+                        ON_BREAK=Molada)
                     break_description:
                       type: string
-                      description: Break reason description (only present when status
-                        is ON_BREAK)
+                      description: MT molada ise, mola açıklaması (sadece status ON_BREAK
+                        olduğunda mevcut)
                   required:
                   - agent
                   - queues
                   - status
         '400':
-          description: Bad request - Module not enabled or invalid status
+          description: Hatalı istek - Modül etkin değil veya geçersiz durum
           content:
             text/plain:
               examples:
@@ -134,22 +136,39 @@ paths:
             application/json:
               schema:
                 type: string
-                description: Error message describing the failure
+                description: Hata mesajı
+        '429':
+          description: Çok fazla istek - Rate limit aşıldı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: Too Many Requests
+            application/json:
+              schema:
+                type: string
+                description: Rate limit hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+            application/json:
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/announcements":
     get:
       summary: Get list of announcements
       tags:
-      - Announcements
+      - Anons Yönetimi
+      security:
+      - api_key: []
       description: Retrieves a list of all announcements (audio files) available in
         the domain
       operationId: getAnnouncements
-      parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       responses:
         '200':
           description: Announcements retrieved successfully
@@ -187,16 +206,12 @@ paths:
     post:
       summary: Create a new announcement
       tags:
-      - Announcements
+      - Anons Yönetimi
+      security:
+      - api_key: []
       description: Creates a new announcement by uploading an audio file
       operationId: createAnnouncement
-      parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
+      parameters: []
       responses:
         '200':
           description: Announcement created successfully
@@ -247,16 +262,12 @@ paths:
     patch:
       summary: Update an existing announcement
       tags:
-      - Announcements
+      - Anons Yönetimi
+      security:
+      - api_key: []
       description: Updates an existing announcement name and/or audio file
       operationId: updateAnnouncement
-      parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
+      parameters: []
       responses:
         '200':
           description: Announcement updated successfully
@@ -298,16 +309,11 @@ paths:
     delete:
       summary: Delete an announcement
       tags:
-      - Announcements
+      - Anons Yönetimi
+      security:
+      - api_key: []
       description: Deletes an existing announcement from the domain
       operationId: deleteAnnouncement
-      parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       responses:
         '200':
           description: Announcement deleted successfully
@@ -342,44 +348,46 @@ paths:
                 description: Authentication error message
   "/blocked_numbers":
     get:
-      summary: List blocked numbers
+      summary: Karalisteye erişim
       tags:
-      - Blocked Numbers
-      description: Retrieves a paginated list of blocked numbers for the domain
+      - Çağrı Yönetimi
+      description: Santralinizdeki kara listedeki numaraların listesine erişmek için
+        kullanılır. HTTP GET metodu ile api.bulutsantralim.com/blocked_numbers adresi
+        parametrelerle çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu ile
+        mesajın Body&#39;sinde kara liste döner. İstek başarısız olduğunda ise ilgili
+        HTTP Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: listBlockedNumbers
+      security:
+      - api_key: []
       parameters:
       - name: page
         in: query
         required: false
-        description: Page number for pagination (defaults to 1)
+        description: Sayfa numarası (varsayılan 1)
         schema:
           type: integer
       - name: limit
         in: query
         required: false
-        description: Number of records per page (must be within configured min/max
-          limits)
+        description: Listeyi sınırlayabilirsiniz. Varsayılan değer 10, minimum değer
+          10, maksimum değer 100
         schema:
           type: integer
       responses:
         '200':
-          description: Blocked numbers retrieved successfully
+          description: OK
           content:
             application/json:
               examples:
                 example_0:
                   value:
                     blocked_numbers:
-                    - id: 1
-                      number: '905551234567'
-                    - id: 2
-                      number: '905559876543'
-                    - id: 3
-                      number: '90212555000'
+                    - id: 4274
+                      number: '905531234567'
                     pagination:
                       page: 1
-                      total_count: 25
-                      total_pages: 3
+                      total_count: 1
+                      total_pages: 1
                       limit: 10
               schema:
                 type: object
@@ -391,10 +399,10 @@ paths:
                       properties:
                         id:
                           type: integer
-                          description: Unique identifier of the blocked number entry
+                          description: Engelli numara kaydının benzersiz kimlik numarası
                         number:
                           type: string
-                          description: Normalized phone number that is blocked
+                          description: Normalize edilmiş engelli telefon numarası
                       required:
                       - id
                       - number
@@ -403,16 +411,16 @@ paths:
                     properties:
                       page:
                         type: integer
-                        description: Current page number
+                        description: Mevcut sayfa numarası
                       total_count:
                         type: integer
-                        description: Total number of blocked numbers
+                        description: Toplam engelli numara sayısı
                       total_pages:
                         type: integer
-                        description: Total number of pages
+                        description: Toplam sayfa sayısı
                       limit:
                         type: integer
-                        description: Number of records per page
+                        description: Sayfa başına kayıt sayısı
                     required:
                     - page
                     - total_count
@@ -422,7 +430,7 @@ paths:
                 - blocked_numbers
                 - pagination
         '400':
-          description: Bad request - Invalid pagination parameters
+          description: Hatalı istek - Geçersiz sayfalama parametreleri
           content:
             text/plain:
               examples:
@@ -431,34 +439,52 @@ paths:
             application/json:
               schema:
                 type: string
-    post:
-      summary: Add number to blocked list
-      tags:
-      - Blocked Numbers
-      description: Adds a phone number to the blocked numbers list. The number will
-        be normalized before storage.
-      operationId: createBlockedNumber
-      parameters:
-      - name: number
-        in: query
-        required: true
-        description: Phone number to block (will be normalized)
-        schema:
-          type: string
-      responses:
-        '200':
-          description: Number added to blocked list successfully
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
             text/plain:
               examples:
                 example_0:
-                  value: '42'
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+            application/json:
               schema:
                 type: string
-                description: ID of the created blocked number entry
+                description: Kimlik doğrulama hata mesajı
+    post:
+      summary: Karalisteye ekleme
+      tags:
+      - Çağrı Yönetimi
+      description: Telefon numarasını kara listeye ekler. Numara kayıt edilmeden önce
+        normalize edilir. POST metodu ile api.bulutsantralim.com/blocked_numbers adresine
+        istek gönderilir. İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın
+        Body&#39;sinde oluşturulan kaydın ID&#39;si döner. İstek başarısız olduğunda
+        ise ilgili HTTP Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
+      operationId: createBlockedNumber
+      security:
+      - api_key: []
+      parameters:
+      - name: number
+        in: query
+        required: true
+        description: Engellenecek telefon numarası (normalize edilecek)
+        example: '05531234567'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: '20212'
+              schema:
+                type: string
+                description: Oluşturulan engelli numara kaydının ID&#39;si
         '400':
-          description: Bad request - Invalid or missing number, or number already
-            blocked
+          description: Hatalı istek - Geçersiz veya eksik numara, ya da numara zaten
+            engelli
           content:
             text/plain:
               examples:
@@ -466,23 +492,40 @@ paths:
                   value: Number has already been taken
               schema:
                 type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
     delete:
-      summary: Remove number from blocked list
+      summary: Karalisteden silme
       tags:
-      - Blocked Numbers
-      description: Removes a phone number from the blocked numbers list. The number
-        will be normalized before lookup.
+      - Çağrı Yönetimi
+      description: Telefon numarasını kara listeden çıkarır. Numara kaldırılmadan
+        önce normalize edilir. DELETE metodu ile api.bulutsantralim.com/blocked_numbers/delete
+        adresi parametrelerle çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu
+        ile mesajın Body&#39;sinde başarı mesajı döner. İstek başarısız olduğunda
+        ise ilgili HTTP Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: deleteBlockedNumber
+      security:
+      - api_key: []
       parameters:
       - name: number
         in: query
         required: true
-        description: Phone number to unblock (will be normalized)
+        description: Kara listeden çıkarılacak telefon numarası (normalize edilecek)
+        example: '05531234567'
         schema:
           type: string
       responses:
         '200':
-          description: Number removed from blocked list successfully
+          description: OK
           content:
             text/plain:
               examples:
@@ -490,9 +533,10 @@ paths:
                   value: OK
               schema:
                 type: string
-                description: Success message
+                description: Başarı mesajı
         '400':
-          description: Bad request - Invalid, missing, or not blocked number
+          description: Hatalı istek - Geçersiz, eksik veya engelli listede olmayan
+            numara
           content:
             text/plain:
               examples:
@@ -500,21 +544,28 @@ paths:
                   value: 905559998888 is not in blocked numbers
               schema:
                 type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/bridges":
     post:
       summary: Create a bridge connection between two phone numbers
       tags:
-      - Bridges
+      - Çağrı Yönetimi
+      security:
+      - api_key: []
       description: Creates a bridge connection between source and destination phone
         numbers with optional announcements and recording
       operationId: createBridge
       parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       - name: source
         in: query
         required: true
@@ -595,17 +646,13 @@ paths:
     post:
       summary: Transfer an active call to another user
       tags:
-      - Call Transfer
+      - Çağrı Yönetimi
+      security:
+      - api_key: []
       description: Transfers an active call identified by call UUID to another user
         within the same domain
       operationId: transferCall
       parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       - name: id
         in: query
         required: true
@@ -659,18 +706,13 @@ paths:
     get:
       summary: Get list of available Caller IDs
       tags:
-      - Caller IDs
+      - Çağrı Yönetimi
       description: Retrieves a list of all available Caller ID numbers for the domain.
         Includes numbers from Bulutsantralim authentications and SIP trunks (if SIP
         trunk module is available).
       operationId: getCallerIds
-      parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
+      security:
+      - api_key: []
       responses:
         '200':
           description: Caller IDs retrieved successfully
@@ -706,7 +748,9 @@ paths:
     get:
       summary: Bir çağrı başlat
       tags:
-      - Çağrı
+      - Çağrı Yönetimi
+      security:
+      - api_key: []
       description: Geçersiz istek. Gerekli bir parametre eksik veya geçersiz olabilir
         (örneğin, eksik dahili numara, geçersiz hedef).
       parameters:
@@ -752,14 +796,16 @@ paths:
         in: query
         required: false
         description: Opsiyonel. Cevaplanma anında aranan tarafa bu anons dinletilir.
-          Ses dosyası ID’lerinizi API ile veya Online İşlem Merkezi üzerinden görebilirsiniz.
+          Ses dosyası ID&#39;lerinizi API ile veya Online İşlem Merkezi üzerinden
+          görebilirsiniz.
         schema:
           type: integer
       - name: announcement_to_callee
         in: query
         required: false
         description: Opsiyonel. Cevaplanma anında arayan tarafa bu anons dinletilir.
-          Ses dosyası ID’lerinizi API ile veya Online İşlem Merkezi üzerinden görebilirsiniz.
+          Ses dosyası ID&#39;lerinizi API ile veya Online İşlem Merkezi üzerinden
+          görebilirsiniz.
         schema:
           type: integer
       responses:
@@ -780,7 +826,7 @@ paths:
     post:
       summary: Bir Çağrı Başlat (POST)
       tags:
-      - Çağrı
+      - Çağrı Yönetimi
       description: Invalid request. A required parameter might be missing or invalid.
       security:
       - api_key: []
@@ -848,89 +894,88 @@ paths:
     parameters:
     - name: id
       in: path
-      description: Call UUID to hangup
+      description: Sonlandırmak istediğiniz çağrının UUID'si. Yeni çağrı başlattığınızda
+        API'den dönen UUID'yi kullanabilirsiniz veya Olay Bildirme ile gelen UUID'leri
+        kullanabilirsiniz
+      example: f3797dfc-a818-11e7-bf70-cb295b6663ce
       required: true
       schema:
         type: string
     delete:
-      summary: Hangup an active call
+      summary: Çağrıyı Sonlandır
       tags:
-      - Çağrı
-      description: Aktif bir çağrıyı sonlandırmak için kullanılır. Call UUID kullanarak
-        çağrıyı kapatır.
+      - Çağrı Yönetimi
+      security:
+      - api_key: []
+      description: Uygulamalarınız üzerinden santralde devam eden bir çağrıyı sonlandırmak
+        için kullanılır. HTTP GET metodu ile api.bulutsantralim.com adresi parametrelerle
+        çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body'sinde
+        +OK döner.
       operationId: hangupCall
-      parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       responses:
         '200':
-          description: Call hung up successfully
+          description: OK
           content:
             text/plain:
               examples:
                 example_0:
-                  value:
-                    Call terminated successfully:
-                      value: Call terminated
-                    Call ended:
-                      value: OK
+                  value: "+OK"
               schema:
                 type: string
-                description: Success message or operation result
+                description: Başarı onay mesajı
         '400':
-          description: Bad request - hangup failed
+          description: Hatalı istek
           content:
             text/plain:
               examples:
                 example_0:
-                  value:
-                    Call not found:
-                      value: Call not found or already ended
+                  value: No such channel!
               schema:
                 type: string
-                description: Error message when hangup operation fails
+                description: Hata mesajı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz erişim
           content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Geçersiz API anahtarı:
+                      error: Unauthorized
             text/plain:
               schema:
-                type: string
-                description: Authentication error message
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Hata mesajı
   "/cdrs":
     get:
-      summary: Get list of Call Detail Records (CDRs)
+      summary: Çağrı Detay Kayıtları (CDR) listesini getirir
       tags:
-      - CDRs (Call Detail Records)
-      description: Retrieves a paginated list of Call Detail Records with various
-        filtering options
+      - Raporlama ve Kayıtlar
+      description: Farklı filtrelerle ve sayfalama ile çağrı detay kayıtlarını (CDR)
+        listeler.
       operationId: getCdrs
+      security:
+      - api_key: []
       parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       - name: start_stamp_from
         in: query
         required: false
-        description: Start date/time filter (ISO format)
+        description: Başlangıç tarihi/zamanı (ISO formatı)
         schema:
           type: string
       - name: start_stamp_to
         in: query
         required: false
-        description: End date/time filter (ISO format)
+        description: Bitiş tarihi/zamanı (ISO formatı)
         schema:
           type: string
       - name: recording_present
         in: query
         required: false
-        description: "Filter by recording presence:\n * `true` \n * `false` \n * `deleted`
+        description: "Kayıt durumu filtresi:\n * `true` \n * `false` \n * `deleted`
           \n "
         enum:
         - 'true'
@@ -941,7 +986,7 @@ paths:
       - name: direction
         in: query
         required: false
-        description: Call direction filter
+        description: Çağrı yönü filtresi
         enum:
         - inbound
         - outbound
@@ -951,19 +996,19 @@ paths:
       - name: caller_id_number
         in: query
         required: false
-        description: Filter by caller ID number
+        description: Arayan numara filtresi
         schema:
           type: string
       - name: destination_number
         in: query
         required: false
-        description: Filter by destination number
+        description: Hedef numara filtresi
         schema:
           type: string
       - name: missed
         in: query
         required: false
-        description: Filter by missed calls
+        description: Cevapsız çağrı filtresi
         enum:
         - 'true'
         - 'false'
@@ -972,30 +1017,30 @@ paths:
       - name: queue
         in: query
         required: false
-        description: Filter by queue name
+        description: Kuyruk adı filtresi
         schema:
           type: string
       - name: page
         in: query
         required: false
-        description: 'Page number for pagination (default: 1)'
+        description: 'Sayfa numarası (varsayılan: 1)'
         schema:
           type: integer
       - name: limit
         in: query
         required: false
-        description: Number of records per page
+        description: Sayfa başına kayıt sayısı
         schema:
           type: integer
       responses:
         '200':
-          description: CDRs retrieved successfully
+          description: CDR listesi başarıyla getirildi
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    CDRs list with pagination:
+                    CDR listesi örneği:
                       value:
                         cdrs:
                         - start_stamp: '2025-01-01 10:30:15'
@@ -1003,11 +1048,11 @@ paths:
                           caller_id_number: "+905551234567"
                           caller_id_name: John Doe
                           destination_number: '1001'
-                          destination_name: Extension 1001
+                          destination_name: Dahili 1001
                           duration: '00:05:30'
                           talk_duration: '00:05:10'
                           queue_wait_seconds: '00:00:20'
-                          queue: support
+                          queue: destek
                           result: Cevaplandı
                           missed: false
                           return_uuid: return-uuid-123
@@ -1031,34 +1076,34 @@ paths:
                       properties:
                         start_stamp:
                           type: string
-                          description: Call start timestamp
+                          description: Çağrı başlangıç zamanı
                         direction:
                           type: string
-                          description: Call direction (human readable)
+                          description: Çağrı yönü (insan okunabilir)
                         caller_id_number:
                           type: string
-                          description: Caller ID number
+                          description: Arayan numara
                         caller_id_name:
                           type: string
-                          description: Caller ID name
+                          description: Arayan isim
                         destination_number:
                           type: string
-                          description: Filter by destination number
+                          description: Hedef numara
                         destination_name:
                           type: string
-                          description: Destination name
+                          description: Hedef isim
                         duration:
                           type: string
-                          description: Call duration (HH:MM:SS)
+                          description: Çağrı süresi (SS:dd:ss)
                         talk_duration:
                           type: string
-                          description: Talk duration (HH:MM:SS)
+                          description: Konuşma süresi (SS:dd:ss)
                         queue_wait_seconds:
                           type: string
-                          description: Queue wait time (HH:MM:SS)
+                          description: Kuyruk bekleme süresi (SS:dd:ss)
                         queue:
                           type: string
-                          description: Queue number
+                          description: Kuyruk adı
                         result:
                           type: string
                           description: Human-readable call result in Turkish
@@ -1091,16 +1136,16 @@ paths:
                           - Geçersiz JSON kullanımı
                         missed:
                           type: boolean
-                          description: Whether call was missed
+                          description: Cevapsız çağrı mı?
                         return_uuid:
                           type: string
                           description: Return UUID
                         recording_present:
                           type: string
-                          description: Recording presence status
+                          description: Kayıt durumu
                         sip_hangup_disposition:
                           type: string
-                          description: SIP hangup disposition
+                          description: SIP sonlandırma nedeni
                         hangup_cause:
                           type: string
                           description: SIP hangup cause code
@@ -1141,79 +1186,73 @@ paths:
                           - INVALID_CALL_REFERENCE
                         call_uuid:
                           type: string
-                          description: Call UUID
+                          description: Çağrı UUID
                         answer_stamp:
                           type: string
-                          description: Call answer timestamp
+                          description: Çağrı cevaplanma zamanı
                           nullable: true
                         end_stamp:
                           type: string
-                          description: Call end timestamp
+                          description: Çağrı bitiş zamanı
                   pagination:
                     type: object
                     properties:
                       page:
                         type: integer
-                        description: Current page number
+                        description: Mevcut sayfa numarası
                       total_count:
                         type: integer
-                        description: Total number of records
+                        description: Toplam kayıt sayısı
                       total_pages:
                         type: integer
-                        description: Total number of pages
+                        description: Toplam sayfa sayısı
                       limit:
                         type: integer
-                        description: Records per page
+                        description: Sayfa başına kayıt sayısı
         '400':
-          description: Bad request - validation error
+          description: Geçersiz istek - doğrulama hatası
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    Invalid recording_present:
-                      value: 'invalid recording_present : invalid_value'
+                    Geçersiz recording_present:
+                      value: 'Geçersiz kayıt durumu: invalid_value'
               schema:
                 type: string
-                description: Error message describing the validation failure
+                description: Doğrulama hatası mesajı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz - geçersiz API anahtarı
           content:
             application/json:
               schema:
                 type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hatası mesajı
   "/cdrs/{id}":
     parameters:
     - name: id
       in: path
-      description: Call UUID
+      description: Çağrı UUID
       required: true
       schema:
         type: string
     get:
-      summary: Get detailed Call Detail Record by Call UUID
+      summary: Belirli bir çağrıya ait detaylı CDR kaydını getirir
       tags:
-      - CDRs (Call Detail Records)
-      description: Retrieves detailed information about a specific call including
-        call flow details
+      - Raporlama ve Kayıtlar
+      description: Belirli bir çağrıya ait tüm detayları ve çağrı akışını getirir.
       operationId: getCdr
-      parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
+      security:
+      - api_key: []
       responses:
         '200':
-          description: CDR details retrieved successfully
+          description: CDR detayları başarıyla getirildi
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    CDR details with call flow:
+                    Çağrı detayları ve akışı örneği:
                       value:
                         cdr:
                           direction: Gelen
@@ -1250,50 +1289,50 @@ paths:
                     properties:
                       direction:
                         type: string
-                        description: Call direction (human readable)
+                        description: Çağrı yönü
                       caller_id_number:
                         type: string
-                        description: Caller ID number
+                        description: Arayan numara
                       destination_number:
                         type: string
-                        description: Destination number
+                        description: Hedef numara
                       result:
                         type: string
-                        description: Call result (human readable)
+                        description: Çağrı sonucu
                       sip_hangup_disposition:
                         type: string
-                        description: SIP hangup disposition
+                        description: SIP sonlandırma nedeni
                       missed:
                         type: boolean
-                        description: Whether call was missed
+                        description: Cevapsız çağrı mı?
                       return_uuid:
                         type: string
                         description: Return UUID
                       call_uuid:
                         type: string
-                        description: Call UUID
+                        description: Çağrı UUID
                       start_stamp:
                         type: string
-                        description: Call start timestamp
+                        description: Çağrı başlangıç zamanı
                       answer_stamp:
                         type: string
-                        description: Call answer timestamp
+                        description: Çağrı cevaplanma zamanı
                         nullable: true
                       end_stamp:
                         type: string
-                        description: Call end timestamp
+                        description: Çağrı bitiş zamanı
                       duration:
                         type: string
-                        description: Call duration (HH:MM:SS)
+                        description: Çağrı süresi (SS:dd:ss)
                       talk_duration:
                         type: string
-                        description: Talk duration (HH:MM:SS)
+                        description: Konuşma süresi (SS:dd:ss)
                       queue_wait_seconds:
                         type: string
-                        description: Queue wait time (HH:MM:SS)
+                        description: Kuyruk bekleme süresi (SS:dd:ss)
                       recording_present:
                         type: string
-                        description: Recording presence status
+                        description: Kayıt durumu
                   call_flow:
                     type: array
                     items:
@@ -1301,75 +1340,79 @@ paths:
                       properties:
                         destination_number:
                           type: string
-                          description: Destination number for this leg
+                          description: Bu bacak için hedef numara
                         start_stamp:
                           type: string
-                          description: Start timestamp for this leg
+                          description: Bu bacak için başlangıç zamanı
                         answer_stamp:
                           type: string
-                          description: Answer timestamp for this leg
+                          description: Bu bacak için cevaplanma zamanı
                           nullable: true
                         end_stamp:
                           type: string
-                          description: End timestamp for this leg
+                          description: Bu bacak için bitiş zamanı
                         duration:
                           type: string
-                          description: Duration for this leg (HH:MM:SS)
+                          description: Bu bacak için süre (SS:dd:ss)
                         ip_address:
                           type: string
-                          description: IP address used
+                          description: Kullanılan IP adresi
                         sip_user_agent:
                           type: string
                           description: SIP User Agent
                         write_codec:
                           type: string
-                          description: Write codec used
+                          description: Yazma codec'i
                         read_codec:
                           type: string
-                          description: Read codec used
+                          description: Okuma codec'i
                         result:
                           type: string
-                          description: Result for this leg
+                          description: Bu bacak için sonuç
         '400':
-          description: CDR not found
+          description: CDR bulunamadı
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    CDR not found:
-                      value: Couldn't find cdr that you was requested
+                    CDR bulunamadı:
+                      value: İstenen CDR kaydı bulunamadı
               schema:
                 type: string
-                description: Error message when CDR cannot be found
+                description: CDR kaydı bulunamazsa hata mesajı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz - geçersiz API anahtarı
           content:
             application/json:
               schema:
                 type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hatası mesajı
   "/contact_groups":
     get:
-      summary: List contact groups
+      summary: Grup listesine erişim
       tags:
-      - Contact Groups
-      description: Retrieves all contact groups for the domain account
+      - Rehber Yönetimi
+      security:
+      - api_key: []
+      description: Santralinizdeki kişi gruplarının listesine erişmek için kullanılır.
+        HTTP GET metodu ile api.bulutsantralim.com/contact_groups adresi çağrılır.
+        İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body&#39;sinde gruplar
+        listesi döner. İstek başarısız olduğunda ise ilgili HTTP Status kodu ile mesajın
+        Body&#39;sinde hata mesajı döner.
       operationId: listContactGroups
       responses:
         '200':
-          description: Contact groups retrieved successfully
+          description: OK
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                  - id: 1
-                    name: VIP Customers
-                  - id: 2
-                    name: Support Team
-                  - id: 3
-                    name: Sales Prospects
+                  - id: 20212
+                    name: Müşteriler
+                  - id: 20213
+                    name: Arkadaşlarım
               schema:
                 type: array
                 items:
@@ -1377,73 +1420,107 @@ paths:
                   properties:
                     id:
                       type: integer
-                      description: Unique identifier of the contact group
+                      description: Grubun benzersiz kimlik numarası
                     name:
                       type: string
-                      description: Name of the contact group
+                      description: Grup adı
                   required:
                   - id
                   - name
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+            application/json:
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
     post:
-      summary: Create a new contact group
+      summary: Grup oluşturma
       tags:
-      - Contact Groups
-      description: Creates a new contact group. Requires Google Contacts integration
-        to be disabled.
+      - Rehber Yönetimi
+      security:
+      - api_key: []
+      description: Yeni bir kişi grubu oluşturur. Google Kişiler entegrasyonunun kapalı
+        olması gerekir. POST metodu ile api.bulutsantralim.com/contact_groups adresine
+        istek gönderilir. İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın
+        Body&#39;sinde oluşturulan grubun ID&#39;si döner. İstek başarısız olduğunda
+        ise ilgili HTTP Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: createContactGroup
       parameters:
       - name: name
         in: query
         required: true
-        description: Name of the contact group to create
+        description: Oluşturulacak grubun adı
+        example: Müşteriler
         schema:
           type: string
       responses:
         '200':
-          description: Contact group created successfully
+          description: OK
           content:
             text/plain:
               examples:
                 example_0:
-                  value: '42'
+                  value: '20212'
               schema:
                 type: string
-                description: ID of the created contact group
+                description: Oluşturulan grubun ID&#39;si
         '400':
-          description: Bad request - Validation error or Google Contacts integration
-            active
+          description: Hatalı istek - Doğrulama hatası veya Google Kişiler entegrasyonu
+            aktif
           content:
             text/plain:
               examples:
                 example_0:
-                  value: Name can't be blank
+                  value: name can't be blank
               schema:
                 type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/contact_groups/{id}":
     parameters:
     - name: id
       in: path
       required: true
-      description: ID of the contact group
+      description: Kişi grubunun benzersiz kimlik numarası
       schema:
         type: integer
     patch:
-      summary: Update contact group
+      summary: Grup güncelleme
       tags:
-      - Contact Groups
-      description: Updates an existing contact group. Requires Google Contacts integration
-        to be disabled.
+      - Rehber Yönetimi
+      security:
+      - api_key: []
+      description: Mevcut bir kişi grubunu günceller. Google Kişiler entegrasyonunun
+        kapalı olması gerekir. PATCH metodu ile api.bulutsantralim.com/contact_groups/{id}
+        adresine istek gönderilir. İstek başarılı olduğunda HTTP 200 Status kodu ile
+        mesajın Body&#39;sinde OK döner. İstek başarısız olduğunda ise ilgili HTTP
+        Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: updateContactGroup
       parameters:
       - name: name
         in: query
         required: true
-        description: New name for the contact group
+        description: Grubun yeni adı
+        example: Arkadaşlarım
         schema:
           type: string
       responses:
         '200':
-          description: Contact group updated successfully
+          description: OK
           content:
             text/plain:
               examples:
@@ -1451,27 +1528,43 @@ paths:
                   value: OK
               schema:
                 type: string
-                description: Success message
+                description: Başarı mesajı
         '400':
-          description: Bad request - Group not found, validation error, or Google
-            Contacts integration active
+          description: Hatalı istek - Grup bulunamadı, doğrulama hatası veya Google
+            Kişiler entegrasyonu aktif
           content:
             text/plain:
               examples:
                 example_0:
-                  value: Name can't be blank
+                  value: name can't be blank
               schema:
                 type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
     delete:
-      summary: Delete contact group
+      summary: Grup silme
       tags:
-      - Contact Groups
-      description: Deletes an existing contact group. Requires Google Contacts integration
-        to be disabled.
+      - Rehber Yönetimi
+      security:
+      - api_key: []
+      description: Mevcut bir kişi grubunu siler. Google Kişiler entegrasyonunun kapalı
+        olması gerekir. DELETE metodu ile api.bulutsantralim.com/contact_groups/{id}
+        adresine istek gönderilir. İstek başarılı olduğunda HTTP 200 Status kodu ile
+        mesajın Body&#39;sinde OK döner. İstek başarısız olduğunda ise ilgili HTTP
+        Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: deleteContactGroup
       responses:
         '200':
-          description: Contact group deleted successfully
+          description: OK
           content:
             text/plain:
               examples:
@@ -1479,10 +1572,10 @@ paths:
                   value: OK
               schema:
                 type: string
-                description: Success message
+                description: Başarı mesajı
         '400':
-          description: Bad request - Group not found, deletion error, or Google Contacts
-            integration active
+          description: Hatalı istek - Grup bulunamadı, silme hatası veya Google Kişiler
+            entegrasyonu aktif
           content:
             text/plain:
               examples:
@@ -1490,66 +1583,85 @@ paths:
                   value: Cannot delete group with associated contacts
               schema:
                 type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/contacts":
     get:
-      summary: List contacts
+      summary: Kişiler listesine erişim
       tags:
-      - Contacts
-      description: Retrieves a paginated list of contacts for the domain account
+      - Rehber Yönetimi
+      security:
+      - api_key: []
+      description: Santralinizdeki kişiler listesine erişmek için kullanılır. HTTP
+        GET metodu ile api.bulutsantralim.com/contacts adresi parametrelerle çağrılır.
+        İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body&#39;sinde kişiler
+        listesi döner. İstek başarısız olduğunda ise ilgili HTTP Status kodu ile mesajın
+        Body&#39;sinde hata mesajı döner.
       operationId: listContacts
       parameters:
       - name: page
         in: query
         required: false
-        description: Page number for pagination (defaults to 1)
+        description: Listenin hangi sayfasında olduğunuz
+        example: 1
         schema:
           type: integer
       - name: limit
         in: query
         required: false
-        description: Number of records per page (must be within configured min/max
-          limits)
+        description: Listeyi sınırlayabilirsiniz. Varsayılan değer 10, minimum değer
+          10, maksimum değer 100
+        example: 10
         schema:
           type: integer
       responses:
         '200':
-          description: Contacts retrieved successfully
+          description: OK
           content:
             application/json:
               examples:
                 example_0:
                   value:
                     contacts:
-                    - id: 1
-                      name: John
-                      surname: Doe
-                      tckn: '12345678901'
-                      description: VIP Customer
-                      phone: '5551234567'
-                      phone1: '5559876543'
-                      email: john.doe@example.com
-                      title: CEO
-                      phone2: '5555555555'
-                      fax: '2121234567'
-                      gender: Male
-                      birthday: '1980-01-15'
+                    - id: 10203
+                      name: Verimor
+                      surname: Telekomünikasyon
+                      tckn: '12345678910'
+                      description: A.Ş.
+                      phone: '05531234567'
+                      phone1: '05531234569'
+                      email: info@verimor.com.tr
+                      title: Sabit Telefon Operatörü
+                      phone2: '02123205062'
+                      fax: '02123205072'
+                      gender: Erkek
+                      birthday: 01.01.1990
                       birthday_sms: true
-                      weddingday: '2010-06-20'
+                      weddingday: 01.01.2018
                       weddingday_sms: true
-                      note1: Important client
-                      note2: Prefers email contact
-                      note3: Morning meetings only
-                      note4: Annual contract renewal
-                      company_name: Acme Corp
-                      monthly_sms_day: 1
-                      monthly_sms_message: Monthly newsletter
+                      note1: ''
+                      note2: ''
+                      note3: ''
+                      note4: ''
+                      company_name: Verimor Telekomünikasyon
+                      monthly_sms_day: 9
+                      monthly_sms_message: Bu gün ayın dokuz
                       group_ids:
-                      - 1
-                      - 3
+                      - 20212
+                      - 20213
                     pagination:
                       page: 1
-                      total_count: 150
-                      total_pages: 15
+                      total_count: 1
+                      total_pages: 1
                       limit: 10
               schema:
                 type: object
@@ -1561,80 +1673,82 @@ paths:
                       properties:
                         id:
                           type: integer
-                          description: Unique identifier of the contact
+                          description: ID değeri. Bu değeri kullanarak Kişi silme
+                            veya güncelleme işlemlerini gerçekleştirebilirsiniz
                         name:
                           type: string
-                          description: First name of the contact
+                          description: Ad
                         surname:
                           type: string
-                          description: Last name of the contact
+                          description: Soyad
                         tckn:
                           type: string
-                          description: Turkish national ID number
+                          description: TC kimlik numarası
                         description:
                           type: string
-                          description: Contact description
+                          description: Açıklama
                         phone:
                           type: string
-                          description: Primary phone number
+                          description: GSM numarası 1
                         phone1:
                           type: string
-                          description: Secondary phone number
+                          description: GSM numarası 2
                         email:
                           type: string
-                          description: Email address
+                          description: E-posta adresi
                         title:
                           type: string
-                          description: Job title
+                          description: Unvan
                         phone2:
                           type: string
-                          description: Third phone number
+                          description: Ek telefon numarası
                         fax:
                           type: string
-                          description: Fax number
+                          description: Fax numarası
                         gender:
                           type: string
-                          description: Gender (human readable)
+                          description: Cinsiyet
                         birthday:
                           type: string
-                          format: date
-                          description: Birthday date
+                          description: Doğum günü
                         birthday_sms:
                           type: boolean
-                          description: Send birthday SMS reminder
+                          description: Doğum gününde otomatik mesaj gönderimi. &#39;true&#39;
+                            veya &#39;false&#39; döner
                         weddingday:
                           type: string
-                          format: date
-                          description: Wedding anniversary date
+                          description: Evlilik günü
                         weddingday_sms:
                           type: boolean
-                          description: Send wedding anniversary SMS reminder
+                          description: Evlilik gününde otomatik mesaj gönderimi. &#39;true&#39;
+                            veya &#39;false&#39; döner
                         note1:
                           type: string
-                          description: First note field
+                          description: Kişiyle ilgili notlar
                         note2:
                           type: string
-                          description: Second note field
+                          description: Kişiyle ilgili notlar 2
                         note3:
                           type: string
-                          description: Third note field
+                          description: Kişiyle ilgili notlar 3
                         note4:
                           type: string
-                          description: Fourth note field
+                          description: Kişiyle ilgili notlar 4
                         company_name:
                           type: string
-                          description: Company name
+                          description: Firma adı
                         monthly_sms_day:
                           type: integer
-                          description: Day of month for monthly SMS
+                          description: Kişiye aylık otomatik SMS gönderilecek gün.
+                            0-31 arası rakam veya &#39;null&#39; döner
                         monthly_sms_message:
                           type: string
-                          description: Monthly SMS message text
+                          description: Aylık SMS mesajı
                         group_ids:
                           type: array
                           items:
                             type: integer
-                          description: Array of contact group IDs
+                          description: Kişinin eklendiği gruplar
                       required:
                       - id
                       - name
@@ -1646,16 +1760,16 @@ paths:
                     properties:
                       page:
                         type: integer
-                        description: Current page number
+                        description: Listenin hangi sayfasında olduğunuz
                       total_count:
                         type: integer
-                        description: Total number of contacts
+                        description: Listede dönen kişi sayısı
                       total_pages:
                         type: integer
-                        description: Total number of pages
+                        description: Listenin kaç sayfadan oluştuğu (total_pages=total_count/limit)
                       limit:
                         type: integer
-                        description: Number of records per page
+                        description: Listeye verilen sınır
                     required:
                     - page
                     - total_count
@@ -1665,167 +1779,210 @@ paths:
                 - contacts
                 - pagination
         '400':
-          description: Bad request - Invalid pagination parameters
+          description: Hatalı istek - Geçersiz sayfalama parametreleri
           content:
             text/plain:
               examples:
                 example_0:
-                  value: 'invalid limit: 1000'
+                  value:
+                    Geçersiz limit:
+                      value: 'invalid limit: 1000'
             application/json:
               schema:
                 type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Geçersiz anahtar:
+                      value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+            application/json:
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
     post:
-      summary: Create a new contact
+      summary: Kişi ekleme
       tags:
-      - Contacts
-      description: Creates a new contact. Requires Google Contacts integration to
-        be disabled.
+      - Rehber Yönetimi
+      security:
+      - api_key: []
+      description: Yeni bir kişi oluşturur. Google Kişiler entegrasyonunun kapalı
+        olması gerekir. POST metodu ile api.bulutsantralim.com/contacts adresine istek
+        gönderilir. İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body&#39;sinde
+        oluşturulan kişinin ID&#39;si döner. İstek başarısız olduğunda ise ilgili
+        HTTP Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: createContact
       parameters:
       - name: salutation
         in: query
         required: false
-        description: Salutation (Mr., Mrs., etc.)
+        description: Hitap şekli (Bay, Bayan vb.)
         schema:
           type: string
       - name: name
         in: query
         required: true
-        description: First name of the contact
+        description: Ad
+        example: Verimor
         schema:
           type: string
       - name: surname
         in: query
         required: true
-        description: Last name of the contact
+        description: Soyad
+        example: Telekomünikasyon
         schema:
           type: string
       - name: tckn
         in: query
         required: false
-        description: Turkish national ID number
+        description: TC kimlik numarası
+        example: '12345678910'
         schema:
           type: string
       - name: description
         in: query
         required: false
-        description: Contact description
+        description: Açıklama
+        example: A.Ş.
         schema:
           type: string
       - name: phone
         in: query
         required: true
-        description: Primary phone number
+        description: GSM numarası 1
+        example: '05531234567'
         schema:
           type: string
       - name: phone1
         in: query
         required: false
-        description: Secondary phone number
+        description: GSM numarası 2
+        example: '05531234569'
         schema:
           type: string
       - name: email
         in: query
         required: false
-        description: Email address
+        description: E-posta adresi
+        example: info@verimor.com.tr
         schema:
           type: string
       - name: title
         in: query
         required: false
-        description: Job title
+        description: Unvan
+        example: Sabit Telefon Operatörü
         schema:
           type: string
       - name: phone2
         in: query
         required: false
-        description: Third phone number
+        description: Ek telefon numarası
+        example: '02123205062'
         schema:
           type: string
       - name: fax
         in: query
         required: false
-        description: Fax number
+        description: Fax numarası
+        example: '02123205072'
         schema:
           type: string
       - name: gender
         in: query
         required: false
-        description: Gender
+        description: 'Cinsiyet (Erkek: &#39;m&#39;, Kadın: &#39;f&#39; olarak gönderilmeli)'
+        example: m
         schema:
           type: string
       - name: birthday
         in: query
-        format: date
         required: false
-        description: Birthday date
+        description: Doğum günü (dd.mm.yyyy formatında olmalı, birthday_sms parametresi
+          &#39;true&#39; olarak gönderildiği zaman zorunludur)
+        example: 01.01.1990
         schema:
           type: string
       - name: birthday_sms
         in: query
         required: false
-        description: Send birthday SMS reminder
+        description: Doğum gününde otomatik mesaj gönderimi. Devreye girmesi için
+          değeri &#39;true&#39; olarak gönderilmeli
+        example: true
         schema:
           type: boolean
       - name: weddingday
         in: query
-        format: date
         required: false
-        description: Wedding anniversary date
+        description: Evlilik günü (dd.mm.yyyy formatında olmalı, weddingday_sms parametresi
+          &#39;true&#39; olarak gönderildiği zaman zorunludur)
+        example: 01.01.2018
         schema:
           type: string
       - name: weddingday_sms
         in: query
         required: false
-        description: Send wedding anniversary SMS reminder
+        description: Evlilik gününde otomatik mesaj gönderimi. Devreye girmesi için
+          değeri &#39;true&#39; olarak gönderilmeli
+        example: true
         schema:
           type: boolean
       - name: address
         in: query
         required: false
-        description: Contact address
+        description: Adres
         schema:
           type: string
       - name: note1
         in: query
         required: false
-        description: First note field
+        description: Kişiyle ilgili notlar
         schema:
           type: string
       - name: note2
         in: query
         required: false
-        description: Second note field
+        description: Kişiyle ilgili notlar 2
         schema:
           type: string
       - name: note3
         in: query
         required: false
-        description: Third note field
+        description: Kişiyle ilgili notlar 3
         schema:
           type: string
       - name: note4
         in: query
         required: false
-        description: Fourth note field
+        description: Kişiyle ilgili notlar 4
         schema:
           type: string
       - name: company_name
         in: query
         required: false
-        description: Company name
+        description: Firma adı
+        example: Verimor Telekomünikasyon
         schema:
           type: string
       - name: monthly_sms_day
         in: query
         required: false
-        description: Day of month for monthly SMS (1-31)
+        description: Kişiye aylık otomatik SMS gönderilmesini istiyorsanız gönderilecek
+          günü giriniz (1-31 arası)
+        example: 9
         schema:
           type: integer
       - name: monthly_sms_message
         in: query
         required: false
-        description: Monthly SMS message text
+        description: Aylık SMS mesajı (monthly_sms_day parametresi girildiği zaman
+          zorunludur)
+        example: Bu gün ayın dokuzu
         schema:
           type: string
       - name: group_ids
@@ -1833,30 +1990,50 @@ paths:
         items:
           type: integer
         required: false
-        description: Array of contact group IDs to assign contact to
+        description: Kişinin eklenmesini istediğiniz grubun id değeri
+        example:
+        - 20212
+        - 20213
         schema:
           type: array
       responses:
         '200':
-          description: Contact created successfully
+          description: OK
           content:
             text/plain:
               examples:
                 example_0:
-                  value: '42'
+                  value:
+                    Kişi başarıyla oluşturuldu:
+                      value: '10203'
               schema:
                 type: string
-                description: ID of the created contact
+                description: Oluşturulan kişinin ID&#39;si
         '400':
-          description: Bad request - Validation error, invalid group IDs, or Google
-            Contacts integration active
+          description: Hatalı istek - Doğrulama hatası, geçersiz grup ID&#39;leri
+            veya Google Kişiler entegrasyonu aktif
           content:
             text/plain:
               examples:
                 example_0:
-                  value: Name can't be blank
+                  value:
+                    İsim boş olamaz:
+                      value: name can&#39;t be blank
               schema:
                 type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Geçersiz anahtar:
+                      value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/contacts/{id}":
     parameters:
     - name: id
@@ -1866,133 +2043,164 @@ paths:
       schema:
         type: integer
     patch:
-      summary: Update contact
+      summary: Kişi güncelleme
       tags:
-      - Contacts
-      description: Updates an existing contact. Requires Google Contacts integration
-        to be disabled.
+      - Rehber Yönetimi
+      security:
+      - api_key: []
+      description: Mevcut bir kişiyi günceller. Google Kişiler entegrasyonunun kapalı
+        olması gerekir. Kişi eklerken kullanabileceğiniz tüm parametreler güncelleme
+        için de geçerlidir. PATCH metodu ile api.bulutsantralim.com/contacts/{id}
+        adresine istek gönderilir. İstek başarılı olduğunda HTTP 200 Status kodu ile
+        mesajın Body&#39;sinde OK döner. İstek başarısız olduğunda ise ilgili HTTP
+        Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: updateContact
       parameters:
       - name: salutation
         in: query
         required: false
+        description: Hitap şekli (Bay, Bayan vb.)
         schema:
           type: string
       - name: name
         in: query
         required: false
+        description: İsim
+        example: Bulutsantralim
         schema:
           type: string
       - name: surname
         in: query
         required: false
+        description: Soyisim
         schema:
           type: string
       - name: tckn
         in: query
         required: false
+        description: T.C. Kimlik Numarası
         schema:
           type: string
       - name: description
         in: query
         required: false
+        description: Açıklama
         schema:
           type: string
       - name: phone
         in: query
         required: false
+        description: Ana telefon numarası
         schema:
           type: string
       - name: phone1
         in: query
         required: false
+        description: İkinci telefon numarası
         schema:
           type: string
       - name: email
         in: query
         required: false
+        description: E-posta adresi
         schema:
           type: string
       - name: title
         in: query
         required: false
+        description: Ünvan
         schema:
           type: string
       - name: phone2
         in: query
         required: false
+        description: Üçüncü telefon numarası
         schema:
           type: string
       - name: fax
         in: query
         required: false
+        description: Faks numarası
         schema:
           type: string
       - name: gender
         in: query
         required: false
+        description: Cinsiyet
         schema:
           type: string
       - name: birthday
         in: query
         format: date
         required: false
+        description: Doğum tarihi
         schema:
           type: string
       - name: birthday_sms
         in: query
         required: false
+        description: Doğum günü SMS hatırlatması
         schema:
           type: boolean
       - name: weddingday
         in: query
         format: date
         required: false
+        description: Evlilik yıldönümü tarihi
         schema:
           type: string
       - name: weddingday_sms
         in: query
         required: false
+        description: Evlilik yıldönümü SMS hatırlatması
         schema:
           type: boolean
       - name: address
         in: query
         required: false
+        description: Adres
         schema:
           type: string
       - name: note1
         in: query
         required: false
+        description: Not 1
         schema:
           type: string
       - name: note2
         in: query
         required: false
+        description: Not 2
         schema:
           type: string
       - name: note3
         in: query
         required: false
+        description: Not 3
         schema:
           type: string
       - name: note4
         in: query
         required: false
+        description: Not 4
         schema:
           type: string
       - name: company_name
         in: query
         required: false
+        description: Şirket adı
         schema:
           type: string
       - name: monthly_sms_day
         in: query
         required: false
+        description: Aylık SMS günü (1-31)
         schema:
           type: integer
       - name: monthly_sms_message
         in: query
         required: false
+        description: Aylık SMS mesajı
         schema:
           type: string
       - name: group_ids
@@ -2000,86 +2208,136 @@ paths:
         items:
           type: integer
         required: false
+        description: Kişi grubu ID&#39;leri dizisi
         schema:
           type: array
       responses:
         '200':
-          description: Contact updated successfully
+          description: OK
           content:
             text/plain:
               examples:
                 example_0:
-                  value: OK
+                  value:
+                    Kişi başarıyla güncellendi:
+                      value: OK
               schema:
                 type: string
-                description: Success message
+                description: Başarı mesajı
         '400':
-          description: Bad request - Contact not found, validation error, invalid
-            group IDs, or Google Contacts integration active
+          description: Hatalı istek - Kişi bulunamadı, doğrulama hatası, geçersiz
+            grup ID&#39;leri veya Google Kişiler entegrasyonu aktif
           content:
             text/plain:
               examples:
                 example_0:
-                  value: Email is invalid
+                  value:
+                    Geçersiz e-posta:
+                      value: Email is invalid
               schema:
                 type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Geçersiz anahtar:
+                      value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
     delete:
-      summary: Delete contact
+      summary: Kişi silme
       tags:
-      - Contacts
-      description: Deletes an existing contact. Requires Google Contacts integration
-        to be disabled.
+      - Rehber Yönetimi
+      security:
+      - api_key: []
+      description: Mevcut bir kişiyi siler. Google Kişiler entegrasyonunun kapalı
+        olması gerekir. DELETE metodu ile api.bulutsantralim.com/contacts/{id} adresine
+        istek gönderilir. İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın
+        Body&#39;sinde OK döner. İstek başarısız olduğunda ise ilgili HTTP Status
+        kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: deleteContact
       responses:
         '200':
-          description: Contact deleted successfully
+          description: OK
           content:
             text/plain:
               examples:
                 example_0:
-                  value: OK
+                  value:
+                    Kişi başarıyla silindi:
+                      value: OK
               schema:
                 type: string
-                description: Success message
+                description: Başarı mesajı
         '400':
-          description: Bad request - Contact not found, deletion error, or Google
-            Contacts integration active
+          description: Hatalı istek - Kişi bulunamadı, silme hatası veya Google Kişiler
+            entegrasyonu aktif
           content:
             text/plain:
               examples:
                 example_0:
-                  value: Cannot delete contact with active campaigns
+                  value:
+                    Silme başarısız:
+                      value: Cannot delete contact with active campaigns
               schema:
                 type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Geçersiz anahtar:
+                      value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/crm_integrations":
     get:
-      summary: Get CRM integration settings
+      summary: CRM Entegrasyon Ayarlarını Getir
       tags:
-      - CRM Integrations
-      description: Retrieves current CRM webhook integration settings for call events
-        (ringing, answered, hangup).
+      - CRM Entegrasyonu
+      description: Çağrı olayları (çalma, cevaplanma, kapanma) için mevcut CRM webhook
+        entegrasyon ayarlarını getirir. Bu endpoint ile hangi olaylar için webhook
+        bildirimleri aktif olduğunu ve webhook URL'ini öğrenebilirsiniz.
       operationId: getCrmIntegrations
-      parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
+      security:
+      - api_key: []
       responses:
+        '401':
+          description: Yetkisiz erişim
+          content:
+            text/plain:
+              examples:
+                unauthorized:
+                  value: 'Gecersiz anahtar: invalid_key'
+            application/json:
+              schema:
+                type: string
         '200':
-          description: CRM integration settings retrieved successfully
+          description: OK
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    CRM integration settings:
-                      value:
-                        ringing: 'on'
-                        answered: 'on'
-                        hangup: 'off'
-                        notification_url: https://crm.example.com/webhook
+                    Tüm bildirimlerin aktif olduğu durum:
+                      ringing: 'on'
+                      answered: 'on'
+                      hangup: 'on'
+                      notification_url: https://crm.example.com/webhook
+                    Sadece cevaplanma bildiriminin aktif olduğu durum:
+                      ringing: 'off'
+                      answered: 'on'
+                      hangup: 'off'
+                      notification_url: https://mycrm.com/api/webhook/calls
               schema:
                 type: object
                 properties:
@@ -2088,46 +2346,46 @@ paths:
                     enum:
                     - 'on'
                     - 'off'
-                    description: Webhook notification for ringing events
+                    description: 'Çağrı çalma olayları için webhook bildirimi (on:
+                      aktif, off: pasif)'
                   answered:
                     type: string
                     enum:
                     - 'on'
                     - 'off'
-                    description: Webhook notification for answered events
+                    description: 'Çağrı cevaplanma olayları için webhook bildirimi
+                      (on: aktif, off: pasif)'
                   hangup:
                     type: string
                     enum:
                     - 'on'
                     - 'off'
-                    description: Webhook notification for hangup events
+                    description: 'Çağrı kapanma olayları için webhook bildirimi (on:
+                      aktif, off: pasif)'
                   notification_url:
                     type: string
-                    description: Webhook URL for CRM notifications
+                    description: CRM bildirimlerinin gönderileceği webhook URL adresi
                 required:
                 - ringing
                 - answered
                 - hangup
                 - notification_url
     post:
-      summary: Update CRM integration settings
+      summary: CRM Entegrasyon Ayarlarını Güncelle
       tags:
-      - CRM Integrations
-      description: Updates CRM webhook integration settings for call events. Enables
-        or disables notifications for ringing, answered, and hangup events.
+      - CRM Entegrasyonu
+      description: Çağrı olayları için CRM webhook entegrasyon ayarlarını günceller.
+        Çalma, cevaplanma ve kapanma olayları için bildirimleri etkinleştirir veya
+        devre dışı bırakır. Webhook URL'i de güncellenebilir.
       operationId: updateCrmIntegrations
+      security:
+      - api_key: []
       parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       - name: ringing
         in: query
         required: false
-        description: "Enable/disable ringing event notifications:\n * `on` \n * `off`
-          \n "
+        description: "Çağrı çalma olayı bildirimlerini etkinleştir/devre dışı bırak:\n
+          * `on` \n * `off` \n "
         enum:
         - 'on'
         - 'off'
@@ -2136,7 +2394,8 @@ paths:
       - name: answered
         in: query
         required: false
-        description: Enable/disable answered event notifications
+        description: Çağrı cevaplanma olayı bildirimlerini etkinleştir/devre dışı
+          bırak
         enum:
         - 'on'
         - 'off'
@@ -2145,7 +2404,7 @@ paths:
       - name: hangup
         in: query
         required: false
-        description: Enable/disable hangup event notifications
+        description: Çağrı kapanma olayı bildirimlerini etkinleştir/devre dışı bırak
         enum:
         - 'on'
         - 'off'
@@ -2154,12 +2413,12 @@ paths:
       - name: notification_url
         in: query
         required: false
-        description: Webhook URL for CRM notifications
+        description: CRM bildirimlerinin gönderileceği webhook URL adresi
         schema:
           type: string
       responses:
         '200':
-          description: Partial update of CRM settings
+          description: Kısmi CRM ayarları güncellemesi
           content:
             text/plain:
               examples:
@@ -2167,9 +2426,9 @@ paths:
                   value: Ok
               schema:
                 type: string
-                description: Success confirmation message
+                description: Başarı onay mesajı
         '400':
-          description: Bad request - Validation error
+          description: Hatalı istek - Doğrulama hatası
           content:
             text/plain:
               examples:
@@ -2177,33 +2436,38 @@ paths:
                   value: Notification url can't be blank
               schema:
                 type: string
-                description: Validation error message
+                description: Doğrulama hata mesajı
+        '401':
+          description: Yetkisiz erişim
+          content:
+            text/plain:
+              examples:
+                unauthorized:
+                  value: 'Gecersiz anahtar: invalid_key'
+              schema:
+                type: string
   "/dnds":
     post:
-      summary: Set Do Not Disturb (DND) state for a user extension
+      summary: Kullanıcı için Rahatsız Etme (DND) modunu ayarla
       tags:
-      - DND (Do Not Disturb)
-      description: Controls the Do Not Disturb state for a user extension. When DND
-        is enabled (on), the user will not receive incoming calls.
+      - Kullanıcı Yönetimi
+      description: Kullanıcının dahili numarası için Rahatsız Etme (DND) modunu açar
+        veya kapatır. DND açıkken kullanıcıya gelen çağrılar engellenir.
       operationId: createDnd
+      security:
+      - api_key: []
       parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       - name: id
         in: query
         required: true
-        description: User extension number to set DND state for
+        description: 'Dahili numara (örn: 1001)'
         schema:
           type: string
       - name: state
         in: query
         required: true
-        description: "DND state: \"on\" to enable DND, \"off\" to disable DND:\n *
-          `on` \n * `off` \n "
+        description: "DND durumu: \"on\" açmak için, \"off\" kapatmak için:\n * `on`
+          \n * `off` \n "
         enum:
         - 'on'
         - 'off'
@@ -2211,70 +2475,81 @@ paths:
           type: string
       responses:
         '200':
-          description: DND disabled successfully
+          description: DND durumu başarıyla değiştirildi
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    DND enabled successfully:
-                      value: Changed DND of 1001 to on.
-                    DND disabled successfully:
-                      value: Changed DND of 1002 to off.
+                    DND başarıyla açıldı:
+                      value: 1001 için DND durumu on olarak değiştirildi.
+                    DND başarıyla kapatıldı:
+                      value: 1002 için DND durumu off olarak değiştirildi.
             text/plain:
               schema:
                 type: string
-                description: Success message confirming DND was disabled
+                description: DND durumu değiştiğine dair başarı mesajı
         '400':
-          description: Bad request - validation error
+          description: Geçersiz istek - doğrulama hatası
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    Invalid state value:
-                      value: state should be on or off
+                    Geçersiz state değeri:
+                      value: state on veya off olmalı
             text/plain:
               schema:
                 type: string
-                description: Error message describing the validation failure
+                description: Doğrulama hatası mesajı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz - geçersiz API anahtarı
           content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Yetkisiz erişim:
+                      value: API anahtarı geçersiz veya eksik
             text/plain:
               schema:
                 type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hatası mesajı
   "/fax_document_urls":
     post:
-      summary: Generate temporary download URL for fax document
+      summary: URL isteme
       tags:
       - Faks Yönetimi
-      description: Creates a temporary download URL for a successfully transmitted
-        fax document. The URL is valid for 1 hour and provides access to the PDF version
-        of the fax.
+      description: Başarıyla iletilen faks belgesi için geçici indirme URL&#39;si
+        oluşturur. HTTP POST metodu ile api.bulutsantralim.com/fax_document_url/ adresine
+        istek gönderilir. İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın
+        Body&#39;sinde belgeye ait URL döner. URL yaşam süresi 1 saattir ve PDF versiyonuna
+        erişim sağlar. İstek başarısız olduğunda ise ilgili HTTP Status kodu ile mesajın
+        Body&#39;sinde hata mesajı döner.
       operationId: createFaxDocumentUrl
+      security:
+      - api_key: []
       parameters:
       - name: call_uuid
         in: query
         required: true
-        description: UUID of the fax transmission call to get document for
+        description: URL&#39;ini istediğiniz faks belgesine ait uuid
+        example: e28e5d48-05d8-11e8-663a-fde60c59425c
         schema:
           type: string
       responses:
         '200':
-          description: Fax document URL generated successfully
+          description: OK
           content:
             text/plain:
               examples:
                 example_0:
-                  value: https://api.example.com/fax_documents/download/F12345678-abcd-1234-efgh-987654321abc
+                  value: https://api.bulutsantralim.com/fax_document/Fbb9d6f36-d1a7-46f5-961e-4be2e2ba1b8e
               schema:
                 type: string
-                description: Temporary download URL for the fax document PDF (valid
-                  for 1 hour)
+                description: Faks belgesi için geçici indirme URL&#39;si (1 saat geçerli)
         '400':
-          description: Bad request - Invalid or missing parameters
+          description: Hatalı istek - Geçersiz veya eksik parametreler
           content:
             text/plain:
               examples:
@@ -2282,6 +2557,17 @@ paths:
                   value: fax is unsuccessful, document can not be loaded
               schema:
                 type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/fax_document/{id}":
     get:
       summary: Download fax document file
@@ -2363,24 +2649,32 @@ paths:
                 description: Error message when file cannot be fetched or processed
   "/fax_orders":
     get:
-      summary: List fax orders
+      summary: Tamamlanmamış faks gönderimlerinin listesi
       tags:
       - Faks Yönetimi
-      description: Retrieves a paginated list of incomplete fax orders from the last
-        week
+      security:
+      - api_key: []
+      description: Santraldaki tamamlanmamış faks gönderimlerinin listesine erişmek
+        için kullanılır. HTTP GET metodu ile api.bulutsantralim.com/fax_orders adresi
+        parametrelerle çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu ile
+        mesajın Body&#39;sinde faks gönderim kayıtları döner. İstek başarısız olduğunda
+        ise ilgili HTTP Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: listFaxOrders
       parameters:
       - name: page
         in: query
         required: false
-        description: Page number for pagination (defaults to 1)
+        description: Liste limite göre sayfalanıyor. "total_pages" değerinden maksimum
+          kaç sayfa olduğunu belirleyerek görmek istediyiniz sayfanın numarasını girebilirsiniz
+        example: 1
         schema:
           type: integer
       - name: limit
         in: query
         required: false
-        description: Number of records per page (must be within configured min/max
-          limits)
+        description: Listeyi sınırlayabilirsiniz. Varsayılan değer 10, minimum değer
+          10, maksimum değer 100
+        example: 10
         schema:
           type: integer
       responses:
@@ -2392,20 +2686,15 @@ paths:
                 example_0:
                   value:
                     fax_orders:
-                    - id: 123
-                      created_at: '2024-01-15 14:30:25'
-                      local_station_id: '12345678'
-                      remote_station_id: '905551234567'
-                      status: Processing
-                    - id: 124
-                      created_at: '2024-01-15 13:15:42'
-                      local_station_id: '12345678'
-                      remote_station_id: '905559876543'
-                      status: Queued
+                    - id: 96
+                      created_at: '2018-06-05 16:41:39'
+                      local_station_id: '902129630131'
+                      remote_station_id: '902123205072'
+                      status: Bekliyor
                     pagination:
                       page: 1
-                      total_count: 15
-                      total_pages: 2
+                      total_count: 1
+                      total_pages: 1
                       limit: 10
               schema:
                 type: object
@@ -2417,20 +2706,20 @@ paths:
                       properties:
                         id:
                           type: integer
-                          description: Unique identifier of the fax order
+                          description: Kayıt NO
                         created_at:
                           type: string
                           format: datetime
-                          description: When the fax order was created
+                          description: Kayıt zamanı
                         local_station_id:
                           type: string
-                          description: Local fax station identifier
+                          description: Arayan numara
                         remote_station_id:
                           type: string
-                          description: Remote fax number to send to
+                          description: Aranan numara
                         status:
                           type: string
-                          description: Human-readable status of the fax order
+                          description: Sonuç
                       required:
                       - id
                       - created_at
@@ -2442,16 +2731,16 @@ paths:
                     properties:
                       page:
                         type: integer
-                        description: Current page number
+                        description: Mevcut sayfa numarası
                       total_count:
                         type: integer
-                        description: Total number of fax orders
+                        description: Toplam faks gönderim kayıt sayısı
                       total_pages:
                         type: integer
-                        description: Total number of pages
+                        description: Toplam sayfa sayısı
                       limit:
                         type: integer
-                        description: Number of records per page
+                        description: Sayfa başına kayıt sayısı
                     required:
                     - page
                     - total_count
@@ -2461,7 +2750,7 @@ paths:
                 - fax_orders
                 - pagination
         '400':
-          description: Bad request - Invalid pagination parameters
+          description: Hatalı istek - Geçersiz parametreler
           content:
             text/plain:
               examples:
@@ -2470,52 +2759,73 @@ paths:
             application/json:
               schema:
                 type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+            application/json:
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
     post:
-      summary: Create a new fax order
+      summary: Faks gönderimi
       tags:
       - Faks Yönetimi
-      description: Creates a new fax order with file data. The file will be processed
-        and queued for transmission via FTP and background job.
+      security:
+      - api_key: []
+      description: Faks göndermek için dosyasının içeriğinin base64 ile kodlanmış
+        halini ve diğer bilgileri POST etmeniz yeterlidir. Uygulamalarınız üzerinden
+        faks göndermek için api.bulutsantralim.com/fax_orders adresi parametrelerle
+        çağrılır. İstek başarılı olduğunda HTTP 200 status kodu ile mesajın Body&#39;sinde
+        faks ID döner. İstek başarısız olduğunda ise ilgili HTTP Status kodu ile mesajın
+        Body&#39;sinde hata mesajı döner.
       operationId: createFaxOrder
       parameters:
       - name: local_station_id
         in: query
         required: false
-        description: Local fax station ID (if not provided, domain default will be
-          used)
+        description: Gönderici numara (zorunlu değil)
+        example: '908505321234'
         schema:
           type: string
       - name: local_station_header
         in: query
         required: false
-        description: Header text to appear on the fax
+        description: Gönderici başlığı
+        example: Bulutsantralim
         schema:
           type: string
       - name: remote_station_id
         in: query
         required: true
-        description: Remote fax number to send the fax to
+        description: Alıcı numara
+        example: '901234567891'
         schema:
           type: string
       - name: filedata
         in: query
         required: true
-        description: Base64 encoded file data with MIME type prefix (e.g., "data:application/pdf;base64,JVBERi0xLjQ...")
+        description: Gönderilecek dosyanın içeriğinin base64 ile kodlanmış hali (data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...
+          formatında)
         schema:
           type: string
       responses:
         '200':
-          description: Fax order created successfully
+          description: Faks başarıyla gönderildi
           content:
             text/plain:
               examples:
                 example_0:
-                  value: '123'
+                  value: '20212'
               schema:
                 type: string
-                description: ID of the created fax order
+                description: Gönderilen faksın kimlik numarası
         '400':
-          description: Bad request - Invalid parameters or file data
+          description: Hatalı istek - Geçersiz parametreler veya dosya verisi
           content:
             text/plain:
               examples:
@@ -2523,35 +2833,57 @@ paths:
                   value: Remote station id can't be blank
               schema:
                 type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/fdrs":
     get:
-      summary: List fax detail records (FDRs)
+      summary: Faks listesine erişim
       tags:
       - Faks Yönetimi
-      description: Retrieves a paginated list of fax detail records with filtering
-        options for date range, direction, caller information, and transmission success
+      description: Santralinizdeki faks detay kayıtlarının listesine erişmek için
+        kullanılır. HTTP GET metodu ile api.bulutsantralim.com/fdrs adresi parametrelerle
+        çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body&#39;sinde
+        faks kayıtları döner. İstek başarısız olduğunda ise ilgili HTTP Status kodu
+        ile mesajın Body&#39;sinde hata mesajı döner. Tarih aralığı 31 günden uzun
+        olamaz.
       operationId: listFdrs
+      security:
+      - api_key: []
       parameters:
       - name: start_stamp_from
         in: query
         format: datetime
         required: false
-        description: Start date for filtering records (defaults to beginning of day
-          for start_stamp_to)
+        description: Başlama tarihi yazdığınız tarihten sonra olan çağrıları listeler.
+          "2017-08-03 12:30:32 UTC" formatında olmalı
+        example: 2018-03-22 12:00:00 UTC
         schema:
           type: string
       - name: start_stamp_to
         in: query
         format: datetime
         required: false
-        description: End date for filtering records (defaults to end of current day)
+        description: Başlama tarihi yazdığınız tarihe kadar olan çağrıları listeler.
+          "2017-08-03 12:30:32 UTC" formatında olmalı. Tarih aralığı 31 günden uzun
+          olamaz
+        example: 2018-03-22 23:59:59 UTC
         schema:
           type: string
       - name: direction
         in: query
         required: false
-        description: "Filter by fax direction:\n * `outbound` \n * `inbound` \n *
-          `internal` \n "
+        description: "Değeri \"inbound\" olarak gönderilirse gelen, değeri \"outbound\"
+          olarak gönderilirse giden, değeri \"internal\" olarak gönderilirse santral
+          içi faksları listeler:\n * `outbound` \n * `inbound` \n * `internal` \n "
         enum:
         - outbound
         - inbound
@@ -2561,19 +2893,22 @@ paths:
       - name: caller_id_number
         in: query
         required: false
-        description: Filter by caller ID number (supports LIKE search)
+        description: Faks gönderen numara
+        example: '902129630131'
         schema:
           type: string
       - name: original_destination
         in: query
         required: false
-        description: Filter by destination fax number (supports LIKE search)
+        description: Faks alan numara
+        example: '902123205072'
         schema:
           type: string
       - name: success
         in: query
         required: false
-        description: Filter by transmission success status
+        description: Değeri "true" olarak gönderilirse başarılı, değeri "false" olarak
+          gönderilirse başarısız faksları listeler
         enum:
         - 'true'
         - 'false'
@@ -2582,55 +2917,45 @@ paths:
       - name: page
         in: query
         required: false
-        description: Page number for pagination (must be > 0, defaults to 1)
+        description: Liste limite göre sayfalanıyor. "total_pages" değerinden maksimum
+          kaç sayfa olduğunu belirleyerek görmek istediyiniz sayfanın numarasını girebilirsiniz
+        example: 1
         schema:
           type: integer
       - name: limit
         in: query
         required: false
-        description: Number of records per page (must be within configured min/max
-          limits)
+        description: Listeyi sınırlayabilirsiniz. Varsayılan değer 10, minimum değer
+          10, maksimum değer 100
+        example: 10
         schema:
           type: integer
       responses:
         '200':
-          description: Fax detail records retrieved successfully
+          description: OK
           content:
             application/json:
               examples:
                 example_0:
                   value:
                     fdrs:
-                    - call_uuid: abc123-def456-ghi789
-                      direction: Outbound
-                      caller_id_number: '12345678'
-                      local_station_header: ACME Corp Fax
-                      original_destination: '905551234567'
-                      pages_count: 3 / 3
+                    - call_uuid: 3289fe02-2dc7-11e8-9a23-1f0cd544cc6v
+                      direction: Giden
+                      caller_id_number: '902129630131'
+                      local_station_header: Bulutsantralim
+                      original_destination: '902123205072'
+                      pages_count: 0 / 0
                       transfer_rate: 14400
-                      start_stamp: '2024-01-15 14:30:25'
-                      answer_stamp: '2024-01-15 14:30:30'
-                      end_stamp: '2024-01-15 14:32:15'
-                      duration: 105
-                      success: Success
-                      result: Normal termination
-                    - call_uuid: xyz987-uvw654-rst321
-                      direction: Inbound
-                      caller_id_number: '905559876543'
-                      local_station_header: 
-                      original_destination: '87654321'
-                      pages_count: 0 / 2
-                      transfer_rate: 9600
-                      start_stamp: '2024-01-15 13:15:42'
-                      answer_stamp: '2024-01-15 13:15:45'
-                      end_stamp: '2024-01-15 13:16:30'
-                      duration: 45
-                      success: Failed
-                      result: Remote disconnection
+                      start_stamp: '2018-03-22 14:50:20'
+                      answer_stamp: '2018-03-22 14:50:20'
+                      end_stamp: '2018-03-22 14:50:35'
+                      duration: 15
+                      success: true
+                      result: Başarılı
                     pagination:
                       page: 1
-                      total_count: 85
-                      total_pages: 9
+                      total_count: 1
+                      total_pages: 1
                       limit: 10
               schema:
                 type: object
@@ -2642,49 +2967,47 @@ paths:
                       properties:
                         call_uuid:
                           type: string
-                          description: Unique identifier of the fax transmission call
+                          description: Faksın uuid&#39;si
                         direction:
                           type: string
-                          description: Human-readable direction of the fax (Outbound,
-                            Inbound, Internal)
+                          description: Çağrının yönü. "Gelen", "Giden" ve "Santral
+                            içi" olarak değişebilir
                         caller_id_number:
                           type: string
-                          description: Caller ID number of the sender
+                          description: Faks gönderen numara
                         local_station_header:
                           type: string
-                          description: Header text displayed on the fax
+                          description: Gönderen başlığı
                         original_destination:
                           type: string
-                          description: Destination fax number
+                          description: Faks alan numara
                         pages_count:
                           type: string
-                          description: Pages transferred vs total pages (e.g., "3
-                            / 5")
+                          description: Sayfa adedi
                         transfer_rate:
                           type: integer
-                          description: Transmission speed in baud rate
+                          description: Gönderim hızı
                         start_stamp:
                           type: string
                           format: datetime
-                          description: When the fax transmission started
+                          description: Arama Zamanı
                         answer_stamp:
                           type: string
                           format: datetime
-                          description: When the fax call was answered (null if not
-                            answered)
+                          description: Cevaplama Zamanı
                         end_stamp:
                           type: string
                           format: datetime
-                          description: When the fax transmission ended (null if ongoing)
+                          description: Kapatma Zamanı
                         duration:
                           type: integer
-                          description: Duration of the fax transmission in seconds
+                          description: Süre
                         success:
-                          type: string
-                          description: Human-readable success status
+                          type: boolean
+                          description: Durum
                         result:
                           type: string
-                          description: Human-readable result code description
+                          description: Sonuç
                       required:
                       - call_uuid
                       - direction
@@ -2699,16 +3022,16 @@ paths:
                     properties:
                       page:
                         type: integer
-                        description: Current page number
+                        description: Mevcut sayfa numarası
                       total_count:
                         type: integer
-                        description: Total number of fax detail records
+                        description: Toplam faks kayıt sayısı
                       total_pages:
                         type: integer
-                        description: Total number of pages
+                        description: Toplam sayfa sayısı
                       limit:
                         type: integer
-                        description: Number of records per page
+                        description: Sayfa başına kayıt sayısı
                     required:
                     - page
                     - total_count
@@ -2718,7 +3041,7 @@ paths:
                 - fdrs
                 - pagination
         '400':
-          description: Bad request - Invalid parameters
+          description: Hatalı istek - Geçersiz parametreler
           content:
             text/plain:
               examples:
@@ -2727,285 +3050,310 @@ paths:
             application/json:
               schema:
                 type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+            application/json:
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/ivr_campaigns.json":
     post:
-      summary: Create a new IVR Campaign
+      summary: Otomatik arama kampanyası oluştur
       tags:
-      - IVR Campaigns
-      description: Creates a new IVR (Interactive Voice Response) campaign for automated
-        outbound calling with digit collection and routing
+      - Çağrı Yönetimi
+      description: Yeni otomatik arama kampanyası oluşturmak için kullanılır. JSON
+        formatında parametreler ile POST isteği gönderilir.
       operationId: createIvrCampaign
+      security:
+      - api_key: []
       parameters:
       - name: key
         in: query
         required: true
-        description: API authentication key
+        description: Size özel oluşturulmuş API anahtarınız
         schema:
           type: string
-      - name: name
-        in: query
-        required: true
-        description: Campaign name
-        schema:
-          type: string
-      - name: date_range_begin
-        in: query
-        required: false
-        description: Campaign start date
-        schema:
-          type: string
-      - name: date_range_end
-        in: query
-        required: false
-        description: Campaign end date
-        schema:
-          type: string
-      - name: time_range_begin
-        in: query
-        required: false
-        description: Daily start time
-        schema:
-          type: string
-      - name: time_range_end
-        in: query
-        required: false
-        description: Daily end time
-        schema:
-          type: string
-      - name: ring_timeout
-        in: query
-        required: false
-        description: Ring timeout in seconds
-        schema:
-          type: integer
-      - name: cli
-        in: query
-        required: false
-        description: Caller ID number
-        schema:
-          type: string
-      - name: welcome_announcement_id
-        in: query
-        required: false
-        description: Welcome announcement ID
-        schema:
-          type: integer
-      - name: call_retries
-        in: query
-        required: false
-        description: Number of call retries
-        schema:
-          type: integer
-      - name: webhook_url
-        in: query
-        required: false
-        description: Webhook URL for notifications
-        schema:
-          type: string
-      - name: digit_target_0
-        in: query
-        required: false
-        description: Target for digit 0
-        schema:
-          type: string
-      - name: digit_target_1
-        in: query
-        required: false
-        description: Target for digit 1
-        schema:
-          type: string
-      - name: digit_target_2
-        in: query
-        required: false
-        description: Target for digit 2
-        schema:
-          type: string
-      - name: digit_target_3
-        in: query
-        required: false
-        description: Target for digit 3
-        schema:
-          type: string
-      - name: digit_target_4
-        in: query
-        required: false
-        description: Target for digit 4
-        schema:
-          type: string
-      - name: digit_target_5
-        in: query
-        required: false
-        description: Target for digit 5
-        schema:
-          type: string
-      - name: digit_target_6
-        in: query
-        required: false
-        description: Target for digit 6
-        schema:
-          type: string
-      - name: digit_target_7
-        in: query
-        required: false
-        description: Target for digit 7
-        schema:
-          type: string
-      - name: digit_target_8
-        in: query
-        required: false
-        description: Target for digit 8
-        schema:
-          type: string
-      - name: digit_target_9
-        in: query
-        required: false
-        description: Target for digit 9
-        schema:
-          type: string
-      - name: digit_target_star
-        in: query
-        required: false
-        description: Target for * key
-        schema:
-          type: string
-      - name: digit_target_square
-        in: query
-        required: false
-        description: 'Target for # key'
-        schema:
-          type: string
-      - name: timeout_target
-        in: query
-        required: false
-        description: Target for timeout
-        schema:
-          type: string
-      - name: invalid_target
-        in: query
-        required: false
-        description: Target for invalid input
-        schema:
-          type: string
-      - name: digit_retries
-        in: query
-        required: false
-        description: Number of digit input retries
-        schema:
-          type: integer
-      - name: digit_timeout
-        in: query
-        required: false
-        description: Digit input timeout
-        schema:
-          type: integer
-      - name: is_commercial
-        in: query
-        required: false
-        description: Whether campaign is commercial
-        schema:
-          type: boolean
-      - name: max_thread_count
-        in: query
-        required: false
-        description: Maximum concurrent threads
-        schema:
-          type: integer
       - name: call_type
         in: query
-        required: false
-        description: Type of call
+        required: true
+        description: 'Otomatik arama tipi: "queue" veya "ivr"'
         schema:
           type: string
       - name: queue_number
         in: query
         required: false
-        description: Queue number for routing
+        description: Kuyruk tipi aramalarda çağrıların aktarılacağı kuyruk numarası
         schema:
           type: string
       - name: thread_multiplier
         in: query
         required: false
-        description: Thread multiplier
+        description: Kuyruk tipi aramalarda eşzamanlı arama çarpanı
         schema:
           type: integer
-      - name: recording_enabled
+      - name: max_thread_count
         in: query
         required: false
-        description: Enable call recording
+        description: Kampanya için eşzamanlı maksimum çağrı sayısı
+        schema:
+          type: integer
+      - name: name
+        in: query
+        required: true
+        description: Kampanya adı
+        schema:
+          type: string
+      - name: date_range_begin
+        in: query
+        required: false
+        description: Kampanya başlangıç tarihi (YYYY-MM-DD)
+        schema:
+          type: string
+      - name: date_range_end
+        in: query
+        required: false
+        description: Kampanya bitiş tarihi (YYYY-MM-DD)
+        schema:
+          type: string
+      - name: time_range_begin
+        in: query
+        required: false
+        description: Çalışma saatlerinin başlangıcı (SS:DD)
+        schema:
+          type: string
+      - name: time_range_end
+        in: query
+        required: false
+        description: Çalışma saatlerinin bitişi (SS:DD)
+        schema:
+          type: string
+      - name: active_days
+        in: query
+        items:
+          type: integer
+        required: false
+        description: Kampanya çalışma günleri (1=Pazartesi, 7=Pazar)
+        schema:
+          type: array
+      - name: ring_timeout
+        in: query
+        required: false
+        description: Aranan numara çalarken beklenecek süre (sn)
+        schema:
+          type: integer
+      - name: cli
+        in: query
+        required: false
+        description: Arayan numara
+        schema:
+          type: string
+      - name: welcome_announcement_id
+        in: query
+        required: false
+        description: Karşılama ses dosyası ID&#39;si
+        schema:
+          type: integer
+      - name: call_retries
+        in: query
+        required: false
+        description: Tekrar arama sayısı
+        schema:
+          type: integer
+      - name: webhook_url
+        in: query
+        required: false
+        description: Tuşlamaların bildirileceği URL
+        schema:
+          type: string
+      - name: digit_target_0
+        in: query
+        required: false
+        description: 0 tuşu hedefi
+        schema:
+          type: string
+      - name: digit_target_1
+        in: query
+        required: false
+        description: 1 tuşu hedefi
+        schema:
+          type: string
+      - name: digit_target_2
+        in: query
+        required: false
+        description: 2 tuşu hedefi
+        schema:
+          type: string
+      - name: digit_target_3
+        in: query
+        required: false
+        description: 3 tuşu hedefi
+        schema:
+          type: string
+      - name: digit_target_4
+        in: query
+        required: false
+        description: 4 tuşu hedefi
+        schema:
+          type: string
+      - name: digit_target_5
+        in: query
+        required: false
+        description: 5 tuşu hedefi
+        schema:
+          type: string
+      - name: digit_target_6
+        in: query
+        required: false
+        description: 6 tuşu hedefi
+        schema:
+          type: string
+      - name: digit_target_7
+        in: query
+        required: false
+        description: 7 tuşu hedefi
+        schema:
+          type: string
+      - name: digit_target_8
+        in: query
+        required: false
+        description: 8 tuşu hedefi
+        schema:
+          type: string
+      - name: digit_target_9
+        in: query
+        required: false
+        description: 9 tuşu hedefi
+        schema:
+          type: string
+      - name: digit_target_star
+        in: query
+        required: false
+        description: "* tuşu hedefi"
+        schema:
+          type: string
+      - name: digit_target_square
+        in: query
+        required: false
+        description: "# tuşu hedefi"
+        schema:
+          type: string
+      - name: timeout_target
+        in: query
+        required: false
+        description: Zaman aşımı hedefi
+        schema:
+          type: string
+      - name: invalid_target
+        in: query
+        required: false
+        description: Geçersiz tuşlama hedefi
+        schema:
+          type: string
+      - name: digit_retries
+        in: query
+        required: false
+        description: Tuşlama tekrar sayısı
+        schema:
+          type: integer
+      - name: digit_timeout
+        in: query
+        required: false
+        description: Tuşlama zaman aşımı (sn)
+        schema:
+          type: integer
+      - name: is_commercial
+        in: query
+        required: false
+        description: Ticari gönderim mi?
         schema:
           type: boolean
       - name: phone_list
         in: query
         items:
           type: object
-        required: false
-        description: List of phone numbers and phrases
-        schema:
-          type: array
-      - name: active_days
-        in: query
-        items:
-          type: string
-        required: false
-        description: Active days of the week
+        required: true
+        description: Aranacak numara listesi ve cümleler
         schema:
           type: array
       - name: iys_recipient_type
         in: query
         required: false
-        description: IYS recipient type (for commercial campaigns)
+        description: İYS alıcı tipi (ticari kampanyalar için)
         schema:
           type: string
       - name: iys_brand_code
         in: query
         required: false
-        description: IYS brand code (for commercial campaigns)
+        description: İYS marka kodu (ticari kampanyalar için)
         schema:
           type: string
+      - name: recording_enabled
+        in: query
+        required: false
+        description: Arama başlar başlamaz kayıt yapılsın mı?
+        schema:
+          type: boolean
       responses:
         '200':
-          description: IVR Campaign created successfully
+          description: Kampanya başarıyla oluşturuldu
           content:
-            text/plain:
+            application/json:
               examples:
                 example_0:
                   value:
-                    Campaign created:
-                      value: '12345'
+                    Başarılı cevap:
+                      value: '20212'
+                    Kuyruk kampanya örneği:
+                      value: '20213'
+            text/plain:
               schema:
                 type: string
-                description: Campaign ID
+                description: Oluşturulan kampanya ID&#39;si
         '400':
-          description: Bad request - validation error
+          description: Hatalı istek - doğrulama hatası
           content:
-            text/plain:
+            application/json:
               examples:
                 example_0:
                   value:
-                    Missing required fields:
-                      value: Name can't be blank
+                    Eksik kampanya adı:
+                      value: name can't be blank
+            text/plain:
               schema:
                 type: string
-                description: Validation error messages
+                description: Hata mesajı
         '403':
-          description: Forbidden - module not purchased
+          description: Modül satın alınmadı - yetkisiz işlem
           content:
-            text/plain:
+            application/json:
               examples:
                 example_0:
                   value:
-                    Module not available:
-                      value: You need to purchase Otomatik IVR module
-              schema:
-                type: string
-                description: Module access error
-        '401':
-          description: Unauthorized - invalid API key
-          content:
+                    Modül satın alınmadı:
+                      value: module not purchased
             text/plain:
               schema:
                 type: string
-                description: Authentication error message
+                description: Modül satın alınmadı hata mesajı
+        '401':
+          description: Yetkisiz - geçersiz API anahtarı
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Yetkisiz erişim:
+                      value: API anahtarı geçersiz veya eksik
+            text/plain:
+              schema:
+                type: string
+                description: Kimlik doğrulama hatası mesajı
   "/ivr_campaigns/{id}.json":
     parameters:
     - name: id
@@ -3015,23 +3363,21 @@ paths:
       schema:
         type: string
     patch:
-      summary: Update IVR Campaign status
+      summary: Otomatik arama kampanyasını başlat/durdur
       tags:
-      - IVR Campaigns
-      description: Updates the status of an existing IVR campaign (start/stop)
+      - Çağrı Yönetimi
+      description: Otomatik arama kampanyasını durdurmak veya tekrar başlatmak için
+        kullanılır. PATCH ile status=off gönderilirse kampanya durur, status=on gönderilirse
+        tekrar başlar.
       operationId: updateIvrCampaign
+      security:
+      - api_key: []
       parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       - name: status
         in: query
         required: true
-        description: "Campaign status: \"on\" to start, \"off\" to stop:\n * `on`
-          \n * `off` \n "
+        description: "Kampanya durumu: \"on\" başlatmak için, \"off\" durdurmak için:\n
+          * `on` \n * `off` \n "
         enum:
         - 'on'
         - 'off'
@@ -3039,19 +3385,19 @@ paths:
           type: string
       responses:
         '200':
-          description: Campaign status updated successfully
+          description: Kampanya durumu başarıyla güncellendi
           content:
             text/plain:
               examples:
                 example_0:
                   value:
-                    Status updated:
-                      value: Ok
+                    Başarılı cevap:
+                      value: OK
               schema:
                 type: string
-                description: Success message
+                description: Başarı mesajı
         '400':
-          description: Bad request - validation error
+          description: Hatalı istek - doğrulama hatası
           content:
             text/plain:
               examples:
@@ -3061,180 +3407,156 @@ paths:
                       value: ivr_campaign is over
               schema:
                 type: string
-                description: Error message describing the validation failure
-        '404':
-          description: Campaign not found
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz - geçersiz API anahtarı
           content:
             text/plain:
               examples:
                 example_0:
                   value:
-                    Campaign not found:
-                      value: Cannot find ivr_campaign with ID non-existent-id
+                    Yetkisiz erişim:
+                      value: API anahtarı geçersiz veya eksik
               schema:
                 type: string
-                description: Error message when campaign cannot be found
-        '401':
-          description: Unauthorized - invalid API key
-          content:
-            text/plain:
-              schema:
-                type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hatası mesajı
     delete:
-      summary: Delete IVR Campaign
+      summary: Otomatik arama kampanyasını sil
       tags:
-      - IVR Campaigns
-      description: Deletes an existing IVR campaign
+      - Çağrı Yönetimi
+      description: Otomatik arama kampanyasını iptal etmek/silmek için kullanılır.
+        Kampanya ID'si ve API anahtarı ile DELETE isteği gönderilir.
       operationId: deleteIvrCampaign
-      parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
+      security:
+      - api_key: []
       responses:
         '200':
-          description: Campaign deleted successfully
+          description: Kampanya başarıyla silindi
           content:
             text/plain:
               examples:
                 example_0:
                   value:
-                    Campaign deleted:
+                    Başarılı cevap:
                       value: OK
               schema:
                 type: string
-                description: Success message
+                description: Başarı mesajı
         '400':
-          description: Bad request - deletion failed
+          description: Hatalı istek - silme hatası
           content:
             text/plain:
               examples:
                 example_0:
                   value:
-                    Deletion failed:
-                      value: Cannot delete campaign with active calls
+                    Kampanya bulunamadı:
+                      value: Cannot find ivr_campaign with ID 112
               schema:
                 type: string
-                description: Error message when deletion fails
-        '404':
-          description: Campaign not found
-          content:
-            text/plain:
-              examples:
-                example_0:
-                  value:
-                    Campaign not found:
-                      value: Cannot find ivr_campaign with ID non-existent-id
-              schema:
-                type: string
-                description: Error message when campaign cannot be found
+                description: Hata mesajı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz - geçersiz API anahtarı
           content:
             text/plain:
+              examples:
+                example_0:
+                  value:
+                    Yetkisiz erişim:
+                      value: API anahtarı geçersiz veya eksik
               schema:
                 type: string
-                description: Authentication error message
-  "/mutings":
-    post:
-      summary: Mute or unmute an active call
+                description: Kimlik doğrulama hatası mesajı
+  "/mute/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Sessize almak istediğiniz çağrının UUID'si. Yeni çağrı başlattığınızda
+        API'den dönen UUID'yi kullanabilirsiniz veya Olay Bildirme ile gelen UUID'leri
+        kullanabilirsiniz
+      example: f3797dfc-a818-11e7-bf70-cb295b6663ce
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Çağrıyı Sessize Al / Sesli Yap
       tags:
-      - Mutings
-      description: Controls the mute state of an active call by call UUID. Can mute
-        (on) or unmute (off) the call audio.
-      operationId: createMuting
+      - Çağrı Yönetimi
+      security:
+      - api_key: []
+      description: Santralde devam eden bir çağrıyı sessize almak veya sesli yapmak
+        için kullanılır. HTTP GET metodu ile çağrı UUID'si ve state parametresi kullanılarak
+        mute işlemi gerçekleştirilir.
+      operationId: muteCall
       parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
-      - name: id
-        in: query
-        required: true
-        description: Call UUID to mute/unmute
-        schema:
-          type: string
       - name: state
         in: query
         required: true
-        description: "Mute state: \"on\" to mute, \"off\" to unmute:\n * `on` \n *
-          `off` \n "
+        description: "Mute modunu açmak için \"on\", kapatmak için \"off\" olarak
+          gönderilir:\n * `on` \n * `off` \n "
         enum:
         - 'on'
         - 'off'
+        example: 'on'
         schema:
           type: string
       responses:
         '200':
-          description: Unmute state changed successfully
+          description: OK - Sesli yapma
           content:
-            application/json:
+            text/plain:
               examples:
                 example_0:
-                  value:
-                    Successfully muted call:
-                      value: Call muted successfully
-                    Successfully unmuted call:
-                      value: Call unmuted successfully
-            text/plain:
+                  value: "+OK"
               schema:
                 type: string
-                description: Success message or operation result
+                description: Başarı onay mesajı
         '400':
-          description: Bad request - validation error
+          description: Hatalı istek
           content:
-            application/json:
+            text/plain:
               examples:
                 example_0:
-                  value:
-                    Call not found:
-                      value: Call not found or already ended
-            text/plain:
+                  value: No such channel!
               schema:
                 type: string
-                description: Error message describing the validation failure
+                description: Hata mesajı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz erişim
           content:
             text/plain:
+              examples:
+                example_0:
+                  value: Unauthorized
               schema:
                 type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hata mesajı
   "/queues":
     get:
-      summary: Get list of queues
+      summary: Kuyruklar listesine erişim
       tags:
-      - Queues
-      description: Retrieves a list of all queues available in the domain
+      - Çağrı Yönetimi
+      description: Santralinizdeki kuyrukların listesine erişmek için kullanılır.
+        Bunun için HTTP GET metodu ile api.bulutsantralim.com adresi aşağıdaki parametrelerle
+        çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body&#39;sinde
+        kuyrukların listesi döner. İstek başarısız olduğunda ise ilgili HTTP Status
+        kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: getQueues
-      parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
+      security:
+      - api_key: []
       responses:
         '200':
-          description: Queues retrieved successfully
+          description: OK
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    Queues list:
-                      value:
-                      - number: support
-                        name: Customer Support
-                      - number: sales
-                        name: Sales Team
-                      - number: tech
-                        name: Technical Support
+                  - number: 200
+                    name: Kuyruk 1
+                  - number: 201
+                    name: Kuyruk 2
+                  - number: 202
+                    name: Kuyruk 3
               schema:
                 type: array
                 items:
@@ -3242,317 +3564,334 @@ paths:
                   properties:
                     number:
                       type: string
-                      description: Queue number
+                      description: Kuyruk numarası
                     name:
                       type: string
-                      description: Queue name
+                      description: Kuyruk adı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
             application/json:
               schema:
                 type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hata mesajı
   "/queues/pending":
     get:
-      summary: Get pending queue calls
+      summary: Kuyrukta bekleyenler listesine erişim
       tags:
-      - Queues
-      description: Retrieves real-time information about pending calls in all queues,
-        fetched from Redis
+      - Çağrı Yönetimi
+      description: Santralinizdeki kuyrukta bekleyenlerin listesine erişmek için kullanılır.
+        Bunun için HTTP GET metodu ile api.bulutsantralim.com adresi aşağıdaki parametrelerle
+        çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body&#39;sinde
+        kuyrukta bekleyenlerin listesi döner. İstek başarısız olduğunda ise ilgili
+        HTTP Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: getQueuesPending
-      parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
+      security:
+      - api_key: []
       responses:
         '200':
-          description: Pending queue calls retrieved successfully
+          description: OK
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    Pending calls in queues:
-                      value:
-                      - joined_at: '1641123456'
-                        caller_id: "+905551234567"
-                        queue_number: support
-                        wait_time: 45
-                      - joined_at: '1641123789'
-                        caller_id: "+905559876543"
-                        queue_number: sales
-                        wait_time: 12
-                    No pending calls:
-                      value: []
+                  - queue_number: '200'
+                    uuid: a7713781-xxxx-44b0-xxxx-38f24c4b55bb
+                    call_uuid: f776683e-1bde-4b58-bc43-128b99497bd9
+                    caller_id: '905320000000'
+                    joined_at: '1624947819'
+                  - queue_number: '202'
+                    uuid: df160df9-1a39-4f3a-abe7-36921ebc53cbb
+                    call_uuid: 98f13afd-697b-409d-8ebc-05f71290517c
+                    caller_id: '905320000001'
+                    joined_at: '1624947822'
               schema:
                 type: array
                 items:
                   type: object
                   description: Pending call information from Redis queue data
                   properties:
-                    joined_at:
-                      type: string
-                      description: Timestamp when call joined queue
-                    caller_id:
-                      type: string
-                      description: Caller ID number
                     queue_number:
                       type: string
-                      description: Queue number
+                      description: Kuyruk numarası
+                    uuid:
+                      type: string
+                      description: Çağrı UUID&#39;si
+                    call_uuid:
+                      type: string
+                      description: Çağrı UUID&#39;si
+                    caller_id:
+                      type: string
+                      description: Arayan numara
+                    joined_at:
+                      type: string
+                      description: Kuyruğa katılma zamanı (timestamp)
                     wait_time:
                       type: integer
-                      description: Wait time in seconds
+                      description: Bekleme süresi (saniye)
         '401':
-          description: Unauthorized - invalid API key
+          description: Bad Request - Geçersiz anahtar
           content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
             application/json:
               schema:
                 type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hata mesajı
   "/queue/manage_users":
     post:
-      summary: Manage queue user members
+      summary: Kuyruğa dahili ekleme, çıkarma veya yer değiştirme
       tags:
-      - Queues
-      description: Updates the list of users assigned to a specific queue
+      - Çağrı Yönetimi
+      description: Santralinizdeki kuyruklara dahili ekleme, çıkarma veya yer değiştirme
+        için kullanılır. Bunun için HTTP GET metodu ile api.bulutsantralim.com adresi
+        aşağıdaki parametrelerle çağrılır. İstek başarılı olduğunda HTTP 200 Status
+        kodu ile mesajın Body&#39;sinde OK döner. İstek başarısız olduğunda ise ilgili
+        HTTP Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: manageQueueUsers
+      security:
+      - api_key: []
       parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       - name: queue_number
         in: query
         required: true
-        description: Queue number to manage
+        description: Dahili ayarını değiştirmek istediğiniz kuyruğun numarası
+        example: '200'
         schema:
           type: string
       - name: user_list
         in: query
         required: true
-        description: Comma-separated list of user extensions to assign to queue
+        description: Kuyruğa dahili eklemek, çıkarmak veya yerini değiştirmek için
+          göndermeniz gereken değer (virgülle ayrılmış)
+        example: '1000,1001,1002'
         schema:
           type: string
       responses:
         '200':
-          description: Queue users updated successfully
+          description: OK
           content:
             text/plain:
               examples:
                 example_0:
                   value:
-                    Users assigned to queue:
-                      value: OK
+                    Başarılı işlem: OK
               schema:
                 type: string
-                description: Success message
+                description: Başarı mesajı
         '400':
-          description: Bad request - validation error
+          description: Hatalı istek - doğrulama hatası
           content:
             text/plain:
               examples:
                 example_0:
                   value:
-                    Invalid user in list:
-                      value: User value null or none 9999
+                    Geçersiz kullanıcı listede: User value null or none 9999
               schema:
                 type: string
-                description: Error message describing the validation failure
+                description: Doğrulama hatası açıklayan hata mesajı
         '404':
-          description: Queue not found
+          description: Kuyruk bulunamadı
           content:
             text/plain:
               examples:
                 example_0:
                   value:
-                    Queue not found:
-                      value: Queue_number value null or none non-existent-queue
+                    Kuyruk bulunamadı: Queue_number value null or none 999
               schema:
                 type: string
-                description: Error message when queue cannot be found
+                description: Kuyruk bulunamadığında dönen hata mesajı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
             text/plain:
+              examples:
+                example_0:
+                  value:
+                    Geçersiz anahtar: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hata mesajı
   "/queue/user_list":
     get:
-      summary: Get queue user members
+      summary: Kuyruktaki dahili listesine erişim
       tags:
-      - Queues
-      description: Retrieves the list of users currently assigned to a specific queue
+      - Çağrı Yönetimi
+      description: Santralinizdeki kuyruğun dahili sırasını listeler. Bunun için HTTP
+        GET metodu ile api.bulutsantralim.com adresi aşağıdaki parametrelerle çağrılır.
+        İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body&#39;sinde dahili
+        listesi döner. İstek başarısız olduğunda ise ilgili HTTP Status kodu ile mesajın
+        Body&#39;sinde hata mesajı döner.
       operationId: getQueueUserList
+      security:
+      - api_key: []
       parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       - name: queue_number
         in: query
         required: true
-        description: Queue number to get user list for
+        description: Kuyruk numarası
+        example: '200'
         schema:
           type: string
       responses:
         '200':
-          description: Queue user list retrieved successfully
+          description: OK
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    Queue user members:
-                      value:
-                      - user: '1001'
-                        name: John Doe
-                      - user: '1002'
-                        name: Jane Smith
-                      - user: '1003'
-                        name: Mike Johnson
-                    Empty queue:
-                      value: []
+                    Kuyruk dahili listesi:
+                    - user: 1000
+                      name: DAHİLİ-1
+                    - user: 1001
+                      name: DAHİLİ-2
+                    - user: 1006
+                      name: DAHİLİ-3
+                    Boş kuyruk: []
               schema:
                 type: array
                 items:
                   type: object
                   properties:
                     user:
-                      type: string
-                      description: User extension number
+                      type: integer
+                      description: Dahili numarası
                     name:
                       type: string
-                      description: User full name
+                      description: Dahili adı
         '404':
-          description: Queue not found
+          description: Kuyruk bulunamadı
           content:
             text/plain:
               examples:
                 example_0:
                   value:
-                    Queue not found:
-                      value: Queue_number value null or none non-existent-queue
+                    Kuyruk bulunamadı: Queue_number value null or none 999
             application/json:
               schema:
                 type: string
-                description: Error message when queue cannot be found
+                description: Kuyruk bulunamadığında dönen hata mesajı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Geçersiz anahtar: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
             application/json:
               schema:
                 type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hata mesajı
   "/recording_urls":
     post:
-      summary: Generate a temporary download URL for call recording
+      summary: Ses kaydı için geçici URL oluştur
       tags:
-      - Recording URLs
-      description: Creates a temporary download URL for a call recording file identified
-        by call UUID. The URL expires after 1 hour.
+      - Raporlama ve Kayıtlar
+      description: Santralinizdeki veya Google Drive'a aktarılmış ses kayıtlarınıza
+        erişmek için geçici bir URL oluşturur. URL 1 saat geçerlidir ve dakikada en
+        fazla 5 istek yapılabilir.
       operationId: createRecordingUrl
+      security:
+      - api_key: []
       parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       - name: call_uuid
         in: query
         required: true
-        description: UUID of the call to get recording URL for
+        description: URL'ini istediğiniz ses kaydına ait çağrı UUID'si
         schema:
           type: string
       responses:
         '200':
-          description: Recording URL generated successfully
+          description: Ses kaydı URL'i başarıyla oluşturuldu
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    Recording download URL:
-                      value: https://api.example.com/recordings/download/R12345678-1234-5678-9abc-123456789def
-                    Another recording URL:
-                      value: https://api.example.com/recordings/download/R87654321-8765-4321-dcba-987654321fed
+                    Başarılı cevap:
+                      value: https://api.bulutsantralim.com/recording/Rbb9d6f36-d1a7-46f5-961e-4be2e2ba1b8e
             text/plain:
               schema:
                 type: string
-                description: Temporary download URL for the recording file (expires
-                  in 1 hour)
+                description: 1 saat geçerli olan geçici ses kaydı dinleme/indirme
+                  URL'i
         '400':
-          description: Bad request - validation or resource error
+          description: Hatalı istek - doğrulama veya kaynak hatası
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    Recording file not found:
-                      value: cannot find recording file for call call-uuid-file-missing
+                    Ses kaydı dosyası bulunamadı:
+                      value: Ses kaydı dosyası bulunamadı
             text/plain:
               schema:
                 type: string
-                description: Error message describing the failure
+                description: Hata mesajı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz - geçersiz API anahtarı
           content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Yetkisiz erişim:
+                      value: API anahtarı geçersiz veya eksik
             text/plain:
               schema:
                 type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hatası mesajı
   "/user_statuses":
     get:
-      summary: List user statuses with filtering
+      summary: Dahili durumlarını listeleme
       tags:
-      - User Statuses
-      description: Retrieves real-time registration and call status information for
-        users. Provides filtering by user number and status. Includes DND (Do Not
-        Disturb) status handling.
+      - Kullanıcı Yönetimi
+      description: Dahililerinizin durumlarını listelemek için kullanılır. HTTP GET
+        metodu ile api.bulutsantralim.com/user_statuses adresi parametrelerle çağrılır.
+        İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body&#39;sinde mesajlar
+        döner. İstek başarısız olduğunda ise ilgili HTTP Status kodu ile mesajın Body&#39;sinde
+        hata mesajı döner. API ile dakikada iki istek (request) gönderebilirsiniz.
       operationId: listUserStatuses
+      security:
+      - api_key: []
       parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       - name: user
         in: query
         required: false
-        description: Filter by specific user number
+        description: Belirli bir Dahilinin durumunu öğrenmek için kullanılır
+        example: '1000'
         schema:
           type: string
       - name: status
         in: query
         required: false
-        description: "Filter by user status:\n * `AVAILABLE` \n * `UNREGISTERED` \n
-          * `TALKING` \n * `SS_DND` \n "
+        description: "Belirli durumdaki Dahilileri listelemek için kullanılır:\n *
+          `AVAILABLE` \n * `TALKING` \n * `UNREGISTERED` \n * `SS_DND` \n "
         enum:
         - AVAILABLE
-        - UNREGISTERED
         - TALKING
+        - UNREGISTERED
         - SS_DND
         schema:
           type: string
       responses:
         '200':
-          description: Filtered user statuses
+          description: Filtrelenmiş dahili durumları
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                  - user: '1003'
+                  - user: 1003
                     status: SS_DND
               schema:
                 type: array
@@ -3560,22 +3899,23 @@ paths:
                   type: object
                   properties:
                     user:
-                      type: string
-                      description: User number (extension number)
+                      type: integer
+                      description: Dahili numarası
                     status:
                       type: string
                       enum:
                       - AVAILABLE
-                      - UNREGISTERED
                       - TALKING
+                      - UNREGISTERED
                       - SS_DND
-                      description: Current user status based on registration and call
-                        state
+                      description: Dahili durumu (AVAILABLE=Müsait, TALKING=Çağrıda,
+                        UNREGISTERED=Çevrimdışı, SS_DND=Bulutsantral server side DND
+                        ayarı aktif)
                   required:
                   - user
                   - status
         '400':
-          description: Bad request - Invalid status filter
+          description: Hatalı istek - Geçersiz durum filtresi
           content:
             text/plain:
               examples:
@@ -3584,22 +3924,40 @@ paths:
             application/json:
               schema:
                 type: string
-                description: Error message listing valid status values
+                description: Geçerli durum değerlerini listeleyen hata mesajı
+        '429':
+          description: Çok fazla istek - Rate limit aşıldı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: Too Many Requests
+            application/json:
+              schema:
+                type: string
+                description: Rate limit hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+            application/json:
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/update_outbound_caller_id":
     post:
       summary: Update user outbound caller ID
       tags:
-      - Users
+      - Kullanıcı Yönetimi
       description: Updates the outbound caller ID number for a specific user extension.
         The caller ID must be one of the available caller IDs for the domain.
       operationId: updateOutboundCallerId
+      security:
+      - api_key: []
       parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       - name: extension
         in: query
         required: true
@@ -3646,31 +4004,42 @@ paths:
                 description: Authentication error message
   "/voicemail_messages":
     get:
-      summary: List voicemail messages
+      summary: Telesekreter arama kayıtlarına erişim
       tags:
-      - Voicemail Messages
-      description: Retrieves a paginated list of voicemail messages with optional
-        filtering by date range, read status, and user number
+      - Raporlama ve Kayıtlar
+      description: Santralinizdeki telesekreter arama kayıtlarına ve ses kayıtlarına
+        erişmek için kullanılır. HTTP GET metodu ile api.bulutsantralim.com adresi
+        parametrelerle çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu ile
+        mesajın Body&#39;sinde mesajlar döner. İstek başarısız olduğunda ise ilgili
+        HTTP Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
+      operationId: getVoicemailMessages
+      security:
+      - api_key: []
       parameters:
       - name: start_stamp_from
         in: query
         format: datetime
         required: false
-        description: Start date for filtering messages (defaults to beginning of day
-          for start_stamp_to)
+        description: Mesaj bırakma tarihi yazdığınız tarihden sonra olan çağrıları
+          listeler
+        example: 2017-08-03 12:30:32 UTC
         schema:
           type: string
       - name: start_stamp_to
         in: query
         format: datetime
         required: false
-        description: End date for filtering messages (defaults to end of current day)
+        description: Mesaj bırakma tarihi yazdığınız tarihe kadar olan çağrıları listeler.
+          Tarih aralığı 31 günden uzun olamaz
+        example: 2017-08-03 12:30:32 UTC
         schema:
           type: string
       - name: read
         in: query
         required: false
-        description: "Filter by read status:\n * `true` \n * `false` \n "
+        description: "Değeri \"true\" olarak gönderilirse okunmuş mesajları, değeri
+          \"false\" olarak gönderilirse henüz okunmamış mesajları listeler:\n * `true`
+          \n * `false` \n "
         enum:
         - 'true'
         - 'false'
@@ -3679,134 +4048,236 @@ paths:
       - name: user_number
         in: query
         required: false
-        description: Filter by specific user number/username
+        description: Mesajın bırakıldığı dahilinin numarası
+        example: '1002'
         schema:
           type: string
       - name: uuid
         in: query
         required: false
-        description: Filter by specific message UUID
+        description: Mesajın (veya ilgili CDR kaydının) kayıt numarası
+        example: 651f8a68-782e-11g7-a6b6-5bedc26e2ab3
         schema:
           type: string
       - name: page
         in: query
         required: false
-        description: Page number for pagination (must be > 0, defaults to 1)
+        description: Liste limite göre sayfalanıyor. "total_pages" değerinden maksimum
+          kaç sayfa olduğunu belirleyerek görmek istediğiniz sayfanın numarasını girebilirsiniz
+        example: 1
         schema:
           type: integer
       - name: limit
         in: query
         required: false
-        description: Number of records per page (must be within configured min/max
-          limits)
+        description: Listeyi sınırlayabilirsiniz. Varsayılan değer 10, minimum değer
+          10, maksimum değer 100
+        example: 10
         schema:
           type: integer
       responses:
         '200':
-          description: Voicemail messages retrieved successfully
+          description: OK
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    messages:
-                    - start_stamp: '2024-01-15 14:30:25'
-                      read_stamp: '2024-01-15 15:45:12'
-                      user_number: '1001'
-                      uuid: abc123-def456-ghi789
-                      caller_id_name: John Doe
-                      caller_id_number: '5551234567'
-                      duration: '00:02:30'
-                    - start_stamp: '2024-01-15 10:15:42'
-                      read_stamp: '1970-01-01 00:00:00'
-                      user_number: '1002'
-                      uuid: xyz987-uvw654-rst321
-                      caller_id_name: Jane Smith
-                      caller_id_number: '5559876543'
-                      duration: '00:01:45'
-                    pagination:
-                      page: 1
-                      total_count: 25
-                      total_pages: 3
-                      limit: 10
+                    Telesekreter mesajları listesi:
+                      value:
+                        messages:
+                        - start_stamp: '2017-08-03 12:30:32 +0300'
+                          read_stamp: '2017-08-03 14:31:32 +0300'
+                          user_number: '1002'
+                          uuid: 651f8a68-782e-11g7-a6b6-5bedc26e2ab3
+                          caller_id_number: '03121234567'
+                          caller_id_name: Mehmet Yılmaz
+                          duration: '00:01:05'
+                        pagination:
+                          page: 1
+                          total_count: 25
+                          total_pages: 3
+                          limit: 10
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start_stamp:
+                          type: string
+                          description: Telesekreter mesajının bırakıldığı zaman
+                        read_stamp:
+                          type: string
+                          description: Telesekreter mesajı okunduysa, okunma zamanı
+                            (OİM&#39;den, IVR&#39;dan veya API&#39;den ses kaydı dinlendiği
+                            zaman)
+                        user_number:
+                          type: string
+                          description: Mesajın bırakıldığı dahili numarası
+                        uuid:
+                          type: string
+                          description: Bu mesajın kayıt numarası. Aynı zamanda ilgili
+                            çağrının numarasıdır, CDR kayıtlarıyla ilişkilidir
+                        caller_id_name:
+                          type: string
+                          description: Mesajı burakan kişinin ismi
+                        caller_id_number:
+                          type: string
+                          description: Mesajı burakan numara
+                        duration:
+                          type: string
+                          description: Ses kaydının süresi
+                      required:
+                      - start_stamp
+                      - read_stamp
+                      - user_number
+                      - uuid
+                      - caller_id_name
+                      - caller_id_number
+                      - duration
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        description: Listenin hangi sayfasında olduğunuz
+                      total_count:
+                        type: integer
+                        description: Listede dönen çağrı sayısı
+                      total_pages:
+                        type: integer
+                        description: Listenin kaç sayfadan oluştuğu (total_pages=total_count/limit)
+                      limit:
+                        type: integer
+                        description: Listeye verilen sınır
+                    required:
+                    - page
+                    - total_count
+                    - total_pages
+                    - limit
+                required:
+                - messages
+                - pagination
         '400':
-          description: Bad request - Invalid parameters
+          description: Hatalı istek - Geçersiz parametreler
           content:
-            application/json:
+            text/plain:
               examples:
                 example_0:
-                  value: 'invalid page : 0'
+                  value:
+                    Geçersiz sayfa:
+                      value: 'invalid page : 0'
+            application/json:
+              schema:
+                type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Geçersiz anahtar:
+                      value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+            application/json:
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/voicemail_recording_urls":
     post:
-      summary: Generate temporary download URL for voicemail recording
+      summary: Telesekreterin ses kaydına erişim
       tags:
-      - Voicemail Recording URLs
-      description: Creates a temporary download URL for a voicemail recording file.
-        The URL is valid for 1 hour and automatically marks the voicemail as read.
+      - Raporlama ve Kayıtlar
+      description: CDR&#39;ın ses kaydına erişimde olduğu gibi, bu ses kayıtlarına
+        erişim de iki aşamaladır. Birinci aşamada URL elde edilir. İkinci aşamada
+        ise o URL&#39;den ses dosyası indirilir/dinlenir. HTTP POST metodu ile api.bulutsantralim.com
+        adresine parametreler gönderilir. İstek başarılı olduğunda HTTP 200 Status
+        kodu ile mesajın Body&#39;sinde ses kaydına ait olan bir URL döner. İstek
+        başarısız olduğunda ise ilgili HTTP Status kodu ile mesajın Body&#39;sinde
+        hata mesajı döner. URL yaşam süresi 1 saattir.
       operationId: createVoicemailRecordingUrl
+      security:
+      - api_key: []
       parameters:
       - name: uuid
         in: query
         required: true
-        description: UUID of the voicemail message to get recording for
+        description: URL&#39;ini istediğiniz telesekreter mesajına ait uuid
+        example: 12345678-1234-5678-4321-123456789012
         schema:
           type: string
       responses:
         '200':
-          description: Recording URL generated successfully
+          description: OK
           content:
             text/plain:
               examples:
                 example_0:
-                  value: https://api.example.com/recordings/download/R12345678-abcd-1234-efgh-987654321abc
+                  value:
+                    Başarılı URL oluşturma:
+                      value: https://api.bulutsantralim.com/recording/Rbb9d6f36-d1a7-46f5-961e-4be2e2ba1b8e
               schema:
                 type: string
-                description: Temporary download URL for the voicemail recording (valid
-                  for 1 hour)
+                description: Telesekreter ses kaydına ait geçici indirme URL&#39;si
+                  (1 saat geçerli)
         '400':
-          description: Bad request - Invalid or missing parameters
+          description: Hatalı istek - Geçersiz veya eksik parametreler
           content:
             text/plain:
               examples:
                 example_0:
-                  value: cannot find recording file for voicemail voicemail-without-recording-789
+                  value:
+                    Telesekreter bulunamadı:
+                      value: cannot find voicemail with uuid 12345678-1234-5678-4321-123456789012
               schema:
                 type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value:
+                    Geçersiz anahtar:
+                      value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/webphone_tokens":
     post:
-      summary: Create webphone authentication token
+      summary: Dahili için token (anahtar) alma
       tags:
-      - Webphone Tokens
-      description: Creates a temporary authentication token for webphone access. Requires
-        the user to be an employee in the system. Token is valid for 24 hours.
+      - Kullanıcı Yönetimi
+      description: Web telefonunu kendi uygulamanızda kullanmak için token oluşturur.
+        Her açılışta ilgili dahili için token alınmalıdır. Token 1 gün geçerlidir.
       operationId: createWebphoneToken
+      security:
+      - api_key: []
       parameters:
-      - name: key
-        in: query
-        required: true
-        description: API authentication key
-        schema:
-          type: string
       - name: extension
         in: query
         required: true
-        description: User extension number for webphone access
+        description: Web telefonunu kullanacak dahili numarası
         schema:
           type: string
       responses:
         '200':
-          description: Webphone token created successfully
+          description: Başarılı cevap
           content:
             text/plain:
               examples:
                 example_0:
-                  value: W12345678-abcd-1234-efgh-987654321abc
+                  value: W03311746-d56d-489b-801f-da610aba71cf
               schema:
                 type: string
-                description: Temporary webphone authentication token (valid for 24
-                  hours)
+                description: Geçici webphone token (1 gün geçerli)
         '400':
-          description: Bad request - Invalid or missing parameters
+          description: Hatalı istek
           content:
             text/plain:
               examples:
@@ -3814,7 +4285,7 @@ paths:
                   value: cannot find employee for extension 1002
               schema:
                 type: string
-                description: Error message describing the failure
+                description: Hata mesajı
 security:
 - api_key: []
 servers:
