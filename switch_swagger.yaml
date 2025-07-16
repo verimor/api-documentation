@@ -92,6 +92,41 @@ paths:
                 example_0:
                   value:
                   - agent: '1010'
+                    status: AVAILABLE
+                    queues:
+                    - '204'
+                    - '205'
+                  - agent: '1011'
+                    status: TALKING
+                    queues:
+                    - '202'
+                  - agent: '1026'
+                    status: ON_BREAK
+                    queues:
+                    - '204'
+                    break_description: Kahve
+                FILTER_BY_AGENT:
+                  value:
+                  - agent: '1010'
+                    queues:
+                    - '204'
+                    - '205'
+                    status: AVAILABLE
+                FILTER_BY_QUEUE:
+                  value:
+                  - agent: '1010'
+                    queues:
+                    - '204'
+                    - '205'
+                    status: AVAILABLE
+                  - agent: '1026'
+                    queues:
+                    - '204'
+                    status: ON_BREAK
+                    break_description: Kahve
+                FILTER_BY_STATUS:
+                  value:
+                  - agent: '1010'
                     queues:
                     - '204'
                     - '205'
@@ -131,7 +166,10 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                MODULE_NOT_ENABLED:
+                  value: Bu API'i kullanabilmeniz için Müşteri Temsilcisi modülüne
+                    sahip olmanız gerekmektedir.
+                INVALID_STATUS:
                   value: invalid status
             application/json:
               schema:
@@ -236,7 +274,12 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                PACKAGE_LIMIT_EXCEEDED:
+                  value: Paket limitinizi doldurduğunuz için yeni ses dosyası ekleyemezsiniz.
+                INVALID_FILE_FORMAT:
+                  value: 'Sound file should have one of these extensions: wav mp3
+                    wma m4a aac ac3 amr flac gsm mpeg mp1 mp2 ra spx ogg 3gp'
+                NAME_REQUIRED:
                   value: Name can't be blank
               schema:
                 type: string
@@ -290,7 +333,12 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                ANNOUNCEMENT_NOT_FOUND:
+                  value: 'cannot find announcement with id: 21870'
+                INVALID_FILE_FORMAT:
+                  value: 'Sound file should have one of these extensions: wav mp3
+                    wma m4a aac ac3 amr flac gsm mpeg mp1 mp2 ra spx ogg 3gp'
+                NAME_REQUIRED:
                   value: Name can't be blank
               schema:
                 type: string
@@ -340,7 +388,11 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                ANNOUNCEMENT_NOT_FOUND:
+                  value: 'cannot find announcement with id: 21870'
+                ID_REQUIRED:
+                  value: id is required
+                ANNOUNCEMENT_IN_USE:
                   value: Cannot delete announcement that is currently in use
               schema:
                 type: string
@@ -440,7 +492,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                INVALID_LIMIT:
                   value: 'invalid limit: 1000'
             application/json:
               schema:
@@ -494,7 +546,13 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                NUMBER_REQUIRED_NULL:
+                  value: number required
+                NUMBER_REQUIRED_EMPTY:
+                  value: number required
+                INVALID_NUMBER_FORMAT:
+                  value: invalid number
+                NUMBER_ALREADY_BLOCKED:
                   value: Number has already been taken
               schema:
                 type: string
@@ -546,7 +604,13 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                NUMBER_REQUIRED_NULL:
+                  value: number required
+                NUMBER_REQUIRED_EMPTY:
+                  value: number required
+                INVALID_NUMBER_FORMAT:
+                  value: invalid number
+                NUMBER_NOT_BLOCKED:
                   value: 905559998888 is not in blocked numbers
               schema:
                 type: string
@@ -649,7 +713,17 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SOURCE_REQUIRED:
+                  value: source required
+                DESTINATION_REQUIRED:
+                  value: destination required
+                INVALID_SOURCE:
+                  value: 'invalid source: 1234'
+                INVALID_DESTINATION:
+                  value: 'invalid destination: 1234'
+                INVALID_CALLER_ID:
+                  value: 'invalid caller_id: yetkisiz_numara'
+                INVALID_TIMEOUT:
                   value: timeout must be between 10 and 60 seconds
               schema:
                 type: string
@@ -707,7 +781,15 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                CALL_UUID_REQUIRED:
+                  value: call_uuid required
+                USER_NUMBER_REQUIRED:
+                  value: user_number required
+                INVALID_USER_NUMBER:
+                  value: not valid user_number
+                CALL_NOT_FOUND:
+                  value: Call not found or already ended
+                TRANSFER_FAILED:
                   value: Transfer failed - user busy or unavailable
               schema:
                 type: string
@@ -773,7 +855,9 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+                NO_SUCH_CHANNEL:
                   value: No such channel!
               schema:
                 type: string
@@ -796,55 +880,67 @@ paths:
                     description: Hata mesajı
   "/caller_ids":
     get:
-      summary: Get list of available Caller IDs
+      summary: Dış Numaralar Listesine Erişim
       tags:
       - Çağrı Yönetimi
-      description: Retrieves a list of all available Caller ID numbers for the domain.
-        Includes numbers from Bulutsantralim authentications and SIP trunks (if SIP
-        trunk module is available).
+      description: |-
+        Santralinizdeki Arayan Numara olarak kullanabileceğiniz numaraların listesine erişmek için kullanılır.
+
+        HAZIRLIK:
+        Online İşlem Merkezi => Bulut Santralim => Santral Ayarlarım menüsü altından API Anahtarınızı (key) öğrenmelisiniz.
       operationId: getCallerIds
       security:
       - api_key: []
       responses:
         '200':
-          description: Caller IDs retrieved successfully
+          description: OK
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    Caller IDs list:
-                      value:
-                      - "+905551234567"
-                      - "+905559876543"
-                      - "+905551111111"
-                      - "+905552222222"
-                    Empty caller IDs list:
-                      value: []
-                    Single caller ID:
-                      value:
-                      - "+905551234567"
+                  - '908501234567'
+                  - '902121234567'
+                  - '902161234567'
+                  - '902127654321'
               schema:
                 type: array
                 items:
                   type: string
-                  description: Caller ID number
-        '401':
-          description: Unauthorized - invalid API key
+                  description: Arayan numara
+                description: Kullanılabilir arayan numaralarının listesi
+        '400':
+          description: Hatalı istek - Geçersiz API anahtarı
           content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
             application/json:
               schema:
                 type: string
-                description: Authentication error message
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+            application/json:
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/originate":
     get:
-      summary: Bir çağrı başlat
+      summary: Çağrı Başlatma
       tags:
       - Çağrı Yönetimi
       security:
       - api_key: []
       description: Geçersiz istek. Gerekli bir parametre eksik veya geçersiz olabilir
         (örneğin, eksik dahili numara, geçersiz hedef).
+      operationId: originateCall
       parameters:
       - name: extension
         in: query
@@ -866,7 +962,7 @@ paths:
         required: false
         description: " Aramada kullanılacak olan dış numara (908505320000 formatında
           olmalı. Bu parametre verilmezse dahilide seçili olan dış no kullanılacaktır)."
-        example: '23123'
+        example: '908505320000'
         schema:
           type: string
       - name: manual_answer
@@ -874,47 +970,64 @@ paths:
         required: false
         description: Değeri true olarak gönderilirse dahilinin telefonu açmasını bekler
           (Normalde otomatik olarak dahili açılır ve karşı numara aranır).
+        example: true
         schema:
           type: boolean
       - name: timeout
         in: query
         required: false
-        description: Opsiyonel. Telefon çaldırma süresidir. 10 ile 60 sn. arasında
-          bir değer olmalı. Varsayılan 30'dur.
+        description: Telefon çaldırma süresidir. 10 ile 60 sn. arasında bir değer
+          olmalı. Varsayılan 30'dur.
         example: 30
-        schema:
-          type: integer
-      - name: announcement_to_caller
-        in: query
-        required: false
-        description: Opsiyonel. Cevaplanma anında aranan tarafa bu anons dinletilir.
-          Ses dosyası ID&#39;lerinizi API ile veya Online İşlem Merkezi üzerinden
-          görebilirsiniz.
         schema:
           type: integer
       - name: announcement_to_callee
         in: query
         required: false
-        description: Opsiyonel. Cevaplanma anında arayan tarafa bu anons dinletilir.
-          Ses dosyası ID&#39;lerinizi API ile veya Online İşlem Merkezi üzerinden
-          görebilirsiniz.
+        description: Cevaplanma anında aranan tarafa dinletilecek anons. Ses dosyası
+          ID'lerinizi API ile veya Online İşlem Merkezi üzerinden görebilirsiniz.
+        schema:
+          type: integer
+      - name: announcement_to_caller
+        in: query
+        required: false
+        description: Cevaplanma anında arayan tarafa dinletilecek anons. Ses dosyası
+          ID'lerinizi API ile veya Online İşlem Merkezi üzerinden görebilirsiniz.
         schema:
           type: integer
       responses:
         '200':
-          description: başarılı
+          description: OK
           content:
             text/plain:
+              examples:
+                success:
+                  value: 358c20bc-fd86-11e5-87a2-157d41a07454
               schema:
                 type: string
-                example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+                description: Çağrı UUID'si
         '400':
-          description: hatalı istek
+          description: Hatalı istek
           content:
             text/plain:
+              examples:
+                EXTENSION_MISSING:
+                  value: extension is missing
+                EXTENSION_NOT_FOUND:
+                  value: extension 1005 not found
               schema:
                 type: string
-                example: dahili numara gerekli
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
     post:
       summary: Bir Çağrı Başlat (POST)
       tags:
@@ -926,8 +1039,24 @@ paths:
       responses:
         '200':
           description: successful
+          content:
+            text/plain:
+              examples:
+                success:
+                  value: a1b2c3d4-e5f6-7890-1234-567890abcdef
+              schema:
+                type: string
+                description: Çağrı UUID'si
         '400':
           description: bad request
+          content:
+            text/plain:
+              examples:
+                MISSING_EXTENSION:
+                  value: extension parameter is required
+              schema:
+                type: string
+                description: Hata mesajı
       requestBody:
         content:
           application/json:
@@ -1010,7 +1139,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                success:
                   value: "+OK"
               schema:
                 type: string
@@ -1020,7 +1149,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                CALL_NOT_FOUND:
                   value: No such channel!
               schema:
                 type: string
@@ -1028,19 +1157,13 @@ paths:
         '401':
           description: Yetkisiz erişim
           content:
-            application/json:
-              examples:
-                example_0:
-                  value:
-                    Geçersiz API anahtarı:
-                      error: Unauthorized
             text/plain:
+              examples:
+                UNAUTHORIZED:
+                  value: Unauthorized
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: Hata mesajı
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/cdrs":
     get:
       summary: Çağrı Detay Kayıtları (CDR) listesini getirir
@@ -1306,10 +1429,12 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
-                  value:
-                    Geçersiz recording_present:
-                      value: 'Geçersiz kayıt durumu: invalid_value'
+                DATE_RANGE_TOO_LONG:
+                  value: Arama zaman filtresi aralığı 31 günden uzun olamaz!
+                INVALID_DIRECTION:
+                  value: 'Geçersiz çağrı yönü: invalid_direction'
+                INVALID_RECORDING_PRESENT:
+                  value: 'Geçersiz kayıt durumu: invalid_value'
               schema:
                 type: string
                 description: Doğrulama hatası mesajı
@@ -1567,7 +1692,9 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                GOOGLE_CONTACTS_ACTIVE:
+                  value: Google Kişiler ile eşitleme özelliği açıkken bu işlem yapılamaz.
+                NAME_REQUIRED:
                   value: name can't be blank
               schema:
                 type: string
@@ -1627,7 +1754,11 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                GOOGLE_CONTACTS_ACTIVE:
+                  value: Google Kişiler ile eşitleme özelliği açıkken bu işlem yapılamaz.
+                GROUP_NOT_FOUND:
+                  value: 'cannot find group with id: 20212'
+                NAME_REQUIRED:
                   value: name can't be blank
               schema:
                 type: string
@@ -1671,7 +1802,11 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                GOOGLE_CONTACTS_ACTIVE:
+                  value: Google Kişiler ile eşitleme özelliği açıkken bu işlem yapılamaz.
+                GROUP_NOT_FOUND:
+                  value: 'cannot find group with id: 20212'
+                CANNOT_DELETE_GROUP_WITH_CONTACTS:
                   value: Cannot delete group with associated contacts
               schema:
                 type: string
@@ -1875,10 +2010,8 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Geçersiz limit:
-                      value: 'invalid limit: 1000'
+                INVALID_LIMIT:
+                  value: 'invalid limit: 1000'
             application/json:
               schema:
                 type: string
@@ -2095,9 +2228,7 @@ paths:
             text/plain:
               examples:
                 example_0:
-                  value:
-                    Kişi başarıyla oluşturuldu:
-                      value: '10203'
+                  value: '10203'
               schema:
                 type: string
                 description: Oluşturulan kişinin ID&#39;si
@@ -2107,10 +2238,12 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    İsim boş olamaz:
-                      value: name can&#39;t be blank
+                GOOGLE_CONTACTS_ACTIVE:
+                  value: Google Kişiler ile eşitleme özelliği açıkken bu işlem yapılamaz.
+                GROUPS_NOT_FOUND:
+                  value: 'Couldn&#39;t find groups with id: 99999'
+                NAME_REQUIRED:
+                  value: name can&#39;t be blank
               schema:
                 type: string
                 description: Hata mesajı
@@ -2310,9 +2443,7 @@ paths:
             text/plain:
               examples:
                 example_0:
-                  value:
-                    Kişi başarıyla güncellendi:
-                      value: OK
+                  value: OK
               schema:
                 type: string
                 description: Başarı mesajı
@@ -2322,10 +2453,14 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Geçersiz e-posta:
-                      value: Email is invalid
+                GOOGLE_CONTACTS_ACTIVE:
+                  value: Google Kişiler ile eşitleme özelliği açıkken bu işlem yapılamaz.
+                CONTACT_NOT_FOUND:
+                  value: 'cannot find contact with id: 10203'
+                GROUPS_NOT_FOUND:
+                  value: 'Couldn&#39;t find groups with id: 99999'
+                INVALID_EMAIL:
+                  value: Email is invalid
               schema:
                 type: string
                 description: Hata mesajı
@@ -2360,9 +2495,7 @@ paths:
             text/plain:
               examples:
                 example_0:
-                  value:
-                    Kişi başarıyla silindi:
-                      value: OK
+                  value: OK
               schema:
                 type: string
                 description: Başarı mesajı
@@ -2372,10 +2505,12 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Silme başarısız:
-                      value: Cannot delete contact with active campaigns
+                GOOGLE_CONTACTS_ACTIVE:
+                  value: Google Kişiler ile eşitleme özelliği açıkken bu işlem yapılamaz.
+                CONTACT_NOT_FOUND:
+                  value: 'cannot find contact with id: 10203'
+                CANNOT_DELETE_CONTACT_WITH_CAMPAIGNS:
+                  value: Cannot delete contact with active campaigns
               schema:
                 type: string
                 description: Hata mesajı
@@ -2516,6 +2651,10 @@ paths:
               examples:
                 example_0:
                   value: Ok
+                UPDATE_RINGING_ONLY:
+                  value: Ok
+                UPDATE_WEBHOOK_URL_ONLY:
+                  value: Ok
               schema:
                 type: string
                 description: Başarı onay mesajı
@@ -2524,7 +2663,9 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                INVALID_NOTIFICATION_URL:
+                  value: Notification url is invalid
+                NOTIFICATION_URL_REQUIRED:
                   value: Notification url can't be blank
               schema:
                 type: string
@@ -2684,10 +2825,14 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
-                  value:
-                    Geçersiz state değeri:
-                      value: state on veya off olmalı
+                ID_REQUIRED:
+                  value: dahili numara gerekli
+                ID_NOT_FOUND:
+                  value: 9999 numaralı dahili bulunamadı
+                STATE_REQUIRED:
+                  value: state gerekli
+                INVALID_STATE:
+                  value: state on veya off olmalı
             text/plain:
               schema:
                 type: string
@@ -2743,7 +2888,13 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                CALL_UUID_MISSING_NULL:
+                  value: missing call_uuid
+                CALL_UUID_MISSING_BLANK:
+                  value: missing call_uuid
+                CALL_NOT_FOUND:
+                  value: cannot find call with call_uuid 12345678-1234-5678-4321-123456789012
+                FAX_UNSUCCESSFUL:
                   value: fax is unsuccessful, document can not be loaded
               schema:
                 type: string
@@ -2804,7 +2955,13 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                MISSING_ID_NULL:
+                  value: missing id
+                MISSING_ID_BLANK:
+                  value: missing id
+                DOWNLOAD_TICKET_NOT_FOUND:
+                  value: cannot find download ticket with code invalid-ticket-code-xyz
+                DOWNLOAD_TICKET_EXPIRED:
                   value: download ticket is expired
             application/pdf:
               schema:
@@ -2823,7 +2980,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                FTP_FETCH_ERROR:
                   value: Unable to fetch file from FTP server
             application/pdf:
               schema:
@@ -2944,7 +3101,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                INVALID_LIMIT:
                   value: 'invalid limit: 1000'
             application/json:
               schema:
@@ -3019,7 +3176,14 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                INVALID_LOCAL_STATION_ID:
+                  value: 'invalid local_station_id: invalid-station'
+                UNSUPPORTED_FILE_EXTENSION:
+                  value: 'File should have one of these extensions: ["pdf", "jpg",
+                    "jpeg", "png", "bmp", "gif", "tif", "tiff"]'
+                INVALID_BASE64:
+                  value: invalid base64
+                REMOTE_STATION_ID_REQUIRED:
                   value: Remote station id can't be blank
               schema:
                 type: string
@@ -3235,7 +3399,21 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                INVALID_START_STAMP_FROM:
+                  value: 'Invalid start_stamp_from : invalid-date'
+                INVALID_START_STAMP_TO:
+                  value: 'Invalid start_stamp_to : invalid-date'
+                DATE_RANGE_TOO_LONG:
+                  value: Search time filter interval can not be longer than 31 days!
+                START_STAMP_FROM_AFTER_TO:
+                  value: 'Invalid start_stamp_from : invalid-date'
+                INVALID_DIRECTION:
+                  value: 'invalid direction : invalid-direction'
+                INVALID_SUCCESS:
+                  value: 'invalid success : maybe'
+                INVALID_LIMIT:
+                  value: 'invalid limit: 1000'
+                INVALID_PAGE:
                   value: 'invalid page : 0'
             application/json:
               schema:
@@ -3510,10 +3688,8 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
-                  value:
-                    Eksik kampanya adı:
-                      value: name can't be blank
+                NAME_REQUIRED:
+                  value: name can't be blank
             text/plain:
               schema:
                 type: string
@@ -3591,10 +3767,14 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Campaign finished:
-                      value: ivr_campaign is over
+                CAMPAIGN_NOT_FOUND:
+                  value: Cannot find ivr_campaign with ID 112
+                STATUS_REQUIRED:
+                  value: status parametresi gerekli
+                INVALID_STATUS:
+                  value: status on veya off olmalı
+                CAMPAIGN_FINISHED:
+                  value: ivr_campaign is over
               schema:
                 type: string
                 description: Hata mesajı
@@ -3610,6 +3790,19 @@ paths:
               schema:
                 type: string
                 description: Kimlik doğrulama hatası mesajı
+        '403':
+          description: Modül satın alınmadı - yetkisiz işlem
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Modül satın alınmadı:
+                      value: module not purchased
+            text/plain:
+              schema:
+                type: string
+                description: Modül satın alınmadı hata mesajı
     delete:
       summary: Otomatik arama kampanyasını sil
       tags:
@@ -3656,6 +3849,19 @@ paths:
               schema:
                 type: string
                 description: Kimlik doğrulama hatası mesajı
+        '403':
+          description: Modül satın alınmadı - yetkisiz işlem
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Modül satın alınmadı:
+                      value: module not purchased
+            text/plain:
+              schema:
+                type: string
+                description: Modül satın alınmadı hata mesajı
   "/mute/{id}":
     parameters:
     - name: id
@@ -3705,7 +3911,13 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+                MISSING_STATE:
+                  value: state required
+                INVALID_STATE:
+                  value: state should be on or off
+                INVALID_UUID:
                   value: No such channel!
               schema:
                 type: string
@@ -3881,9 +4093,10 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Geçersiz kullanıcı listede: User value null or none 9999
+                USER_LIST_REQUIRED:
+                  value: user_list value null or none
+                INVALID_USER_IN_LIST:
+                  value: User value null or none 9999
               schema:
                 type: string
                 description: Doğrulama hatası açıklayan hata mesajı
@@ -4019,10 +4232,14 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
-                  value:
-                    Ses kaydı dosyası bulunamadı:
-                      value: Ses kaydı dosyası bulunamadı
+                CALL_UUID_REQUIRED:
+                  value: call_uuid parametresi gerekli
+                CALL_NOT_FOUND:
+                  value: call_uuid ile eşleşen çağrı bulunamadı
+                RECORDING_NOT_FOUND:
+                  value: Bu çağrı için ses kaydı bulunamadı
+                RECORDING_FILE_NOT_FOUND:
+                  value: Ses kaydı dosyası bulunamadı
             text/plain:
               schema:
                 type: string
@@ -4081,6 +4298,24 @@ paths:
               examples:
                 example_0:
                   value:
+                  - user: 1000
+                    status: AVAILABLE
+                  - user: 1001
+                    status: UNREGISTERED
+                  - user: 1002
+                    status: TALKING
+                  - user: 1003
+                    status: SS_DND
+                FILTER_BY_USER:
+                  value:
+                  - user: 1000
+                    status: AVAILABLE
+                FILTER_BY_TALKING_STATUS:
+                  value:
+                  - user: 1002
+                    status: TALKING
+                FILTER_BY_DND_STATUS:
+                  value:
                   - user: 1003
                     status: SS_DND
               schema:
@@ -4109,7 +4344,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                INVALID_STATUS:
                   value: status should be AVAILABLE, UNREGISTERED, TALKING, SS_DND
             application/json:
               schema:
@@ -4138,12 +4373,18 @@ paths:
                 type: string
                 description: Kimlik doğrulama hata mesajı
   "/update_outbound_caller_id":
-    post:
-      summary: Update user outbound caller ID
+    get:
+      summary: Dahilinin Dış Numarasını (Arayan No) Değiştirme
       tags:
       - Kullanıcı Yönetimi
-      description: Updates the outbound caller ID number for a specific user extension.
-        The caller ID must be one of the available caller IDs for the domain.
+      description: |-
+        Santralinizdeki dahililerin dış numarasını değiştirmek için kullanılır.
+
+        HAZIRLIK:
+        Online İşlem Merkezi => Bulut Santralim => Santral Ayarlarım menüsü altından API Anahtarınızı (key) öğrenmelisiniz.
+
+        ÖNEMLİ NOT:
+        Kullanabileceğiniz numara listesini caller_ids API'sinden öğrenebilirsiniz.
       operationId: updateOutboundCallerId
       security:
       - api_key: []
@@ -4151,47 +4392,57 @@ paths:
       - name: extension
         in: query
         required: true
-        description: User extension number
+        description: Dış numarası değiştirilecek olan dahili
+        example: '1000'
         schema:
           type: string
       - name: caller_id
         in: query
         required: true
-        description: New outbound caller ID number (must be available for domain)
+        description: Dahilinin kullanacağı dış numara. Kullanabileceğiniz numara listesini
+          caller_ids API'sinden öğrenebilirsiniz
+        example: 90850532xxxx
         schema:
           type: string
       responses:
         '200':
-          description: Outbound caller ID updated successfully
+          description: OK
           content:
             text/plain:
               examples:
                 example_0:
-                  value:
-                    Caller ID updated:
-                      value: OK
+                  value: OK
               schema:
                 type: string
-                description: Success message
+                description: Başarı mesajı
         '400':
-          description: Bad request - validation error
+          description: Hatalı istek - Doğrulama hatası
+          content:
+            text/plain:
+              examples:
+                EXTENSION_REQUIRED:
+                  value: extension required
+                CALLER_ID_REQUIRED:
+                  value: caller_id required
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+                USER_NOT_FOUND:
+                  value: cannot find user for extension 9999
+                INVALID_CALLER_ID_FORMAT:
+                  value: Outbound caller id number is invalid
+              schema:
+                type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
             text/plain:
               examples:
                 example_0:
-                  value:
-                    Save validation error:
-                      value: Outbound caller id number is invalid
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
-                description: Error message describing the validation failure
-        '401':
-          description: Unauthorized - invalid API key
-          content:
-            text/plain:
-              schema:
-                type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hata mesajı
   "/voicemail_messages":
     get:
       summary: Telesekreter arama kayıtlarına erişim
@@ -4271,23 +4522,21 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                success:
                   value:
-                    Telesekreter mesajları listesi:
-                      value:
-                        messages:
-                        - start_stamp: '2017-08-03 12:30:32 +0300'
-                          read_stamp: '2017-08-03 14:31:32 +0300'
-                          user_number: '1002'
-                          uuid: 651f8a68-782e-11g7-a6b6-5bedc26e2ab3
-                          caller_id_number: '03121234567'
-                          caller_id_name: Mehmet Yılmaz
-                          duration: '00:01:05'
-                        pagination:
-                          page: 1
-                          total_count: 25
-                          total_pages: 3
-                          limit: 10
+                    messages:
+                    - start_stamp: '2017-08-03 12:30:32 +0300'
+                      read_stamp: '2017-08-03 14:31:32 +0300'
+                      user_number: '1002'
+                      uuid: 651f8a68-782e-11g7-a6b6-5bedc26e2ab3
+                      caller_id_number: '03121234567'
+                      caller_id_name: Mehmet Yılmaz
+                      duration: '00:01:05'
+                    pagination:
+                      page: 1
+                      total_count: 25
+                      total_pages: 3
+                      limit: 10
               schema:
                 type: object
                 properties:
@@ -4356,10 +4605,18 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Geçersiz sayfa:
-                      value: 'invalid page : 0'
+                INVALID_START_STAMP_FROM:
+                  value: 'Invalid start_stamp_from : invalid-date'
+                INVALID_START_STAMP_TO:
+                  value: 'Invalid start_stamp_to : invalid-date'
+                TIME_INTERVAL_TOO_LONG:
+                  value: Search time filter interval can not be longer than 31 days!
+                INVALID_READ_PARAM:
+                  value: 'invalid read : invalid'
+                INVALID_LIMIT:
+                  value: 'invalid limit: 1000'
+                INVALID_PAGE:
+                  value: 'invalid page : 0'
             application/json:
               schema:
                 type: string
@@ -4369,10 +4626,8 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Geçersiz anahtar:
-                      value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
             application/json:
               schema:
                 type: string
@@ -4406,10 +4661,8 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Başarılı URL oluşturma:
-                      value: https://api.bulutsantralim.com/recording/Rbb9d6f36-d1a7-46f5-961e-4be2e2ba1b8e
+                success:
+                  value: https://api.bulutsantralim.com/recording/Rbb9d6f36-d1a7-46f5-961e-4be2e2ba1b8e
               schema:
                 type: string
                 description: Telesekreter ses kaydına ait geçici indirme URL&#39;si
@@ -4419,10 +4672,12 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Telesekreter bulunamadı:
-                      value: cannot find voicemail with uuid 12345678-1234-5678-4321-123456789012
+                UUID_MISSING_NULL:
+                  value: missing uuid
+                UUID_MISSING_BLANK:
+                  value: missing uuid
+                VOICEMAIL_NOT_FOUND:
+                  value: cannot find voicemail with uuid 12345678-1234-5678-4321-123456789012
               schema:
                 type: string
                 description: Hata mesajı
@@ -4431,10 +4686,8 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Geçersiz anahtar:
-                      value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
@@ -4471,7 +4724,13 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                MISSING_EXTENSION_NULL:
+                  value: missing extension
+                MISSING_EXTENSION_EMPTY:
+                  value: missing extension
+                USER_NOT_FOUND:
+                  value: cannot find user for extension 9999
+                EMPLOYEE_NOT_FOUND:
                   value: cannot find employee for extension 1002
               schema:
                 type: string
