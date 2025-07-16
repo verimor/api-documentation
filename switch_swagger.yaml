@@ -161,30 +161,32 @@ paths:
                 description: Kimlik doğrulama hata mesajı
   "/announcements":
     get:
-      summary: Get list of announcements
+      summary: Ses dosyaları listesine erişim
       tags:
       - Anons Yönetimi
       security:
       - api_key: []
-      description: Retrieves a list of all announcements (audio files) available in
-        the domain
+      description: Santralinizdeki ses dosyalarının listesine erişmek için kullanılır.
+        İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body&#39;sinde ses
+        dosyalarının listesi döner. İstek başarısız olduğunda ise ilgili HTTP Status
+        kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: getAnnouncements
       responses:
         '200':
-          description: Announcements retrieved successfully
+          description: Başarılı cevap
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    Announcements list:
-                      value:
-                      - id: 1
-                        name: Welcome Message
-                      - id: 2
-                        name: Hold Music
-                      - id: 3
-                        name: Queue Announcement
+                  - id: 112
+                    name: Firmamıza hoşgeldiniz
+                  - id: 113
+                    name: Kalite standlarımız gereği
+                  - id: 114
+                    name: Mesai dışındayız
+                  - id: 115
+                    name: Öğle molası
               schema:
                 type: array
                 items:
@@ -192,165 +194,169 @@ paths:
                   properties:
                     id:
                       type: integer
-                      description: Announcement ID
+                      description: Ses dosyası ID
                     name:
                       type: string
-                      description: Announcement name
+                      description: Ses dosyası adı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz - geçersiz API anahtarı
           content:
+            text/plain:
+              examples:
+                example_0:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
             application/json:
               schema:
                 type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hata mesajı
     post:
-      summary: Create a new announcement
+      summary: Yeni ses dosyası yükleme
       tags:
       - Anons Yönetimi
       security:
       - api_key: []
-      description: Creates a new announcement by uploading an audio file
+      description: Yeni ses dosyası yüklemek için kullanılır. Yeni ses dosyasının
+        ismini ve içeriğinin base64 ile kodlanmış halini POST etmeniz yeterlidir.
+        Başarılı durumda oluşturulan ses dosyasının ID'si döner.
       operationId: createAnnouncement
       parameters: []
       responses:
         '200':
-          description: Announcement created successfully
+          description: Başarılı cevap
           content:
             text/plain:
               examples:
                 example_0:
-                  value:
-                    Announcement created:
-                      value: '123'
+                  value: '859'
               schema:
                 type: string
-                description: Created announcement ID
+                description: Oluşturulan ses dosyası ID'si
         '400':
-          description: Bad request - validation error or plan limit reached
+          description: Hatalı istek
           content:
             text/plain:
               examples:
                 example_0:
-                  value:
-                    Missing required fields:
-                      value: Name can't be blank
+                  value: Name can't be blank
               schema:
                 type: string
-                description: Error message describing the validation failure
+                description: Hata mesajı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz - geçersiz API anahtarı
           content:
             text/plain:
               schema:
                 type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hata mesajı
       requestBody:
         content:
           multipart/form-data:
             schema:
               type: string
         required: true
-        description: Announcement name
+        description: Ses dosyası adı
   "/announcements/{id}":
     parameters:
     - name: id
       in: path
-      description: Announcement ID
+      description: Ses dosyası ID
       required: true
       schema:
         type: string
     patch:
-      summary: Update an existing announcement
+      summary: Ses dosyası güncelleme
       tags:
       - Anons Yönetimi
       security:
       - api_key: []
-      description: Updates an existing announcement name and/or audio file
+      description: Mevcut ses dosyasının adını ve içeriğini güncellemek için kullanılır.
+        Ses dosyasının ismini ve içeriğinin base64 ile kodlanmış halini PUT etmeniz
+        yeterlidir. Başarılı durumda OK döner.
       operationId: updateAnnouncement
       parameters: []
       responses:
         '200':
-          description: Announcement updated successfully
+          description: Başarılı cevap
           content:
             text/plain:
               examples:
                 example_0:
-                  value:
-                    Announcement updated:
-                      value: OK
+                  value: OK
               schema:
                 type: string
-                description: Success message
+                description: Başarı mesajı
         '400':
-          description: Bad request - validation error or announcement not found
+          description: Hatalı istek
           content:
             text/plain:
               examples:
                 example_0:
-                  value:
-                    Validation error:
-                      value: Name can't be blank
+                  value: Name can't be blank
               schema:
                 type: string
-                description: Error message describing the failure
+                description: Hata mesajı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz - geçersiz API anahtarı
           content:
             text/plain:
               schema:
                 type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hata mesajı
       requestBody:
         content:
           multipart/form-data:
             schema:
               type: string
-        description: New announcement name
+        description: Yeni ses dosyası adı
     delete:
-      summary: Delete an announcement
+      summary: Ses dosyası silme
       tags:
       - Anons Yönetimi
       security:
       - api_key: []
-      description: Deletes an existing announcement from the domain
+      description: Ses dosyasını silmek için kullanılır. Ses dosyasının id ile DELETE
+        etmeniz yeterlidir. Başarılı durumda OK döner.
       operationId: deleteAnnouncement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Silinecek ses dosyasının ID değeri
+        schema:
+          type: string
       responses:
         '200':
-          description: Announcement deleted successfully
+          description: Başarılı cevap
           content:
             text/plain:
               examples:
                 example_0:
-                  value:
-                    Announcement deleted:
-                      value: OK
+                  value: OK
               schema:
                 type: string
-                description: Success message
+                description: Başarı mesajı
         '400':
-          description: Bad request - announcement not found or deletion failed
+          description: Hatalı istek - ses dosyası bulunamadı veya silme başarısız
           content:
             text/plain:
               examples:
                 example_0:
-                  value:
-                    Deletion failed:
-                      value: Cannot delete announcement that is currently in use
+                  value: Cannot delete announcement that is currently in use
               schema:
                 type: string
-                description: Error message describing the failure
+                description: Hata mesajı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz - geçersiz API anahtarı
           content:
             text/plain:
               schema:
                 type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hata mesajı
   "/blocked_numbers":
     get:
       summary: Karalisteye erişim
       tags:
-      - Çağrı Yönetimi
+      - Karaliste Yönetimi
       description: Santralinizdeki kara listedeki numaraların listesine erişmek için
         kullanılır. HTTP GET metodu ile api.bulutsantralim.com/blocked_numbers adresi
         parametrelerle çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu ile
@@ -454,7 +460,7 @@ paths:
     post:
       summary: Karalisteye ekleme
       tags:
-      - Çağrı Yönetimi
+      - Karaliste Yönetimi
       description: Telefon numarasını kara listeye ekler. Numara kayıt edilmeden önce
         normalize edilir. POST metodu ile api.bulutsantralim.com/blocked_numbers adresine
         istek gönderilir. İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın
@@ -506,7 +512,7 @@ paths:
     delete:
       summary: Karalisteden silme
       tags:
-      - Çağrı Yönetimi
+      - Karaliste Yönetimi
       description: Telefon numarasını kara listeden çıkarır. Numara kaldırılmadan
         önce normalize edilir. DELETE metodu ile api.bulutsantralim.com/blocked_numbers/delete
         adresi parametrelerle çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu
@@ -555,153 +561,239 @@ paths:
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
-  "/bridges":
-    post:
-      summary: Create a bridge connection between two phone numbers
+  "/bridge":
+    get:
+      summary: Çağrı Bağlama
       tags:
       - Çağrı Yönetimi
       security:
       - api_key: []
-      description: Creates a bridge connection between source and destination phone
-        numbers with optional announcements and recording
+      description: 'Uygulamalarınız üzerinden iki dış numarayı (örn. cep telefonu)
+        arayıp birbiriyle görüştürmek için kullanılır. Kullanım alanları: Müşteriniz
+        ve saha personelinizi görüştürmek istiyorsunuz fakat bilgi güvenliği (örn.
+        KVKK) nedeniyle cep telefonu numaralarının görünmesini istemiyorsunuz (numara
+        maskeleme/gizleme). Müşteriniz ve saha personelinizin yaptığı görüşmeleri
+        raporlamak ve ses kayıtlarını tutmak istiyorsunuz.'
       operationId: createBridge
       parameters:
       - name: source
         in: query
         required: true
-        description: Source phone number to bridge from
+        description: İlk olarak bu numara aranır, telefon açılınca destination aranır
+          (yurtiçi çağrılar için 908505320000, yurtdışı çağrılar için 00493027590915
+          formatında)
+        example: '905321234567'
         schema:
           type: string
       - name: destination
         in: query
         required: true
-        description: Destination phone number to bridge to
+        description: İkinci aranacak numara (yurtiçi çağrılar için 908505320000, yurtdışı
+          çağrılar için 00493027590915 formatında)
+        example: '905423456789'
         schema:
           type: string
       - name: caller_id
         in: query
         required: false
-        description: Caller ID to display (must be authorized for domain)
+        description: İki tarafı da ararken kullanılacak dış numara (908505320000 formatında.
+          Bu parametre verilmezse 1000 dahilisinde seçili olan dış no kullanılacaktır)
+        example: '908505320000'
         schema:
           type: string
       - name: timeout
         in: query
         required: false
-        description: 'Call timeout in seconds (10-60, default: 29)'
+        description: Telefon çaldırma süresi. 10 ile 60 sn. arasında bir değer olmalı.
+          Varsayılan 30
+        example: 30
         schema:
           type: integer
       - name: announcement_to_caller
         in: query
         required: false
-        description: Announcement ID to play to caller
+        description: Cevaplanma anında arayan tarafa dinletilecek anons. Ses dosyası
+          ID'lerinizi API ile veya Online İşlem Merkezi üzerinden görebilirsiniz
         schema:
-          type: string
+          type: integer
       - name: announcement_to_callee
         in: query
         required: false
-        description: Announcement ID to play to callee
+        description: Cevaplanma anında aranan tarafa dinletilecek anons. Ses dosyası
+          ID'lerinizi API ile veya Online İşlem Merkezi üzerinden görebilirsiniz
         schema:
-          type: string
+          type: integer
       - name: recording_enabled
         in: query
         required: false
-        description: Enable call recording (true/false, default based on domain settings)
+        description: Görüşmenin kaydedilmesini istemiyorsanız false verin. Varsayılan
+          olarak true kabul edilir
+        example: false
         schema:
-          type: string
+          type: boolean
       responses:
         '200':
-          description: Bridge created successfully
+          description: OK
           content:
-            application/json:
+            text/plain:
               examples:
                 example_0:
-                  value:
-                    Successful bridge creation:
-                      value: bridge_id_12345
-            text/plain:
+                  value: 358c20bc-fd86-11e5-87a2-157d41a07454
               schema:
                 type: string
-                description: Bridge ID or success message
+                description: Çağrı ID'si (UUID). Bu ID'yi Olay Bildirme'deki ID'ler
+                  ile eşleştirebilir veya çağrı bittikten sonra Arama Kayıtlarına
+                  Erişim için kullanabilirsiniz
         '400':
-          description: Bad request - validation error
+          description: Hatalı istek - Doğrulama hatası
           content:
-            application/json:
+            text/plain:
               examples:
                 example_0:
-                  value:
-                    Invalid caller ID:
-                      value: 'invalid caller_id: unauthorized_number'
-            text/plain:
+                  value: timeout must be between 10 and 60 seconds
               schema:
                 type: string
-                description: Error message describing the validation failure
+                description: Doğrulama hata mesajı
         '401':
-          description: Unauthorized - invalid API key
+          description: Yetkisiz - geçersiz API anahtarı
           content:
             text/plain:
+              examples:
+                example_0:
+                  value: API anahtarı geçersiz veya eksik
               schema:
                 type: string
-                description: Authentication error message
+                description: Kimlik doğrulama hata mesajı
   "/call_transfer":
     post:
-      summary: Transfer an active call to another user
+      summary: Çağrıyı Aktar (POST)
       tags:
       - Çağrı Yönetimi
       security:
       - api_key: []
-      description: Transfers an active call identified by call UUID to another user
-        within the same domain
-      operationId: transferCall
+      description: Santralde devam eden bir çağrıyı başka bir dahiliye aktarmak için
+        kullanılır. POST metodu ile çağrı UUID'si ve hedef dahili kullanılarak aktarım
+        işlemi gerçekleştirilir.
+      operationId: transferCallPost
       parameters:
       - name: id
         in: query
         required: true
-        description: Call UUID to transfer
+        description: Aktarmak istediğiniz çağrının UUID'si
+        example: f3797dfc-a818-11e7-bf70-cb295b6663ce
         schema:
           type: string
       - name: user_number
         in: query
         required: true
-        description: Target user number to transfer the call to (must be a valid user
-          in the domain)
+        description: Aktarmak istediğiniz, bağlı kullanıcılarınızdan birinin dahili
+          numarası
+        example: '1000'
         schema:
           type: string
       responses:
         '200':
-          description: Call transferred successfully
+          description: Çağrı başarıyla aktarıldı
           content:
-            application/json:
+            text/plain:
               examples:
                 example_0:
-                  value:
-                    Successfully transferred call:
-                      value: Call transferred successfully to user 1001
-                    Transfer completed:
-                      value: Transfer operation completed
-            text/plain:
+                  value: "+OK"
               schema:
                 type: string
-                description: Success message or transfer result
+                description: Başarı onay mesajı
         '400':
-          description: Bad request - validation error
+          description: Hatalı istek - Doğrulama hatası
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: Transfer failed - user busy or unavailable
+              schema:
+                type: string
+                description: Doğrulama hata mesajı
+        '401':
+          description: Yetkisiz erişim
           content:
             application/json:
               examples:
                 example_0:
                   value:
-                    Transfer failed:
-                      value: Transfer failed - user busy or unavailable
+                    Geçersiz API anahtarı:
+                      error: Unauthorized
             text/plain:
               schema:
-                type: string
-                description: Error message describing the validation failure
-        '401':
-          description: Unauthorized - invalid API key
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Hata mesajı
+  "/transfer/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Aktarmak istediğiniz çağrının UUID'si
+      example: f3797dfc-a818-11e7-bf70-cb295b6663ce
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Çağrıyı Aktar
+      tags:
+      - Çağrı Yönetimi
+      security:
+      - api_key: []
+      description: Santralde devam eden bir çağrıyı aktarmak için kullanılır. HTTP
+        GET metodu ile çağrı UUID'si ve hedef dahili kullanılarak aktarım işlemi gerçekleştirilir.
+        Yeni çağrı başlattığınızda API'den dönen UUID'yi kullanabilirsiniz veya Olay
+        Bildirme ile gelen UUID'leri kullanabilirsiniz.
+      operationId: transferCall
+      parameters:
+      - name: user_number
+        in: query
+        required: true
+        description: Aktarmak istediğiniz, bağlı kullanıcılarınızdan birinin dahili
+          numarası
+        example: '1000'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Çağrı başarıyla aktarıldı
           content:
             text/plain:
+              examples:
+                example_0:
+                  value: "+OK"
               schema:
                 type: string
-                description: Authentication error message
+                description: Başarı onay mesajı
+        '400':
+          description: Hatalı istek - Aktarma başarısız
+          content:
+            text/plain:
+              examples:
+                example_0:
+                  value: No such channel!
+              schema:
+                type: string
+                description: Çağrı aktarma işlemi başarısız olduğunda dönen hata mesajı
+        '401':
+          description: Yetkisiz erişim
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Geçersiz API anahtarı:
+                      error: Unauthorized
+            text/plain:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Hata mesajı
   "/caller_ids":
     get:
       summary: Get list of available Caller IDs
@@ -2446,6 +2538,104 @@ paths:
                   value: 'Gecersiz anahtar: invalid_key'
               schema:
                 type: string
+  "/webhook-payload-examples":
+    get:
+      summary: CRM Webhook Payload Örnekleri
+      tags:
+      - CRM Entegrasyonu
+      description: CRM entegrasyonu aktif olduğunda gönderilen webhook payload örnekleri.
+        Bu endpoint gerçek bir API değildir, sadece dokümantasyon amaçlıdır.
+      operationId: webhookPayloadExamples
+      responses:
+        '200':
+          description: Webhook payload örnekleri
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    Çağrı çalma olayı:
+                      event: ringing
+                      call_id: call-789012
+                      caller_number: "+905551234567"
+                      called_number: "+905551234568"
+                      timestamp: '2023-01-01T12:00:00Z'
+                    Çağrı cevaplanma olayı:
+                      event: answered
+                      call_id: call-789012
+                      caller_number: "+905551234567"
+                      called_number: "+905551234568"
+                      answer_time: '2023-01-01T12:00:05Z'
+                    Çağrı kapanma olayı:
+                      event: hangup
+                      call_id: call-789012
+                      caller_number: "+905551234567"
+                      called_number: "+905551234568"
+                      duration: 120
+                      hangup_cause: NORMAL_CLEARING
+              schema:
+                type: object
+                properties:
+                  ringing_event:
+                    type: object
+                    description: Çağrı çalmaya başladığında gönderilen payload
+                    properties:
+                      event:
+                        type: string
+                        example: ringing
+                      call_id:
+                        type: string
+                        example: call-123456
+                      caller_number:
+                        type: string
+                        example: "+905551234567"
+                      called_number:
+                        type: string
+                        example: "+905551234568"
+                      timestamp:
+                        type: string
+                        example: '2023-01-01T12:00:00Z'
+                  answered_event:
+                    type: object
+                    description: Çağrı cevaplandığında gönderilen payload
+                    properties:
+                      event:
+                        type: string
+                        example: answered
+                      call_id:
+                        type: string
+                        example: call-123456
+                      caller_number:
+                        type: string
+                        example: "+905551234567"
+                      called_number:
+                        type: string
+                        example: "+905551234568"
+                      answer_time:
+                        type: string
+                        example: '2023-01-01T12:00:05Z'
+                  hangup_event:
+                    type: object
+                    description: Çağrı sonlandığında gönderilen payload
+                    properties:
+                      event:
+                        type: string
+                        example: hangup
+                      call_id:
+                        type: string
+                        example: call-123456
+                      caller_number:
+                        type: string
+                        example: "+905551234567"
+                      called_number:
+                        type: string
+                        example: "+905551234568"
+                      duration:
+                        type: integer
+                        example: 120
+                      hangup_cause:
+                        type: string
+                        example: NORMAL_CLEARING
   "/dnds":
     post:
       summary: Kullanıcı için Rahatsız Etme (DND) modunu ayarla
@@ -3066,7 +3256,7 @@ paths:
     post:
       summary: Otomatik arama kampanyası oluştur
       tags:
-      - Çağrı Yönetimi
+      - Otomatik Arama Kampanyaları
       description: Yeni otomatik arama kampanyası oluşturmak için kullanılır. JSON
         formatında parametreler ile POST isteği gönderilir.
       operationId: createIvrCampaign
@@ -3365,7 +3555,7 @@ paths:
     patch:
       summary: Otomatik arama kampanyasını başlat/durdur
       tags:
-      - Çağrı Yönetimi
+      - Otomatik Arama Kampanyaları
       description: Otomatik arama kampanyasını durdurmak veya tekrar başlatmak için
         kullanılır. PATCH ile status=off gönderilirse kampanya durur, status=on gönderilirse
         tekrar başlar.
@@ -3423,7 +3613,7 @@ paths:
     delete:
       summary: Otomatik arama kampanyasını sil
       tags:
-      - Çağrı Yönetimi
+      - Otomatik Arama Kampanyaları
       description: Otomatik arama kampanyasını iptal etmek/silmek için kullanılır.
         Kampanya ID'si ve API anahtarı ile DELETE isteği gönderilir.
       operationId: deleteIvrCampaign
@@ -3534,7 +3724,7 @@ paths:
     get:
       summary: Kuyruklar listesine erişim
       tags:
-      - Çağrı Yönetimi
+      - Kuyruk Yönetimi
       description: Santralinizdeki kuyrukların listesine erişmek için kullanılır.
         Bunun için HTTP GET metodu ile api.bulutsantralim.com adresi aşağıdaki parametrelerle
         çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body&#39;sinde
@@ -3583,7 +3773,7 @@ paths:
     get:
       summary: Kuyrukta bekleyenler listesine erişim
       tags:
-      - Çağrı Yönetimi
+      - Kuyruk Yönetimi
       description: Santralinizdeki kuyrukta bekleyenlerin listesine erişmek için kullanılır.
         Bunun için HTTP GET metodu ile api.bulutsantralim.com adresi aşağıdaki parametrelerle
         çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body&#39;sinde
@@ -3649,7 +3839,7 @@ paths:
     post:
       summary: Kuyruğa dahili ekleme, çıkarma veya yer değiştirme
       tags:
-      - Çağrı Yönetimi
+      - Kuyruk Yönetimi
       description: Santralinizdeki kuyruklara dahili ekleme, çıkarma veya yer değiştirme
         için kullanılır. Bunun için HTTP GET metodu ile api.bulutsantralim.com adresi
         aşağıdaki parametrelerle çağrılır. İstek başarılı olduğunda HTTP 200 Status
@@ -3723,7 +3913,7 @@ paths:
     get:
       summary: Kuyruktaki dahili listesine erişim
       tags:
-      - Çağrı Yönetimi
+      - Kuyruk Yönetimi
       description: Santralinizdeki kuyruğun dahili sırasını listeler. Bunun için HTTP
         GET metodu ile api.bulutsantralim.com adresi aşağıdaki parametrelerle çağrılır.
         İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body&#39;sinde dahili
