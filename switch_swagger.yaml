@@ -1,5 +1,5 @@
 ---
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: API V1
   version: v1
@@ -33,8 +33,104 @@ info:
     yönetin.<li><strong>Text-to-Speech (TTS) ve Speech-to-Text (STT):</strong> Yazı
     metinlerini sese dönüştürerek dinamik anonslar oluşturun veya müşterilerden gelen
     sesli komutları metne çevirerek yazılımınıza aktarın.</ul><p>Bu API, HTTP GET/POST
-    istekleri ile kolayca kullanılabilir ve JSON formatında yanıtlar döner. Detaylı
-    bilgi ve endpoint dokümantasyonu için ilgili bölümleri inceleyebilirsiniz.</div>"
+    istekleri ile kolayca kullanılabilir. Detaylı bilgi ve endpoint dokümantasyonu
+    için ilgili bölümleri inceleyebilirsiniz.</div>"
+webhooks:
+  olayBildirme:
+    post:
+      security: []
+      tags:
+      - Webhooks
+      summary: Olay Bildirme
+      description: Santralinizde gerçekleşen olayları (telefon çalıyor, telefon açıldı,
+        telefon kapandı) uygulamalarınıza bildirmek için kullanılır. Telefon kapandı
+        (hangup) bildirimi aynı zamanda CDR bildirimidir. Telefon kapandı bildirimi
+        içesindeki çağrının cevaplanıp cevaplanamadığı (answered) bilgisi Kaçan çağrı
+        tespiti için kullanılır. HTTP POST metodu ile <a target="_blank" href="https://oim.verimor.com.tr/switch/domain/edit">Santral
+        Ayarlarım</a> sayfasından CRM Entegrasyonu bölümünden girdiğiniz Bildirilecek
+        URL adresine aşağıdaki parametreler HTML Form Field olarak gönderilir.
+      requestBody:
+        description: Uygulamanıza gönderilecek bildirim örneği
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              example: event_type=ringing&domain_id=429&direction=outbound&caller_id_number=1007&outbound_caller_id_number=902129630131&destination_number=05347809050&dialed_user=&call_uuid=3556168f-2920-46a0-98ce-771635dd6a24&start_stamp=&queue=
+              properties:
+                event_type:
+                  type: string
+                  description: Olay tipi. ringing, answer, hangup veya user_hangup
+                    döner.
+                domain_id:
+                  type: string
+                  description: Bulutsantral ID’si.
+                direction:
+                  type: string
+                  description: Çağrının yönü. internal, inbound yada outbound döner.
+                caller_id_number:
+                  type: string
+                  description: Arayan numara.
+                outbound_caller_id_number:
+                  type: string
+                  description: Arayanın dış numarası.
+                destination_number:
+                  type: string
+                  description: Aranan numara.
+                dialed_user:
+                  type: string
+                  description: Aranan kişinin dahili numarası.
+                connected_user:
+                  type: string
+                  description: Bağlanan (telefonu açan) dahili.
+                call_uuid:
+                  type: string
+                  description: Çağrının uuid'si.
+                start_stamp:
+                  type: string
+                  format: date_time
+                  description: Çağrının başladığı zaman.
+                answer_stamp:
+                  type: string
+                  format: date_time
+                  description: Çağrının cevaplandığı zaman.
+                end_stamp:
+                  type: string
+                  format: date_time
+                  description: Çağrının sonlandığı zaman.
+                duration:
+                  type: integer
+                  description: Konuşma süresi.
+                recording_present:
+                  type: boolean
+                  description: Çağrının ses kaydının olup olmadığı. true yada false
+                    döner.
+                answered:
+                  type: boolean
+                  description: Kaçan çağrı tespiti için kullanılır. Aranan taraf çağrıyı
+                    kabul ettiyse true döner.
+                queue:
+                  type: string
+                  description: Kuyruğun veya Çağrı grubunun numarası.
+                queue_wait_duration:
+                  type: integer
+                  description: Kuyrukta bekleme süresi.
+                sip_hangup_disposition:
+                  type: string
+                  description: Çağrının kimin tarafından kapatıldığı. caller ya da
+                    callee olarak döner.
+                hangup_cause:
+                  type: string
+                  description: Çağrının kapanma sebebi.
+                failure_status:
+                  type: string
+                  description: Çağrı başarısız ise hata kodu.
+                failure_phrase:
+                  type: string
+                  description: Çağrı başarısız ise hata mesajı.
+      responses:
+        '200':
+          description: Response içeriğinin bir önemi yoktur, sadece HTTP 200 OK dönmesi
+            yeterlidir.
 components:
   securitySchemes:
     api_key:
@@ -316,7 +412,14 @@ paths:
         Ses dosyasının ismini ve içeriğinin base64 ile kodlanmış halini PUT etmeniz
         yeterlidir. Başarılı durumda OK döner.
       operationId: updateAnnouncement
-      parameters: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Güncellenecek ses dosyasının ID'si
+        example: '21870'
+        schema:
+          type: string
       responses:
         '200':
           description: Başarılı cevap
@@ -567,6 +670,7 @@ paths:
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
+  "/blocked_numbers/delete":
     delete:
       summary: Karalisteden silme
       tags:
@@ -1122,7 +1226,7 @@ paths:
       required: true
       schema:
         type: string
-    delete:
+    get:
       summary: Çağrıyı Sonlandır
       tags:
       - Çağrı Yönetimi
@@ -1133,6 +1237,14 @@ paths:
         çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body'sinde
         +OK döner.
       operationId: hangupCall
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Sonlandırmak istediğiniz çağrının UUID'si
+        example: f3797dfc-a818-11e7-bf70-cb295b6663ce
+        schema:
+          type: string
       responses:
         '200':
           description: OK
@@ -1730,6 +1842,13 @@ paths:
         Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: updateContactGroup
       parameters:
+      - name: id
+        in: path
+        required: true
+        description: Güncellenecek grubun ID'si
+        example: 20212
+        schema:
+          type: integer
       - name: name
         in: query
         required: true
@@ -1785,6 +1904,14 @@ paths:
         mesajın Body&#39;sinde OK döner. İstek başarısız olduğunda ise ilgili HTTP
         Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: deleteContactGroup
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Silinecek grubun ID'si
+        example: 20212
+        schema:
+          type: integer
       responses:
         '200':
           description: OK
@@ -2021,10 +2148,8 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Geçersiz anahtar:
-                      value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
             application/json:
               schema:
                 type: string
@@ -2252,10 +2377,8 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Geçersiz anahtar:
-                      value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
@@ -2281,6 +2404,13 @@ paths:
         Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: updateContact
       parameters:
+      - name: id
+        in: path
+        required: true
+        description: Güncellenecek kişinin ID'si
+        example: 10203
+        schema:
+          type: integer
       - name: salutation
         in: query
         required: false
@@ -2469,10 +2599,8 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Geçersiz anahtar:
-                      value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
@@ -2488,6 +2616,14 @@ paths:
         Body&#39;sinde OK döner. İstek başarısız olduğunda ise ilgili HTTP Status
         kodu ile mesajın Body&#39;sinde hata mesajı döner.
       operationId: deleteContact
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Silinecek kişinin ID'si
+        example: 10203
+        schema:
+          type: integer
       responses:
         '200':
           description: OK
@@ -2519,10 +2655,8 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Geçersiz anahtar:
-                      value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
@@ -2538,16 +2672,6 @@ paths:
       security:
       - api_key: []
       responses:
-        '401':
-          description: Yetkisiz erişim
-          content:
-            text/plain:
-              examples:
-                unauthorized:
-                  value: 'Gecersiz anahtar: invalid_key'
-            application/json:
-              schema:
-                type: string
         '200':
           description: OK
           content:
@@ -2555,16 +2679,22 @@ paths:
               examples:
                 example_0:
                   value:
-                    Tüm bildirimlerin aktif olduğu durum:
-                      ringing: 'on'
-                      answered: 'on'
-                      hangup: 'on'
-                      notification_url: https://crm.example.com/webhook
-                    Sadece cevaplanma bildiriminin aktif olduğu durum:
-                      ringing: 'off'
-                      answered: 'on'
-                      hangup: 'off'
-                      notification_url: https://mycrm.com/api/webhook/calls
+                    ringing: 'on'
+                    answered: 'on'
+                    hangup: 'on'
+                    notification_url: https://crm.example.com/webhook
+                ALL_NOTIFICATIONS_ACTIVE:
+                  value:
+                    ringing: 'on'
+                    answered: 'on'
+                    hangup: 'on'
+                    notification_url: https://crm.example.com/webhook
+                ONLY_ANSWERED_ACTIVE:
+                  value:
+                    ringing: 'off'
+                    answered: 'on'
+                    hangup: 'off'
+                    notification_url: https://mycrm.com/api/webhook/calls
               schema:
                 type: object
                 properties:
@@ -2597,6 +2727,16 @@ paths:
                 - answered
                 - hangup
                 - notification_url
+        '401':
+          description: Yetkisiz erişim
+          content:
+            text/plain:
+              examples:
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: invalid_key'
+            application/json:
+              schema:
+                type: string
     post:
       summary: CRM Entegrasyon Ayarlarını Güncelle
       tags:
@@ -2695,25 +2835,33 @@ paths:
               examples:
                 example_0:
                   value:
-                    Çağrı çalma olayı:
-                      event: ringing
-                      call_id: call-789012
-                      caller_number: "+905551234567"
-                      called_number: "+905551234568"
-                      timestamp: '2023-01-01T12:00:00Z'
-                    Çağrı cevaplanma olayı:
-                      event: answered
-                      call_id: call-789012
-                      caller_number: "+905551234567"
-                      called_number: "+905551234568"
-                      answer_time: '2023-01-01T12:00:05Z'
-                    Çağrı kapanma olayı:
-                      event: hangup
-                      call_id: call-789012
-                      caller_number: "+905551234567"
-                      called_number: "+905551234568"
-                      duration: 120
-                      hangup_cause: NORMAL_CLEARING
+                    event: ringing
+                    call_id: call-789012
+                    caller_number: "+905551234567"
+                    called_number: "+905551234568"
+                    timestamp: '2023-01-01T12:00:00Z'
+                RINGING_EVENT:
+                  value:
+                    event: ringing
+                    call_id: call-789012
+                    caller_number: "+905551234567"
+                    called_number: "+905551234568"
+                    timestamp: '2023-01-01T12:00:00Z'
+                ANSWERED_EVENT:
+                  value:
+                    event: answered
+                    call_id: call-789012
+                    caller_number: "+905551234567"
+                    called_number: "+905551234568"
+                    answer_time: '2023-01-01T12:00:05Z'
+                HANGUP_EVENT:
+                  value:
+                    event: hangup
+                    call_id: call-789012
+                    caller_number: "+905551234567"
+                    called_number: "+905551234568"
+                    duration: 120
+                    hangup_cause: NORMAL_CLEARING
               schema:
                 type: object
                 properties:
@@ -2777,8 +2925,16 @@ paths:
                       hangup_cause:
                         type: string
                         example: NORMAL_CLEARING
-  "/dnds":
-    post:
+  "/dnd/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: 'Dahili numara (örn: 1001)'
+      example: '1001'
+      schema:
+        type: string
+    get:
       summary: Kullanıcı için Rahatsız Etme (DND) modunu ayarla
       tags:
       - Kullanıcı Yönetimi
@@ -2789,9 +2945,10 @@ paths:
       - api_key: []
       parameters:
       - name: id
-        in: query
+        in: path
         required: true
         description: 'Dahili numara (örn: 1001)'
+        example: '1001'
         schema:
           type: string
       - name: state
@@ -2808,22 +2965,19 @@ paths:
         '200':
           description: DND durumu başarıyla değiştirildi
           content:
-            application/json:
-              examples:
-                example_0:
-                  value:
-                    DND başarıyla açıldı:
-                      value: 1001 için DND durumu on olarak değiştirildi.
-                    DND başarıyla kapatıldı:
-                      value: 1002 için DND durumu off olarak değiştirildi.
             text/plain:
+              examples:
+                DND_ON:
+                  value: Changed DND of 1008 to on.
+                DND_OFF:
+                  value: Changed DND of 1008 to off.
               schema:
                 type: string
                 description: DND durumu değiştiğine dair başarı mesajı
         '400':
           description: Geçersiz istek - doğrulama hatası
           content:
-            application/json:
+            text/plain:
               examples:
                 ID_REQUIRED:
                   value: dahili numara gerekli
@@ -2833,24 +2987,20 @@ paths:
                   value: state gerekli
                 INVALID_STATE:
                   value: state on veya off olmalı
-            text/plain:
               schema:
                 type: string
                 description: Doğrulama hatası mesajı
         '401':
           description: Yetkisiz - geçersiz API anahtarı
           content:
-            application/json:
-              examples:
-                example_0:
-                  value:
-                    Yetkisiz erişim:
-                      value: API anahtarı geçersiz veya eksik
             text/plain:
+              examples:
+                UNAUTHORIZED:
+                  value: API anahtarı geçersiz veya eksik
               schema:
                 type: string
                 description: Kimlik doğrulama hatası mesajı
-  "/fax_document_urls":
+  "/fax_document_url":
     post:
       summary: URL isteme
       tags:
@@ -3884,6 +4034,13 @@ paths:
         mute işlemi gerçekleştirilir.
       operationId: muteCall
       parameters:
+      - name: id
+        in: path
+        required: true
+        description: Sessize almak istediğiniz çağrının UUID'si
+        example: f3797dfc-a818-11e7-bf70-cb295b6663ce
+        schema:
+          type: string
       - name: state
         in: query
         required: true
@@ -3975,7 +4132,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
             application/json:
               schema:
@@ -4041,14 +4198,14 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
             application/json:
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
   "/queue/manage_users":
-    post:
+    get:
       summary: Kuyruğa dahili ekleme, çıkarma veya yer değiştirme
       tags:
       - Kuyruk Yönetimi
@@ -4082,9 +4239,8 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Başarılı işlem: OK
+                SUCCESS:
+                  value: OK
               schema:
                 type: string
                 description: Başarı mesajı
@@ -4105,9 +4261,8 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Kuyruk bulunamadı: Queue_number value null or none 999
+                QUEUE_NOT_FOUND:
+                  value: Queue_number value null or none 999
               schema:
                 type: string
                 description: Kuyruk bulunamadığında dönen hata mesajı
@@ -4116,9 +4271,8 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Geçersiz anahtar: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
@@ -4151,14 +4305,21 @@ paths:
               examples:
                 example_0:
                   value:
-                    Kuyruk dahili listesi:
-                    - user: 1000
-                      name: DAHİLİ-1
-                    - user: 1001
-                      name: DAHİLİ-2
-                    - user: 1006
-                      name: DAHİLİ-3
-                    Boş kuyruk: []
+                  - user: 1000
+                    name: DAHİLİ-1
+                  - user: 1001
+                    name: DAHİLİ-2
+                  - user: 1006
+                    name: DAHİLİ-3
+                QUEUE_WITH_USERS:
+                  value:
+                  - user: 1000
+                    name: DAHİLİ-1
+                  - user: 1001
+                    name: DAHİLİ-2
+                  - user: 1006
+                    name: DAHİLİ-3
+                EMPTY_QUEUE: {}
               schema:
                 type: array
                 items:
@@ -4175,9 +4336,8 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Kuyruk bulunamadı: Queue_number value null or none 999
+                QUEUE_NOT_FOUND:
+                  value: Queue_number value null or none 999
             application/json:
               schema:
                 type: string
@@ -4187,9 +4347,8 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Geçersiz anahtar: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
             application/json:
               schema:
                 type: string
@@ -4735,7 +4894,18 @@ paths:
               schema:
                 type: string
                 description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim - Geçersiz API anahtarı
+          content:
+            text/plain:
+              examples:
+                INVALID_API_KEY:
+                  value: 'Geçersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edc'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
 security:
 - api_key: []
 servers:
+- url: https://api.bulutsantralim.net/
 - url: http://dev.switch.com:3003
