@@ -63,7 +63,7 @@ webhooks:
                     döner.
                 domain_id:
                   type: string
-                  description: Bulutsantral ID’si.
+                  description: Bulutsantral ID'si.
                 direction:
                   type: string
                   description: Çağrının yönü. internal, inbound yada outbound döner.
@@ -389,11 +389,21 @@ paths:
                 description: Kimlik doğrulama hata mesajı
       requestBody:
         content:
-          multipart/form-data:
+          application/x-www-form-urlencoded:
             schema:
-              type: string
-        required: true
-        description: Ses dosyası adı
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: dosya adı
+                  description: Ses dosyasının adı
+                sounddata:
+                  type: string
+                  example: base64
+                  description: Ses dosyasının içeriği, base64 ile kodlanmış olarak
+              required:
+              - name
+              - sounddata
   "/announcements/{id}":
     parameters:
     - name: id
@@ -409,7 +419,7 @@ paths:
       security:
       - api_key: []
       description: Mevcut ses dosyasının adını ve içeriğini güncellemek için kullanılır.
-        Ses dosyasının ismini ve içeriğinin base64 ile kodlanmış halini PUT etmeniz
+        Ses dosyasının ismini ve içeriğinin base64 ile kodlanmış halini PATCH etmeniz
         yeterlidir. Başarılı durumda OK döner.
       operationId: updateAnnouncement
       parameters:
@@ -455,10 +465,21 @@ paths:
                 description: Kimlik doğrulama hata mesajı
       requestBody:
         content:
-          multipart/form-data:
+          application/x-www-form-urlencoded:
             schema:
-              type: string
-        description: Yeni ses dosyası adı
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: dosya adı
+                  description: Ses dosyasının yeni adı
+                sounddata:
+                  type: string
+                  example: base64
+                  description: Ses dosyasının yeni içeriği, base64 ile kodlanmış olarak
+              required:
+              - name
+              - sounddata
     delete:
       summary: Ses dosyası silme
       tags:
@@ -986,7 +1007,7 @@ paths:
     get:
       summary: Dış Numaralar Listesine Erişim
       tags:
-      - Çağrı Yönetimi
+      - Dış Numaralar Yönetimi
       description: |-
         Santralinizdeki Arayan Numara olarak kullanabileceğiniz numaraların listesine erişmek için kullanılır.
 
@@ -1170,22 +1191,39 @@ paths:
                 extension:
                   type: string
                   example: '1001'
+                  description: Aramanın bağlanacağı dahili numaradır.
                 destination:
                   type: string
                   example: '908505320000'
+                  description: Aranacak olan numara (yurtiçi çağrılar için 908505320000,
+                    yurtdışı çağrılar için 00493027590915 formatında olmalı).
                 caller_id:
                   type: string
                   example: '908505320000'
+                  description: Aramada kullanılacak olan dış numara (908505320000
+                    formatında olmalı. Bu parametre verilmezse dahilide seçili olan
+                    dış no kullanılacaktır).
                 manual_answer:
                   type: boolean
                   example: false
+                  description: Değeri true olarak gönderilirse dahilinin telefonu
+                    açmasını bekler (Normalde otomatik olarak dahili açılır ve karşı
+                    numara aranır).
                 timeout:
                   type: integer
                   example: 30
+                  description: Telefon çaldırma süresidir. 10 ile 60 sn. arasında
+                    bir değer olmalı. Varsayılan 30'dur.
                 announcement_to_caller:
                   type: integer
+                  description: Cevaplanma anında arayan tarafa dinletilecek anons.
+                    Ses dosyası ID'lerinizi API ile veya Online İşlem Merkezi üzerinden
+                    görebilirsiniz.
                 announcement_to_callee:
                   type: integer
+                  description: Cevaplanma anında aranan tarafa dinletilecek anons.
+                    Ses dosyası ID'lerinizi API ile veya Online İşlem Merkezi üzerinden
+                    görebilirsiniz.
               required:
               - extension
               - destination
@@ -1196,25 +1234,43 @@ paths:
                 extension:
                   type: string
                   example: '1001'
+                  description: Aramanın bağlanacağı dahili numaradır.
                 destination:
                   type: string
                   example: '908505320000'
+                  description: Aranacak olan numara (yurtiçi çağrılar için 908505320000,
+                    yurtdışı çağrılar için 00493027590915 formatında olmalı).
                 caller_id:
                   type: string
                   example: '908505320000'
+                  description: Aramada kullanılacak olan dış numara (908505320000
+                    formatında olmalı. Bu parametre verilmezse dahilide seçili olan
+                    dış no kullanılacaktır).
                 manual_answer:
                   type: boolean
                   example: false
+                  description: Değeri true olarak gönderilirse dahilinin telefonu
+                    açmasını bekler (Normalde otomatik olarak dahili açılır ve karşı
+                    numara aranır).
                 timeout:
                   type: integer
                   example: 30
+                  description: Telefon çaldırma süresidir. 10 ile 60 sn. arasında
+                    bir değer olmalı. Varsayılan 30'dur.
                 announcement_to_caller:
                   type: integer
+                  description: Cevaplanma anında arayan tarafa dinletilecek anons.
+                    Ses dosyası ID'lerinizi API ile veya Online İşlem Merkezi üzerinden
+                    görebilirsiniz.
                 announcement_to_callee:
                   type: integer
+                  description: Cevaplanma anında aranan tarafa dinletilecek anons.
+                    Ses dosyası ID'lerinizi API ile veya Online İşlem Merkezi üzerinden
+                    görebilirsiniz.
               required:
               - extension
               - destination
+        required: true
   "/hangup/{id}":
     parameters:
     - name: id
@@ -1367,32 +1423,30 @@ paths:
               examples:
                 example_0:
                   value:
-                    CDR listesi örneği:
-                      value:
-                        cdrs:
-                        - start_stamp: '2025-01-01 10:30:15'
-                          direction: Gelen
-                          caller_id_number: "+905551234567"
-                          caller_id_name: John Doe
-                          destination_number: '1001'
-                          destination_name: Dahili 1001
-                          duration: '00:05:30'
-                          talk_duration: '00:05:10'
-                          queue_wait_seconds: '00:00:20'
-                          queue: destek
-                          result: Cevaplandı
-                          missed: false
-                          return_uuid: return-uuid-123
-                          recording_present: Var
-                          sip_hangup_disposition: Normal
-                          call_uuid: call-uuid-12345
-                          answer_stamp: '2025-01-01 10:30:35'
-                          end_stamp: '2025-01-01 10:35:45'
-                        pagination:
-                          page: 1
-                          total_count: 150
-                          total_pages: 3
-                          limit: 50
+                    cdrs:
+                    - start_stamp: '2025-07-22 15:37:20 +0300'
+                      direction: Giden (IVR)
+                      caller_id_number: '902129630131'
+                      caller_id_name: '905316224837'
+                      destination_number: '905316224837'
+                      destination_name: '905316224837'
+                      duration: '00:00:10'
+                      talk_duration: '00:00:00'
+                      queue_wait_seconds: '00:00:00'
+                      queue: 
+                      result: Cevaplandı
+                      missed: false
+                      return_uuid: 
+                      recording_present: 'false'
+                      sip_hangup_disposition: caller
+                      call_uuid: 8f499eaf-510d-4c9c-b60a-8f3bdddf3fad
+                      answer_stamp: '2025-07-22 15:37:42 +0300'
+                      end_stamp: '2025-07-22 15:37:52 +0300'
+                    pagination:
+                      page: 1
+                      total_count: 7
+                      total_pages: 1
+                      limit: 10
               schema:
                 type: object
                 properties:
@@ -1539,32 +1593,22 @@ paths:
         '400':
           description: Geçersiz istek - doğrulama hatası
           content:
-            application/json:
+            text/plain:
               examples:
-                DATE_RANGE_TOO_LONG:
-                  value: Arama zaman filtresi aralığı 31 günden uzun olamaz!
                 INVALID_DIRECTION:
-                  value: 'Geçersiz çağrı yönü: invalid_direction'
+                  value: 'invalid direction : obo'
+                INTERVAL_TOO_LONG:
+                  value: Search time filter interval can not be longer than 31 days!
                 INVALID_RECORDING_PRESENT:
-                  value: 'Geçersiz kayıt durumu: invalid_value'
-              schema:
-                type: string
-                description: Doğrulama hatası mesajı
+                  value: 'invalid recording_present : tere'
         '401':
-          description: Yetkisiz - geçersiz API anahtarı
+          description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hatası mesajı
+            text/plain:
+              examples:
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edv'
   "/cdrs/{id}":
-    parameters:
-    - name: id
-      in: path
-      description: Çağrı UUID
-      required: true
-      schema:
-        type: string
     get:
       summary: Belirli bir çağrıya ait detaylı CDR kaydını getirir
       tags:
@@ -1573,6 +1617,14 @@ paths:
       operationId: getCdr
       security:
       - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Çağrı UUID
+        example: call-uuid-12345-67890
+        schema:
+          type: string
       responses:
         '200':
           description: CDR detayları başarıyla getirildi
@@ -1581,35 +1633,33 @@ paths:
               examples:
                 example_0:
                   value:
-                    Çağrı detayları ve akışı örneği:
-                      value:
-                        cdr:
-                          direction: Gelen
-                          caller_id_number: "+905551234567"
-                          destination_number: '1001'
-                          result: Cevaplandı
-                          sip_hangup_disposition: Normal
-                          missed: false
-                          return_uuid: return-uuid-123
-                          call_uuid: call-uuid-12345-67890
-                          start_stamp: '2025-01-01 10:30:15'
-                          answer_stamp: '2025-01-01 10:30:35'
-                          end_stamp: '2025-01-01 10:35:45'
-                          duration: '00:05:30'
-                          talk_duration: '00:05:10'
-                          queue_wait_seconds: '00:00:20'
-                          recording_present: Var
-                        call_flow:
-                        - destination_number: '1001'
-                          start_stamp: '2025-01-01 10:30:15'
-                          answer_stamp: '2025-01-01 10:30:35'
-                          end_stamp: '2025-01-01 10:35:45'
-                          duration: '00:05:30'
-                          ip_address: 192.168.1.100
-                          sip_user_agent: Yealink T46G
-                          write_codec: PCMU
-                          read_codec: PCMU
-                          result: Cevaplandı
+                    cdr:
+                      direction: Giden (IVR)
+                      caller_id_number: '902129630131'
+                      destination_number: '905316224837'
+                      result: Cevaplandı
+                      sip_hangup_disposition: callee
+                      missed: false
+                      return_uuid: 
+                      call_uuid: 2c0457ac-496a-4570-a6e3-4e505ff982ea
+                      start_stamp: '2025-07-22 16:35:25 +0300'
+                      answer_stamp: '2025-07-22 16:35:34 +0300'
+                      end_stamp: '2025-07-22 16:35:36 +0300'
+                      duration: '00:00:02'
+                      talk_duration: '00:00:00'
+                      queue_wait_seconds: '00:00:00'
+                      recording_present: 'false'
+                    call_flow:
+                    - destination_number: '905316224837'
+                      start_stamp: '2025-07-22 16:35:25 +0300'
+                      answer_stamp: '2025-07-22 16:35:34 +0300'
+                      end_stamp: '2025-07-22 16:35:36 +0300'
+                      duration: '00:00:02'
+                      ip_address: 194.49.126.26
+                      sip_user_agent: Verimor Softswitch v2022-PRODUCTION.422
+                      write_codec: PCMU
+                      read_codec: PCMU
+                      result: ''
               schema:
                 type: object
                 properties:
@@ -1701,22 +1751,17 @@ paths:
         '400':
           description: CDR bulunamadı
           content:
-            application/json:
+            text/plain:
               examples:
-                example_0:
-                  value:
-                    CDR bulunamadı:
-                      value: İstenen CDR kaydı bulunamadı
-              schema:
-                type: string
-                description: CDR kaydı bulunamazsa hata mesajı
+                CDR_NOT_FOUND:
+                  value: Couldn't find cdr that you was requested
         '401':
           description: Yetkisiz - geçersiz API anahtarı
           content:
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hatası mesajı
+            text/plain:
+              examples:
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edv'
   "/contact_groups":
     get:
       summary: Grup listesine erişim
@@ -3061,47 +3106,50 @@ paths:
                 description: Kimlik doğrulama hata mesajı
   "/fax_document/{id}":
     get:
-      summary: Download fax document file
+      summary: Faks belgesi indirme/görüntüleme
       tags:
       - Faks Yönetimi
-      description: Downloads a fax document file using a download ticket code. The
-        document is automatically fetched from FTP if not already cached locally.
-        No authentication required as security is handled via the secure ticket system.
+      description: |-
+        Bu servis, daha önce 'Faks Belgesi URL'si İsteme Servisi' ile elde edilen geçici URL üzerinden faks belgesini indirmenizi veya görüntülemenizi sağlar.
+
+        URL, 1 saat geçerlidir. Herhangi bir kimlik doğrulama gerekmez; güvenlik, URL'nin kendisinde bulunan tek kullanımlık ticket kodu ile sağlanır.
+
+        Başarılı isteklerde HTTP 200 ile belge dosyası (PDF/TIFF) döner. Hatalı veya süresi dolmuş ticket ile yapılan isteklerde uygun hata mesajı ve HTTP 400 döner.
       operationId: downloadFaxDocument
       parameters:
       - name: id
         in: path
         required: true
-        description: Download ticket code for the fax document (typically starts with
-          "F" prefix)
+        description: Faks belgesi indirme/görüntüleme için gerekli ticket kodu (genellikle
+          "F" ile başlar)
         schema:
           type: string
       responses:
         '200':
-          description: Fax document file downloaded successfully
+          description: Faks belgesi başarıyla indirildi/görüntülendi
           content:
             application/pdf:
               examples:
                 example_0:
                   value:
-                    description: Binary PDF file content
+                    description: Binary PDF dosya içeriği
                     value: "(Binary PDF data)"
               schema:
                 type: string
                 format: binary
-                description: The fax document file content (PDF or TIFF format)
+                description: Faks belgesi dosya içeriği (PDF veya TIFF formatında)
             image/tiff:
               schema:
                 type: string
                 format: binary
-                description: The fax document file content (PDF or TIFF format)
+                description: Faks belgesi dosya içeriği (PDF veya TIFF formatında)
             application/octet-stream:
               schema:
                 type: string
                 format: binary
-                description: The fax document file content (PDF or TIFF format)
+                description: Faks belgesi dosya içeriği (PDF veya TIFF formatında)
         '400':
-          description: Bad request - Invalid or expired ticket
+          description: Hatalı istek - Geçersiz veya süresi dolmuş ticket
           content:
             text/plain:
               examples:
@@ -3116,17 +3164,17 @@ paths:
             application/pdf:
               schema:
                 type: string
-                description: Error message describing the failure
+                description: Hata mesajı
             image/tiff:
               schema:
                 type: string
-                description: Error message describing the failure
+                description: Hata mesajı
             application/octet-stream:
               schema:
                 type: string
-                description: Error message describing the failure
+                description: Hata mesajı
         '500':
-          description: Internal server error - FTP or file system error
+          description: Sunucu hatası - FTP veya dosya sistemi hatası
           content:
             text/plain:
               examples:
@@ -3135,15 +3183,15 @@ paths:
             application/pdf:
               schema:
                 type: string
-                description: Error message when file cannot be fetched or processed
+                description: Dosya alınamaz veya işlenemezse dönen hata mesajı
             image/tiff:
               schema:
                 type: string
-                description: Error message when file cannot be fetched or processed
+                description: Dosya alınamaz veya işlenemezse dönen hata mesajı
             application/octet-stream:
               schema:
                 type: string
-                description: Error message when file cannot be fetched or processed
+                description: Dosya alınamaz veya işlenemezse dönen hata mesajı
   "/fax_orders":
     get:
       summary: Tamamlanmamış faks gönderimlerinin listesi
@@ -4353,7 +4401,7 @@ paths:
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
-  "/recording_urls":
+  "/recording_url":
     post:
       summary: Ses kaydı için geçici URL oluştur
       tags:
@@ -4375,13 +4423,10 @@ paths:
         '200':
           description: Ses kaydı URL'i başarıyla oluşturuldu
           content:
-            application/json:
-              examples:
-                example_0:
-                  value:
-                    Başarılı cevap:
-                      value: https://api.bulutsantralim.com/recording/Rbb9d6f36-d1a7-46f5-961e-4be2e2ba1b8e
             text/plain:
+              examples:
+                SUCCESS:
+                  value: https://api.bulutsantralim.net/recording/Re9a6e998-821c-4f00-b420-7a521b1ad480
               schema:
                 type: string
                 description: 1 saat geçerli olan geçici ses kaydı dinleme/indirme
@@ -4389,30 +4434,26 @@ paths:
         '400':
           description: Hatalı istek - doğrulama veya kaynak hatası
           content:
-            application/json:
-              examples:
-                CALL_UUID_REQUIRED:
-                  value: call_uuid parametresi gerekli
-                CALL_NOT_FOUND:
-                  value: call_uuid ile eşleşen çağrı bulunamadı
-                RECORDING_NOT_FOUND:
-                  value: Bu çağrı için ses kaydı bulunamadı
-                RECORDING_FILE_NOT_FOUND:
-                  value: Ses kaydı dosyası bulunamadı
             text/plain:
+              examples:
+                MISSING_CALL_UUID:
+                  value: missing call_uuid
+                CALL_NOT_FOUND:
+                  value: cannot find call with call_uuid ccd-sdfds-sd
+                RECORDING_NOT_FOUND:
+                  value: no recording present for call 681f0669-e5e9-4fbe-8a01-d7286bcd155f
+                RECORDING_FILE_NOT_FOUND:
+                  value: cannot find recording file for call cc28f783-b99f-4e46-b05c-c3c09b97881c
               schema:
                 type: string
                 description: Hata mesajı
         '401':
           description: Yetkisiz - geçersiz API anahtarı
           content:
-            application/json:
-              examples:
-                example_0:
-                  value:
-                    Yetkisiz erişim:
-                      value: API anahtarı geçersiz veya eksik
             text/plain:
+              examples:
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edv'
               schema:
                 type: string
                 description: Kimlik doğrulama hatası mesajı
@@ -4535,7 +4576,7 @@ paths:
     get:
       summary: Dahilinin Dış Numarasını (Arayan No) Değiştirme
       tags:
-      - Kullanıcı Yönetimi
+      - Dış Numaralar Yönetimi
       description: |-
         Santralinizdeki dahililerin dış numarasını değiştirmek için kullanılır.
 
@@ -4710,8 +4751,7 @@ paths:
                         read_stamp:
                           type: string
                           description: Telesekreter mesajı okunduysa, okunma zamanı
-                            (OİM&#39;den, IVR&#39;dan veya API&#39;den ses kaydı dinlendiği
-                            zaman)
+                            (OİM'den, IVR'dan veya API'den ses kaydı dinlendiği zaman)
                         user_number:
                           type: string
                           description: Mesajın bırakıldığı dahili numarası
@@ -4776,10 +4816,6 @@ paths:
                   value: 'invalid limit: 1000'
                 INVALID_PAGE:
                   value: 'invalid page : 0'
-            application/json:
-              schema:
-                type: string
-                description: Hata mesajı
         '401':
           description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
@@ -4787,17 +4823,13 @@ paths:
               examples:
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hata mesajı
-  "/voicemail_recording_urls":
+  "/voicemail_recording_url":
     post:
       summary: Telesekreterin ses kaydına erişim
       tags:
       - Raporlama ve Kayıtlar
       description: CDR&#39;ın ses kaydına erişimde olduğu gibi, bu ses kayıtlarına
-        erişim de iki aşamaladır. Birinci aşamada URL elde edilir. İkinci aşamada
+        erişim de iki aşamalıdır. Birinci aşamada URL elde edilir. İkinci aşamada
         ise o URL&#39;den ses dosyası indirilir/dinlenir. HTTP POST metodu ile api.bulutsantralim.com
         adresine parametreler gönderilir. İstek başarılı olduğunda HTTP 200 Status
         kodu ile mesajın Body&#39;sinde ses kaydına ait olan bir URL döner. İstek
@@ -4908,4 +4940,5 @@ security:
 - api_key: []
 servers:
 - url: https://api.bulutsantralim.net/
+- url: https://api.bulutsantralim.com/
 - url: http://dev.switch.com:3003
