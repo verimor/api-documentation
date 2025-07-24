@@ -185,7 +185,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                   - agent: '1010'
                     status: AVAILABLE
@@ -267,32 +267,22 @@ paths:
                     sahip olmanız gerekmektedir.
                 INVALID_STATUS:
                   value: invalid status
-            application/json:
-              schema:
-                type: string
-                description: Hata mesajı
         '429':
           description: Çok fazla istek - Rate limit aşıldı
           content:
             text/plain:
               examples:
-                example_0:
+                TOO_MANY_REQUESTS:
                   value: Too Many Requests
-            application/json:
-              schema:
-                type: string
-                description: Rate limit hata mesajı
         '401':
           description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hata mesajı
   "/announcements":
     get:
       summary: Ses dosyaları listesine erişim
@@ -311,7 +301,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                   - id: 112
                     name: Firmamıza hoşgeldiniz
@@ -337,12 +327,10 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hata mesajı
     post:
       summary: Yeni ses dosyası yükleme
       tags:
@@ -360,7 +348,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: '859'
               schema:
                 type: string
@@ -436,7 +424,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: OK
               schema:
                 type: string
@@ -502,7 +490,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: OK
               schema:
                 type: string
@@ -561,7 +549,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                     blocked_numbers:
                     - id: 4274
@@ -618,21 +606,15 @@ paths:
               examples:
                 INVALID_LIMIT:
                   value: 'invalid limit: 1000'
-            application/json:
-              schema:
-                type: string
-                description: Hata mesajı
         '401':
           description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hata mesajı
     post:
       summary: Karalisteye ekleme
       tags:
@@ -659,7 +641,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: '20212'
               schema:
                 type: string
@@ -686,7 +668,9 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
@@ -718,7 +702,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: OK
               schema:
                 type: string
@@ -745,7 +729,9 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
@@ -826,7 +812,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: 358c20bc-fd86-11e5-87a2-157d41a07454
               schema:
                 type: string
@@ -858,12 +844,14 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value: API anahtarı geçersiz veya eksik
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
-  "/call_transfer":
+  "/transfer":
     post:
       summary: Çağrıyı Aktar (POST)
       tags:
@@ -896,7 +884,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: "+OK"
               schema:
                 type: string
@@ -922,19 +910,15 @@ paths:
         '401':
           description: Yetkisiz erişim
           content:
-            application/json:
-              examples:
-                example_0:
-                  value:
-                    Geçersiz API anahtarı:
-                      error: Unauthorized
             text/plain:
+              examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71'
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: Hata mesajı
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/transfer/{id}":
     parameters:
     - name: id
@@ -956,6 +940,13 @@ paths:
         Bildirme ile gelen UUID'leri kullanabilirsiniz.
       operationId: transferCall
       parameters:
+      - name: id
+        in: path
+        required: true
+        description: Aktarmak istediğiniz çağrının UUID'si
+        example: f3797dfc-a818-11e7-bf70-cb295b6663ce
+        schema:
+          type: string
       - name: user_number
         in: query
         required: true
@@ -970,7 +961,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: "+OK"
               schema:
                 type: string
@@ -980,8 +971,12 @@ paths:
           content:
             text/plain:
               examples:
-                INVALID_API_KEY:
-                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+                USER_NUMBER_REQUIRED:
+                  value: user_number required
+                CALL_UUID_REQUIRED:
+                  value: call_uuid required
+                INVALID_USER_NUMBER:
+                  value: not valid user_number
                 NO_SUCH_CHANNEL:
                   value: No such channel!
               schema:
@@ -990,19 +985,15 @@ paths:
         '401':
           description: Yetkisiz erişim
           content:
-            application/json:
-              examples:
-                example_0:
-                  value:
-                    Geçersiz API anahtarı:
-                      error: Unauthorized
             text/plain:
+              examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71'
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: Hata mesajı
+                type: string
+                description: Kimlik doğrulama hata mesajı
   "/caller_ids":
     get:
       summary: Dış Numaralar Listesine Erişim
@@ -1022,7 +1013,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                   - '908501234567'
                   - '902121234567'
@@ -1039,23 +1030,19 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-            application/json:
-              schema:
-                type: string
-                description: Hata mesajı
         '401':
           description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hata mesajı
   "/originate":
     get:
       summary: Çağrı Başlatma
@@ -1148,6 +1135,8 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
@@ -1421,7 +1410,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                     cdrs:
                     - start_stamp: '2025-07-22 15:37:20 +0300'
@@ -1606,6 +1595,8 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edv'
   "/cdrs/{id}":
@@ -1631,7 +1622,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                     cdr:
                       direction: Giden (IVR)
@@ -1760,6 +1751,8 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edv'
   "/contact_groups":
@@ -1781,7 +1774,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                   - id: 20212
                     name: Müşteriler
@@ -1806,12 +1799,10 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hata mesajı
     post:
       summary: Grup oluşturma
       tags:
@@ -1838,7 +1829,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: '20212'
               schema:
                 type: string
@@ -1861,7 +1852,9 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
@@ -1907,7 +1900,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: OK
               schema:
                 type: string
@@ -1932,7 +1925,9 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
@@ -1963,7 +1958,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: OK
               schema:
                 type: string
@@ -1988,7 +1983,9 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
@@ -2028,7 +2025,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                     contacts:
                     - id: 10203
@@ -2184,21 +2181,15 @@ paths:
               examples:
                 INVALID_LIMIT:
                   value: 'invalid limit: 1000'
-            application/json:
-              schema:
-                type: string
-                description: Hata mesajı
         '401':
           description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hata mesajı
     post:
       summary: Kişi ekleme
       tags:
@@ -2397,7 +2388,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: '10203'
               schema:
                 type: string
@@ -2422,6 +2413,8 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
@@ -2617,7 +2610,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: OK
               schema:
                 type: string
@@ -2644,6 +2637,8 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
@@ -2675,7 +2670,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: OK
               schema:
                 type: string
@@ -2700,6 +2695,8 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
@@ -2722,7 +2719,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                     ringing: 'on'
                     answered: 'on'
@@ -2777,11 +2774,10 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: invalid_key'
-            application/json:
-              schema:
-                type: string
     post:
       summary: CRM Entegrasyon Ayarlarını Güncelle
       tags:
@@ -2834,8 +2830,8 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value: Ok
+                SUCCESS:
+                  value: OK
                 UPDATE_RINGING_ONLY:
                   value: Ok
                 UPDATE_WEBHOOK_URL_ONLY:
@@ -2860,6 +2856,8 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 unauthorized:
                   value: 'Gecersiz anahtar: invalid_key'
               schema:
@@ -2878,7 +2876,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                     event: ringing
                     call_id: call-789012
@@ -3073,7 +3071,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: https://api.bulutsantralim.com/fax_document/Fbb9d6f36-d1a7-46f5-961e-4be2e2ba1b8e
               schema:
                 type: string
@@ -3099,7 +3097,9 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
@@ -3161,18 +3161,6 @@ paths:
                   value: cannot find download ticket with code invalid-ticket-code-xyz
                 DOWNLOAD_TICKET_EXPIRED:
                   value: download ticket is expired
-            application/pdf:
-              schema:
-                type: string
-                description: Hata mesajı
-            image/tiff:
-              schema:
-                type: string
-                description: Hata mesajı
-            application/octet-stream:
-              schema:
-                type: string
-                description: Hata mesajı
         '500':
           description: Sunucu hatası - FTP veya dosya sistemi hatası
           content:
@@ -3180,18 +3168,6 @@ paths:
               examples:
                 FTP_FETCH_ERROR:
                   value: Unable to fetch file from FTP server
-            application/pdf:
-              schema:
-                type: string
-                description: Dosya alınamaz veya işlenemezse dönen hata mesajı
-            image/tiff:
-              schema:
-                type: string
-                description: Dosya alınamaz veya işlenemezse dönen hata mesajı
-            application/octet-stream:
-              schema:
-                type: string
-                description: Dosya alınamaz veya işlenemezse dönen hata mesajı
   "/fax_orders":
     get:
       summary: Tamamlanmamış faks gönderimlerinin listesi
@@ -3228,7 +3204,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                     fax_orders:
                     - id: 96
@@ -3301,21 +3277,15 @@ paths:
               examples:
                 INVALID_LIMIT:
                   value: 'invalid limit: 1000'
-            application/json:
-              schema:
-                type: string
-                description: Hata mesajı
         '401':
           description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hata mesajı
     post:
       summary: Faks gönderimi
       tags:
@@ -3364,7 +3334,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: '20212'
               schema:
                 type: string
@@ -3383,19 +3353,29 @@ paths:
                   value: invalid base64
                 REMOTE_STATION_ID_REQUIRED:
                   value: Remote station id can't be blank
-              schema:
-                type: string
-                description: Hata mesajı
         '401':
           description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-              schema:
-                type: string
-                description: Kimlik doğrulama hata mesajı
+        '414':
+          description: Request-URI Too Large
+          content:
+            text/plain:
+              examples:
+                REQUEST_URI_TOO_LARGE:
+                  value: |-
+                    <html>
+                    <head><title>414 Request-URI Too Large</title></head>
+                    <body>
+                    <center><h1>414 Request-URI Too Large</h1></center>
+                    <hr><center>nginx/1.26.1</center>
+                    </body>
+                    </html>
   "/fdrs":
     get:
       summary: Faks listesine erişim
@@ -3488,7 +3468,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                     fdrs:
                     - call_uuid: 3289fe02-2dc7-11e8-9a23-1f0cd544cc6v
@@ -3613,21 +3593,15 @@ paths:
                   value: 'invalid limit: 1000'
                 INVALID_PAGE:
                   value: 'invalid page : 0'
-            application/json:
-              schema:
-                type: string
-                description: Hata mesajı
         '401':
           description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hata mesajı
   "/ivr_campaigns.json":
     post:
       summary: Otomatik arama kampanyası oluştur
@@ -3871,7 +3845,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                     Başarılı cevap:
                       value: '20212'
@@ -3895,13 +3869,10 @@ paths:
         '403':
           description: Modül satın alınmadı - yetkisiz işlem
           content:
-            application/json:
-              examples:
-                example_0:
-                  value:
-                    Modül satın alınmadı:
-                      value: module not purchased
             text/plain:
+              examples:
+                MODULE_NOT_PURCHASED:
+                  value: module not purchased
               schema:
                 type: string
                 description: Modül satın alınmadı hata mesajı
@@ -3910,7 +3881,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                FAILED:
                   value:
                     Yetkisiz erişim:
                       value: API anahtarı geçersiz veya eksik
@@ -3928,15 +3899,13 @@ paths:
         type: string
     patch:
       summary: Otomatik arama kampanyasını başlat/durdur
-      tags:
-      - Otomatik Arama Kampanyaları
-      description: Otomatik arama kampanyasını durdurmak veya tekrar başlatmak için
-        kullanılır. PATCH ile status=off gönderilirse kampanya durur, status=on gönderilirse
-        tekrar başlar.
-      operationId: updateIvrCampaign
-      security:
-      - api_key: []
       parameters:
+      - name: id
+        in: path
+        required: true
+        description: IVR Campaign ID
+        schema:
+          type: string
       - name: status
         in: query
         required: true
@@ -3947,21 +3916,37 @@ paths:
         - 'off'
         schema:
           type: string
+      tags:
+      - Otomatik Arama Kampanyaları
+      description: Otomatik arama kampanyasını durdurmak veya tekrar başlatmak için
+        kullanılır. PATCH ile status=off gönderilirse kampanya durur, status=on gönderilirse
+        tekrar başlar.
+      operationId: updateIvrCampaign
+      security:
+      - api_key: []
       responses:
         '200':
           description: Kampanya durumu başarıyla güncellendi
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Başarılı cevap:
-                      value: OK
+                OK:
+                  value: Ok
               schema:
                 type: string
                 description: Başarı mesajı
+        '404':
+          description: Kampanya bulunamadı
+          content:
+            text/plain:
+              examples:
+                NOT_FOUND:
+                  value: Cannot find ivr_campaign with ID 555
+              schema:
+                type: string
+                description: Hata mesaj
         '400':
-          description: Hatalı istek - doğrulama hatası
+          description: Geçersiz durum
           content:
             text/plain:
               examples:
@@ -3970,7 +3955,7 @@ paths:
                 STATUS_REQUIRED:
                   value: status parametresi gerekli
                 INVALID_STATUS:
-                  value: status on veya off olmalı
+                  value: status should be on or off
                 CAMPAIGN_FINISHED:
                   value: ivr_campaign is over
               schema:
@@ -3981,28 +3966,32 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Yetkisiz erişim:
-                      value: API anahtarı geçersiz veya eksik
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_KEY:
+                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71e'
               schema:
                 type: string
                 description: Kimlik doğrulama hatası mesajı
         '403':
           description: Modül satın alınmadı - yetkisiz işlem
           content:
-            application/json:
-              examples:
-                example_0:
-                  value:
-                    Modül satın alınmadı:
-                      value: module not purchased
             text/plain:
+              examples:
+                MODULE_NOT_PURCHASED:
+                  value: module not purchased
               schema:
                 type: string
                 description: Modül satın alınmadı hata mesajı
     delete:
       summary: Otomatik arama kampanyasını sil
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: IVR Campaign ID
+        schema:
+          type: string
       tags:
       - Otomatik Arama Kampanyaları
       description: Otomatik arama kampanyasını iptal etmek/silmek için kullanılır.
@@ -4016,22 +4005,18 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Başarılı cevap:
-                      value: OK
+                OK:
+                  value: OK
               schema:
                 type: string
                 description: Başarı mesajı
-        '400':
-          description: Hatalı istek - silme hatası
+        '404':
+          description: Kampanya bulunamadı
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Kampanya bulunamadı:
-                      value: Cannot find ivr_campaign with ID 112
+                NOT_FOUND:
+                  value: Cannot find ivr_campaign with ID 5
               schema:
                 type: string
                 description: Hata mesajı
@@ -4040,23 +4025,20 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value:
-                    Yetkisiz erişim:
-                      value: API anahtarı geçersiz veya eksik
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_KEY:
+                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edv'
               schema:
                 type: string
                 description: Kimlik doğrulama hatası mesajı
         '403':
           description: Modül satın alınmadı - yetkisiz işlem
           content:
-            application/json:
-              examples:
-                example_0:
-                  value:
-                    Modül satın alınmadı:
-                      value: module not purchased
             text/plain:
+              examples:
+                MODULE_NOT_PURCHASED:
+                  value: module not purchased
               schema:
                 type: string
                 description: Modül satın alınmadı hata mesajı
@@ -4106,7 +4088,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: "+OK"
               schema:
                 type: string
@@ -4132,8 +4114,10 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
-                  value: Unauthorized
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
@@ -4156,7 +4140,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                   - number: 200
                     name: Kuyruk 1
@@ -4180,12 +4164,10 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hata mesajı
   "/queues/pending":
     get:
       summary: Kuyrukta bekleyenler listesine erişim
@@ -4205,7 +4187,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                   - queue_number: '200'
                     uuid: a7713781-xxxx-44b0-xxxx-38f24c4b55bb
@@ -4246,12 +4228,10 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hata mesajı
   "/queue/manage_users":
     get:
       summary: Kuyruğa dahili ekleme, çıkarma veya yer değiştirme
@@ -4319,6 +4299,8 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
@@ -4351,7 +4333,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                   - user: 1000
                     name: DAHİLİ-1
@@ -4386,21 +4368,15 @@ paths:
               examples:
                 QUEUE_NOT_FOUND:
                   value: Queue_number value null or none 999
-            application/json:
-              schema:
-                type: string
-                description: Kuyruk bulunamadığında dönen hata mesajı
         '401':
           description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hata mesajı
   "/recording_url":
     post:
       summary: Ses kaydı için geçici URL oluştur
@@ -4452,6 +4428,8 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edv'
               schema:
@@ -4496,7 +4474,7 @@ paths:
           content:
             application/json:
               examples:
-                example_0:
+                SUCCESS:
                   value:
                   - user: 1000
                     status: AVAILABLE
@@ -4546,32 +4524,22 @@ paths:
               examples:
                 INVALID_STATUS:
                   value: status should be AVAILABLE, UNREGISTERED, TALKING, SS_DND
-            application/json:
-              schema:
-                type: string
-                description: Geçerli durum değerlerini listeleyen hata mesajı
         '429':
           description: Çok fazla istek - Rate limit aşıldı
           content:
             text/plain:
               examples:
-                example_0:
+                TOO_MANY_REQUESTS:
                   value: Too Many Requests
-            application/json:
-              schema:
-                type: string
-                description: Rate limit hata mesajı
         '401':
           description: Yetkisiz erişim - Geçersiz API anahtarı
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
-            application/json:
-              schema:
-                type: string
-                description: Kimlik doğrulama hata mesajı
   "/update_outbound_caller_id":
     get:
       summary: Dahilinin Dış Numarasını (Arayan No) Değiştirme
@@ -4610,7 +4578,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: OK
               schema:
                 type: string
@@ -4638,7 +4606,9 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
@@ -4821,6 +4791,8 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
   "/voicemail_recording_url":
@@ -4877,6 +4849,8 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
                   value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
@@ -4905,7 +4879,7 @@ paths:
           content:
             text/plain:
               examples:
-                example_0:
+                SUCCESS:
                   value: W03311746-d56d-489b-801f-da610aba71cf
               schema:
                 type: string
@@ -4931,8 +4905,10 @@ paths:
           content:
             text/plain:
               examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
                 INVALID_API_KEY:
-                  value: 'Geçersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edc'
+                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edc'
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
