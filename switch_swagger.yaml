@@ -3754,91 +3754,91 @@ paths:
                     verebilirsiniz.
                 digit_target_0:
                   type: string
-                  example: queue:100
+                  example: queue/100
                   description: 'Aranan kişi 0 tuşuna bastığında yönlendirilecek hedef
                     (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
                     star, square, timeout, invalid. En az birisi için hedef verilmesi
                     zorunludur.'
                 digit_target_1:
                   type: string
-                  example: queue:101
+                  example: queue/101
                   description: 'Aranan kişi 1 tuşuna bastığında yönlendirilecek hedef
                     (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
                     star, square, timeout, invalid. En az birisi için hedef verilmesi
                     zorunludur.'
                 digit_target_2:
                   type: string
-                  example: queue:102
+                  example: queue/102
                   description: 'Aranan kişi 2 tuşuna bastığında yönlendirilecek hedef
                     (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
                     star, square, timeout, invalid. En az birisi için hedef verilmesi
                     zorunludur.'
                 digit_target_3:
                   type: string
-                  example: queue:103
+                  example: queue/103
                   description: 'Aranan kişi 3 tuşuna bastığında yönlendirilecek hedef
                     (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
                     star, square, timeout, invalid. En az birisi için hedef verilmesi
                     zorunludur.'
                 digit_target_4:
                   type: string
-                  example: queue:104
+                  example: queue/104
                   description: 'Aranan kişi 4 tuşuna bastığında yönlendirilecek hedef
                     (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
                     star, square, timeout, invalid. En az birisi için hedef verilmesi
                     zorunludur.'
                 digit_target_5:
                   type: string
-                  example: queue:105
+                  example: queue/105
                   description: 'Aranan kişi 5 tuşuna bastığında yönlendirilecek hedef
                     (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
                     star, square, timeout, invalid. En az birisi için hedef verilmesi
                     zorunludur.'
                 digit_target_6:
                   type: string
-                  example: queue:106
+                  example: queue/106
                   description: 'Aranan kişi 6 tuşuna bastığında yönlendirilecek hedef
                     (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
                     star, square, timeout, invalid. En az birisi için hedef verilmesi
                     zorunludur.'
                 digit_target_7:
                   type: string
-                  example: queue:107
+                  example: queue/107
                   description: 'Aranan kişi 7 tuşuna bastığında yönlendirilecek hedef
                     (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
                     star, square, timeout, invalid. En az birisi için hedef verilmesi
                     zorunludur.'
                 digit_target_8:
                   type: string
-                  example: queue:108
+                  example: queue/108
                   description: 'Aranan kişi 8 tuşuna bastığında yönlendirilecek hedef
                     (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
                     star, square, timeout, invalid. En az birisi için hedef verilmesi
                     zorunludur.'
                 digit_target_9:
                   type: string
-                  example: queue:109
+                  example: queue/109
                   description: 'Aranan kişi 9 tuşuna bastığında yönlendirilecek hedef
                     (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
                     star, square, timeout, invalid. En az birisi için hedef verilmesi
                     zorunludur.'
                 digit_target_star:
                   type: string
-                  example: queue:star
+                  example: queue/star
                   description: 'Aranan kişi yıldız (*) tuşuna bastığında yönlendirilecek
                     hedef (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi:
                     0-9, star, square, timeout, invalid. En az birisi için hedef verilmesi
                     zorunludur.'
                 digit_target_square:
                   type: string
-                  example: queue:square
+                  example: queue/square
                   description: 'Aranan kişi kare (#) tuşuna bastığında yönlendirilecek
                     hedef (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi:
                     0-9, star, square, timeout, invalid. En az birisi için hedef verilmesi
                     zorunludur.'
                 timeout_target:
                   type: string
-                  example: queue:timeout
+                  example: queue/timeout
                   description: 'Aranan kişi ses kaydını dinledikten sonra digit_timeout
                     süresi içinde bir tuşa basmadığında ve retry_count adedi kadar
                     tekrar denemenin sonunda yönlendirilecek hedef (gerçekleşecek
@@ -3846,271 +3846,7 @@ paths:
                     timeout, invalid. En az birisi için hedef verilmesi zorunludur.'
                 invalid_target:
                   type: string
-                  example: queue:invalid
-                  description: 'Aranan kişi ses kaydını dinledikten sonra hatalı bir
-                    tuşa bastığında ve retry_count adedi kadar tekrar denemenin sonunda
-                    yönlendirilecek hedef (gerçekleşecek eylem). Verebileceğiniz hedeflerin
-                    listesi: 0-9, star, square, timeout, invalid. En az birisi için
-                    hedef verilmesi zorunludur.'
-                digit_retries:
-                  type: integer
-                  example: 2
-                  description: Tuşlama tekrar sayısı. Geçersiz tuşlama yapıldığında
-                    veya hiç tuşlama yapılmayıp digit_timeout süresi dolduğunda, ilgili
-                    uyarı okunup Menü baştan okunur.
-                digit_timeout:
-                  type: integer
-                  example: 4
-                  description: Opsiyonel. Min:1, Maks:10, Varsayılan 4'tür. Ses kaydı
-                    dinletildikten sonra burada belirtilen süre kadar bekletilip senaryoya
-                    göre ya zaman aşımı hedefine aktarılır ya da menü baştan okutulur.
-                phone_list:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      phone:
-                        type: string
-                        example: '05321234567'
-                        description: Aranacak numara.
-                      phrase:
-                        type: string
-                        example: "#429 12/05/2017 #430 102.45 #431"
-                        description: Bu numaraya okunacak özel mesaj.
-                      lang:
-                        type: string
-                        example: tr-TR
-                        description: Mesajın dili. Gönderilmediği durumda varsayılan
-                          olarak "tr-TR" kabul edilir.
-                  example:
-                  - phone: '05321234567'
-                    phrase: "#429 12/05/2017 #430 102.45 #431"
-                    lang: tr-TR
-                  - phone: '05329876543'
-                    phrase: "#429 12/05/2017 #430 65.12 #431"
-                    lang: tr-TR
-                  description: 'Aranacak numara listesi (zorunlu). "phone" aranacak
-                    numaradır, "905321234567" veya "05321234567" veya "5321234567"
-                    veya uluslararası için "00491234567" şeklinde olmalıdır, "phone"
-                    sahası zorunludur. "phrase" sahası bu numaraya okunacak özel mesajı
-                    belirtir, formatı için aşağıda Cümle (phrase) Formatı başlığına
-                    bakınız. "phrase" sahası zorunlu değildir. "lang" sahası, mesajın
-                    hangi dilde okunacağını belirtir. Zorunlu değildir. Geçerli diller:
-                    "tr-TR", "en-US" ve "ar-XA".'
-                is_commercial:
-                  type: boolean
-                  example: false
-                  description: Opsiyonel. true | false değeri alır. Varsayılan false.
-                    Ticari gönderimlerde true olarak belirlemelisiniz.
-                iys_recipient_type:
-                  type: string
-                  example: BIREYSEL
-                  description: '"BIREYSEL" ya da "TACIR" olmalıdır. Ticari gönderimlerde
-                    bu alanı zorunlu olarak göndermelisiniz.'
-                iys_brand_code:
-                  type: string
-                  example: BRAND123
-                  description: Sistemde kayıtlı ve onaylı başlıklarınızdan birinin
-                    "İYS Marka Kodu" değeri olmalıdır. Ticari gönderimlerde bu alanı
-                    zorunlu olarak göndermelisiniz.
-                recording_enabled:
-                  type: boolean
-                  example: true
-                  description: Arama başlar başlamaz kayıt yapılmasını istiyorsanız
-                    bu parametreye "true" (String) ya da "t" vermelisiniz.
-              required:
-              - call_type
-              - name
-              - phone_list
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                call_type:
-                  type: string
-                  example: ivr
-                  description: Otomatik aramanın tipi. "queue" ya da "ivr" olabilir.
-                queue_number:
-                  type: string
-                  example: '100'
-                  description: Kuyruk tipi otomatik aramalarda, çağrıların hangi kuyruğa
-                    aktarılacağını belirtir.
-                thread_multiplier:
-                  type: integer
-                  example: 2
-                  description: Kuyruk tipi otomatik aramalarda, eşzamanlı olarak,
-                    müsait temsilci sayısının kaç katı arama yapılacağını belirtir.
-                max_thread_count:
-                  type: integer
-                  example: 10
-                  description: Kampanya için, eşzamanlı maksimum çağrı sayısını belirtir.
-                    Bu parametre belirtilmezse, santralin değerleri referans alınır.
-                    (Santral ayarlarında, "Otomatik Arama Kanal Sayısı" değeri referans
-                    alınır. Bu ayar için "Otomatik Arama / Sesli Mesaj (Çoklu) modülü
-                    gereklidir.)
-                name:
-                  type: string
-                  example: Memnuniyet anketi
-                  description: Kampanyanın adı.
-                date_range_begin:
-                  type: string
-                  example: '2025-07-25'
-                  description: Opsiyonel. Kampanyanın aramaya başlayacağı tarih, YYYY-AA-GG
-                    formatında olmalıdır. Gönderilmezse o anki tarih kullanılır.
-                date_range_end:
-                  type: string
-                  example: '2025-07-26'
-                  description: Opsiyonel. Kampanyanın arama bitiş tarihi. YYYY-AA-GG
-                    formatında olmalıdır. Gönderilmezse date_range_begin değeri kullanılır.
-                time_range_begin:
-                  type: string
-                  example: '09:00'
-                  description: Opsiyonel. Kampanyanın çalışma saatlerinin başlangıcı.
-                    SS:DD (veya S:DD) formatında olmalı. Gönderilmezse "00:00" değeri
-                    kullanılır.
-                time_range_end:
-                  type: string
-                  example: '18:00'
-                  description: Opsiyonel. Kampanyanın çalışma saatlerinin bitişi.
-                    SS:DD (veya S:DD) formatında olmalı. Gönderilmezse "23:59" değeri
-                    kullanılır.
-                active_days:
-                  type: array
-                  items:
-                    type: integer
-                  example:
-                  - 1
-                  - 2
-                  - 3
-                  - 4
-                  - 5
-                  description: Kampanyanın çalışma günleri. 1=Pazartesi, 7=Pazar olacak
-                    şekilde integer array olarak verilir ve kampanyanın haftanın sadece
-                    belirli günleri çalışmasını sağlar.
-                ring_timeout:
-                  type: integer
-                  example: 30
-                  description: Aranan numara çalarken beklenecek süre (saniye), 25
-                    – 60 sn. arasında olabilir.
-                cli:
-                  type: string
-                  example: '908505320000'
-                  description: Arayan numara. Karşı taraf bu numarayı görür.
-                welcome_announcement_id:
-                  type: integer
-                  example: 123
-                  description: Aranan numaralara dinletilecek ses dosyasının ID’si.
-                    Bu ses dinletilip peşinden tuşlama beklenir. Ses dosyası ID’lerinizi
-                    API ile veya Online İşlem Merkezi üzerinden görebilirsiniz.
-                call_retries:
-                  type: integer
-                  example: 2
-                  description: Tekrar arama sayısı. Meşgul, ulaşılamıyor, cevap yok
-                    gibi durumlarda numaranın kaç defa daha aranacağını belirtir.
-                webhook_url:
-                  type: string
-                  example: https://webhook.site/xxxx
-                  description: Tuşlamaların bildirileceği URL. Doluysa tüm tuşlamalar
-                    bu URL’e gönderilir. Kampanya oluşturulurken bu URL’e boş bir
-                    POST request’i gönderilip 200 dönmesi beklenir, bu şekilde URL’i
-                    doğruluyoruz. Aranan kişi tuşlama yaptıktan sonra bir yere yönlenmeyecekse,
-                    sadece tuşlamayı kaydetmek istiyorsanız, tuşa hedef olarak anons
-                    verebilirsiniz.
-                digit_target_0:
-                  type: string
-                  example: queue:100
-                  description: 'Aranan kişi 0 tuşuna bastığında yönlendirilecek hedef
-                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
-                    star, square, timeout, invalid. En az birisi için hedef verilmesi
-                    zorunludur.'
-                digit_target_1:
-                  type: string
-                  example: queue:101
-                  description: 'Aranan kişi 1 tuşuna bastığında yönlendirilecek hedef
-                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
-                    star, square, timeout, invalid. En az birisi için hedef verilmesi
-                    zorunludur.'
-                digit_target_2:
-                  type: string
-                  example: queue:102
-                  description: 'Aranan kişi 2 tuşuna bastığında yönlendirilecek hedef
-                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
-                    star, square, timeout, invalid. En az birisi için hedef verilmesi
-                    zorunludur.'
-                digit_target_3:
-                  type: string
-                  example: queue:103
-                  description: 'Aranan kişi 3 tuşuna bastığında yönlendirilecek hedef
-                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
-                    star, square, timeout, invalid. En az birisi için hedef verilmesi
-                    zorunludur.'
-                digit_target_4:
-                  type: string
-                  example: queue:104
-                  description: 'Aranan kişi 4 tuşuna bastığında yönlendirilecek hedef
-                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
-                    star, square, timeout, invalid. En az birisi için hedef verilmesi
-                    zorunludur.'
-                digit_target_5:
-                  type: string
-                  example: queue:105
-                  description: 'Aranan kişi 5 tuşuna bastığında yönlendirilecek hedef
-                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
-                    star, square, timeout, invalid. En az birisi için hedef verilmesi
-                    zorunludur.'
-                digit_target_6:
-                  type: string
-                  example: queue:106
-                  description: 'Aranan kişi 6 tuşuna bastığında yönlendirilecek hedef
-                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
-                    star, square, timeout, invalid. En az birisi için hedef verilmesi
-                    zorunludur.'
-                digit_target_7:
-                  type: string
-                  example: queue:107
-                  description: 'Aranan kişi 7 tuşuna bastığında yönlendirilecek hedef
-                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
-                    star, square, timeout, invalid. En az birisi için hedef verilmesi
-                    zorunludur.'
-                digit_target_8:
-                  type: string
-                  example: queue:108
-                  description: 'Aranan kişi 8 tuşuna bastığında yönlendirilecek hedef
-                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
-                    star, square, timeout, invalid. En az birisi için hedef verilmesi
-                    zorunludur.'
-                digit_target_9:
-                  type: string
-                  example: queue:109
-                  description: 'Aranan kişi 9 tuşuna bastığında yönlendirilecek hedef
-                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
-                    star, square, timeout, invalid. En az birisi için hedef verilmesi
-                    zorunludur.'
-                digit_target_star:
-                  type: string
-                  example: queue:star
-                  description: 'Aranan kişi yıldız (*) tuşuna bastığında yönlendirilecek
-                    hedef (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi:
-                    0-9, star, square, timeout, invalid. En az birisi için hedef verilmesi
-                    zorunludur.'
-                digit_target_square:
-                  type: string
-                  example: queue:square
-                  description: 'Aranan kişi kare (#) tuşuna bastığında yönlendirilecek
-                    hedef (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi:
-                    0-9, star, square, timeout, invalid. En az birisi için hedef verilmesi
-                    zorunludur.'
-                timeout_target:
-                  type: string
-                  example: queue:timeout
-                  description: 'Aranan kişi ses kaydını dinledikten sonra digit_timeout
-                    süresi içinde bir tuşa basmadığında ve retry_count adedi kadar
-                    tekrar denemenin sonunda yönlendirilecek hedef (gerçekleşecek
-                    eylem). Verebileceğiniz hedeflerin listesi: 0-9, star, square,
-                    timeout, invalid. En az birisi için hedef verilmesi zorunludur.'
-                invalid_target:
-                  type: string
-                  example: queue:invalid
+                  example: queue/invalid
                   description: 'Aranan kişi ses kaydını dinledikten sonra hatalı bir
                     tuşa bastığında ve retry_count adedi kadar tekrar denemenin sonunda
                     yönlendirilecek hedef (gerçekleşecek eylem). Verebileceğiniz hedeflerin
