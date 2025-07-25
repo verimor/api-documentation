@@ -915,7 +915,7 @@ paths:
                 KEY_REQUIRED:
                   value: Anahtar (key) gerekli
                 INVALID_API_KEY:
-                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71'
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
@@ -990,7 +990,7 @@ paths:
                 KEY_REQUIRED:
                   value: Anahtar (key) gerekli
                 INVALID_API_KEY:
-                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71'
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
@@ -1598,7 +1598,7 @@ paths:
                 KEY_REQUIRED:
                   value: Anahtar (key) gerekli
                 INVALID_API_KEY:
-                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edv'
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
   "/cdrs/{id}":
     get:
       summary: Belirli bir çağrıya ait detaylı CDR kaydını getirir
@@ -1754,7 +1754,7 @@ paths:
                 KEY_REQUIRED:
                   value: Anahtar (key) gerekli
                 INVALID_API_KEY:
-                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edv'
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
   "/contact_groups":
     get:
       summary: Grup listesine erişim
@@ -3612,257 +3612,25 @@ paths:
       operationId: createIvrCampaign
       security:
       - api_key: []
-      parameters:
-      - name: key
-        in: query
-        required: true
-        description: Size özel oluşturulmuş API anahtarınız
-        schema:
-          type: string
-      - name: call_type
-        in: query
-        required: true
-        description: 'Otomatik arama tipi: "queue" veya "ivr"'
-        schema:
-          type: string
-      - name: queue_number
-        in: query
-        required: false
-        description: Kuyruk tipi aramalarda çağrıların aktarılacağı kuyruk numarası
-        schema:
-          type: string
-      - name: thread_multiplier
-        in: query
-        required: false
-        description: Kuyruk tipi aramalarda eşzamanlı arama çarpanı
-        schema:
-          type: integer
-      - name: max_thread_count
-        in: query
-        required: false
-        description: Kampanya için eşzamanlı maksimum çağrı sayısı
-        schema:
-          type: integer
-      - name: name
-        in: query
-        required: true
-        description: Kampanya adı
-        schema:
-          type: string
-      - name: date_range_begin
-        in: query
-        required: false
-        description: Kampanya başlangıç tarihi (YYYY-MM-DD)
-        schema:
-          type: string
-      - name: date_range_end
-        in: query
-        required: false
-        description: Kampanya bitiş tarihi (YYYY-MM-DD)
-        schema:
-          type: string
-      - name: time_range_begin
-        in: query
-        required: false
-        description: Çalışma saatlerinin başlangıcı (SS:DD)
-        schema:
-          type: string
-      - name: time_range_end
-        in: query
-        required: false
-        description: Çalışma saatlerinin bitişi (SS:DD)
-        schema:
-          type: string
-      - name: active_days
-        in: query
-        items:
-          type: integer
-        required: false
-        description: Kampanya çalışma günleri (1=Pazartesi, 7=Pazar)
-        schema:
-          type: array
-      - name: ring_timeout
-        in: query
-        required: false
-        description: Aranan numara çalarken beklenecek süre (sn)
-        schema:
-          type: integer
-      - name: cli
-        in: query
-        required: false
-        description: Arayan numara
-        schema:
-          type: string
-      - name: welcome_announcement_id
-        in: query
-        required: false
-        description: Karşılama ses dosyası ID&#39;si
-        schema:
-          type: integer
-      - name: call_retries
-        in: query
-        required: false
-        description: Tekrar arama sayısı
-        schema:
-          type: integer
-      - name: webhook_url
-        in: query
-        required: false
-        description: Tuşlamaların bildirileceği URL
-        schema:
-          type: string
-      - name: digit_target_0
-        in: query
-        required: false
-        description: 0 tuşu hedefi
-        schema:
-          type: string
-      - name: digit_target_1
-        in: query
-        required: false
-        description: 1 tuşu hedefi
-        schema:
-          type: string
-      - name: digit_target_2
-        in: query
-        required: false
-        description: 2 tuşu hedefi
-        schema:
-          type: string
-      - name: digit_target_3
-        in: query
-        required: false
-        description: 3 tuşu hedefi
-        schema:
-          type: string
-      - name: digit_target_4
-        in: query
-        required: false
-        description: 4 tuşu hedefi
-        schema:
-          type: string
-      - name: digit_target_5
-        in: query
-        required: false
-        description: 5 tuşu hedefi
-        schema:
-          type: string
-      - name: digit_target_6
-        in: query
-        required: false
-        description: 6 tuşu hedefi
-        schema:
-          type: string
-      - name: digit_target_7
-        in: query
-        required: false
-        description: 7 tuşu hedefi
-        schema:
-          type: string
-      - name: digit_target_8
-        in: query
-        required: false
-        description: 8 tuşu hedefi
-        schema:
-          type: string
-      - name: digit_target_9
-        in: query
-        required: false
-        description: 9 tuşu hedefi
-        schema:
-          type: string
-      - name: digit_target_star
-        in: query
-        required: false
-        description: "* tuşu hedefi"
-        schema:
-          type: string
-      - name: digit_target_square
-        in: query
-        required: false
-        description: "# tuşu hedefi"
-        schema:
-          type: string
-      - name: timeout_target
-        in: query
-        required: false
-        description: Zaman aşımı hedefi
-        schema:
-          type: string
-      - name: invalid_target
-        in: query
-        required: false
-        description: Geçersiz tuşlama hedefi
-        schema:
-          type: string
-      - name: digit_retries
-        in: query
-        required: false
-        description: Tuşlama tekrar sayısı
-        schema:
-          type: integer
-      - name: digit_timeout
-        in: query
-        required: false
-        description: Tuşlama zaman aşımı (sn)
-        schema:
-          type: integer
-      - name: is_commercial
-        in: query
-        required: false
-        description: Ticari gönderim mi?
-        schema:
-          type: boolean
-      - name: phone_list
-        in: query
-        items:
-          type: object
-        required: true
-        description: Aranacak numara listesi ve cümleler
-        schema:
-          type: array
-      - name: iys_recipient_type
-        in: query
-        required: false
-        description: İYS alıcı tipi (ticari kampanyalar için)
-        schema:
-          type: string
-      - name: iys_brand_code
-        in: query
-        required: false
-        description: İYS marka kodu (ticari kampanyalar için)
-        schema:
-          type: string
-      - name: recording_enabled
-        in: query
-        required: false
-        description: Arama başlar başlamaz kayıt yapılsın mı?
-        schema:
-          type: boolean
+      parameters: []
       responses:
         '200':
           description: Kampanya başarıyla oluşturuldu
           content:
-            application/json:
+            text/plain:
               examples:
                 SUCCESS:
-                  value:
-                    Başarılı cevap:
-                      value: '20212'
-                    Kuyruk kampanya örneği:
-                      value: '20213'
-            text/plain:
+                  value: '20212'
               schema:
                 type: string
-                description: Oluşturulan kampanya ID&#39;si
+                description: Oluşturulan kampanya ID'si
         '400':
           description: Hatalı istek - doğrulama hatası
           content:
-            application/json:
+            text/plain:
               examples:
                 NAME_REQUIRED:
                   value: name can't be blank
-            text/plain:
               schema:
                 type: string
                 description: Hata mesajı
@@ -3879,16 +3647,546 @@ paths:
         '401':
           description: Yetkisiz - geçersiz API anahtarı
           content:
-            application/json:
-              examples:
-                FAILED:
-                  value:
-                    Yetkisiz erişim:
-                      value: API anahtarı geçersiz veya eksik
             text/plain:
+              examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
                 description: Kimlik doğrulama hatası mesajı
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                call_type:
+                  type: string
+                  example: ivr
+                  description: Otomatik aramanın tipi. "queue" ya da "ivr" olabilir.
+                queue_number:
+                  type: string
+                  example: '100'
+                  description: Kuyruk tipi otomatik aramalarda, çağrıların hangi kuyruğa
+                    aktarılacağını belirtir.
+                thread_multiplier:
+                  type: integer
+                  example: 2
+                  description: Kuyruk tipi otomatik aramalarda, eşzamanlı olarak,
+                    müsait temsilci sayısının kaç katı arama yapılacağını belirtir.
+                max_thread_count:
+                  type: integer
+                  example: 10
+                  description: Kampanya için, eşzamanlı maksimum çağrı sayısını belirtir.
+                    Bu parametre belirtilmezse, santralin değerleri referans alınır.
+                    (Santral ayarlarında, "Otomatik Arama Kanal Sayısı" değeri referans
+                    alınır. Bu ayar için "Otomatik Arama / Sesli Mesaj (Çoklu) modülü
+                    gereklidir.)
+                name:
+                  type: string
+                  example: Memnuniyet anketi
+                  description: Kampanyanın adı.
+                date_range_begin:
+                  type: string
+                  example: '2025-07-25'
+                  description: Opsiyonel. Kampanyanın aramaya başlayacağı tarih, YYYY-AA-GG
+                    formatında olmalıdır. Gönderilmezse o anki tarih kullanılır.
+                date_range_end:
+                  type: string
+                  example: '2025-07-26'
+                  description: Opsiyonel. Kampanyanın arama bitiş tarihi. YYYY-AA-GG
+                    formatında olmalıdır. Gönderilmezse date_range_begin değeri kullanılır.
+                time_range_begin:
+                  type: string
+                  example: '09:00'
+                  description: Opsiyonel. Kampanyanın çalışma saatlerinin başlangıcı.
+                    SS:DD (veya S:DD) formatında olmalı. Gönderilmezse "00:00" değeri
+                    kullanılır.
+                time_range_end:
+                  type: string
+                  example: '18:00'
+                  description: Opsiyonel. Kampanyanın çalışma saatlerinin bitişi.
+                    SS:DD (veya S:DD) formatında olmalı. Gönderilmezse "23:59" değeri
+                    kullanılır.
+                active_days:
+                  type: array
+                  items:
+                    type: integer
+                  example:
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  description: Kampanyanın çalışma günleri. 1=Pazartesi, 7=Pazar olacak
+                    şekilde integer array olarak verilir ve kampanyanın haftanın sadece
+                    belirli günleri çalışmasını sağlar.
+                ring_timeout:
+                  type: integer
+                  example: 30
+                  description: Aranan numara çalarken beklenecek süre (saniye), 25
+                    – 60 sn. arasında olabilir.
+                cli:
+                  type: string
+                  example: '908505320000'
+                  description: Arayan numara. Karşı taraf bu numarayı görür.
+                welcome_announcement_id:
+                  type: integer
+                  example: 123
+                  description: Aranan numaralara dinletilecek ses dosyasının ID’si.
+                    Bu ses dinletilip peşinden tuşlama beklenir. Ses dosyası ID’lerinizi
+                    API ile veya Online İşlem Merkezi üzerinden görebilirsiniz.
+                call_retries:
+                  type: integer
+                  example: 2
+                  description: Tekrar arama sayısı. Meşgul, ulaşılamıyor, cevap yok
+                    gibi durumlarda numaranın kaç defa daha aranacağını belirtir.
+                webhook_url:
+                  type: string
+                  example: https://webhook.site/xxxx
+                  description: Tuşlamaların bildirileceği URL. Doluysa tüm tuşlamalar
+                    bu URL’e gönderilir. Kampanya oluşturulurken bu URL’e boş bir
+                    POST request’i gönderilip 200 dönmesi beklenir, bu şekilde URL’i
+                    doğruluyoruz. Aranan kişi tuşlama yaptıktan sonra bir yere yönlenmeyecekse,
+                    sadece tuşlamayı kaydetmek istiyorsanız, tuşa hedef olarak anons
+                    verebilirsiniz.
+                digit_target_0:
+                  type: string
+                  example: queue:100
+                  description: 'Aranan kişi 0 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_1:
+                  type: string
+                  example: queue:101
+                  description: 'Aranan kişi 1 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_2:
+                  type: string
+                  example: queue:102
+                  description: 'Aranan kişi 2 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_3:
+                  type: string
+                  example: queue:103
+                  description: 'Aranan kişi 3 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_4:
+                  type: string
+                  example: queue:104
+                  description: 'Aranan kişi 4 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_5:
+                  type: string
+                  example: queue:105
+                  description: 'Aranan kişi 5 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_6:
+                  type: string
+                  example: queue:106
+                  description: 'Aranan kişi 6 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_7:
+                  type: string
+                  example: queue:107
+                  description: 'Aranan kişi 7 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_8:
+                  type: string
+                  example: queue:108
+                  description: 'Aranan kişi 8 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_9:
+                  type: string
+                  example: queue:109
+                  description: 'Aranan kişi 9 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_star:
+                  type: string
+                  example: queue:star
+                  description: 'Aranan kişi yıldız (*) tuşuna bastığında yönlendirilecek
+                    hedef (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi:
+                    0-9, star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_square:
+                  type: string
+                  example: queue:square
+                  description: 'Aranan kişi kare (#) tuşuna bastığında yönlendirilecek
+                    hedef (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi:
+                    0-9, star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                timeout_target:
+                  type: string
+                  example: queue:timeout
+                  description: 'Aranan kişi ses kaydını dinledikten sonra digit_timeout
+                    süresi içinde bir tuşa basmadığında ve retry_count adedi kadar
+                    tekrar denemenin sonunda yönlendirilecek hedef (gerçekleşecek
+                    eylem). Verebileceğiniz hedeflerin listesi: 0-9, star, square,
+                    timeout, invalid. En az birisi için hedef verilmesi zorunludur.'
+                invalid_target:
+                  type: string
+                  example: queue:invalid
+                  description: 'Aranan kişi ses kaydını dinledikten sonra hatalı bir
+                    tuşa bastığında ve retry_count adedi kadar tekrar denemenin sonunda
+                    yönlendirilecek hedef (gerçekleşecek eylem). Verebileceğiniz hedeflerin
+                    listesi: 0-9, star, square, timeout, invalid. En az birisi için
+                    hedef verilmesi zorunludur.'
+                digit_retries:
+                  type: integer
+                  example: 2
+                  description: Tuşlama tekrar sayısı. Geçersiz tuşlama yapıldığında
+                    veya hiç tuşlama yapılmayıp digit_timeout süresi dolduğunda, ilgili
+                    uyarı okunup Menü baştan okunur.
+                digit_timeout:
+                  type: integer
+                  example: 4
+                  description: Opsiyonel. Min:1, Maks:10, Varsayılan 4'tür. Ses kaydı
+                    dinletildikten sonra burada belirtilen süre kadar bekletilip senaryoya
+                    göre ya zaman aşımı hedefine aktarılır ya da menü baştan okutulur.
+                phone_list:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      phone:
+                        type: string
+                        example: '05321234567'
+                        description: Aranacak numara.
+                      phrase:
+                        type: string
+                        example: "#429 12/05/2017 #430 102.45 #431"
+                        description: Bu numaraya okunacak özel mesaj.
+                      lang:
+                        type: string
+                        example: tr-TR
+                        description: Mesajın dili. Gönderilmediği durumda varsayılan
+                          olarak "tr-TR" kabul edilir.
+                  example:
+                  - phone: '05321234567'
+                    phrase: "#429 12/05/2017 #430 102.45 #431"
+                    lang: tr-TR
+                  - phone: '05329876543'
+                    phrase: "#429 12/05/2017 #430 65.12 #431"
+                    lang: tr-TR
+                  description: 'Aranacak numara listesi (zorunlu). "phone" aranacak
+                    numaradır, "905321234567" veya "05321234567" veya "5321234567"
+                    veya uluslararası için "00491234567" şeklinde olmalıdır, "phone"
+                    sahası zorunludur. "phrase" sahası bu numaraya okunacak özel mesajı
+                    belirtir, formatı için aşağıda Cümle (phrase) Formatı başlığına
+                    bakınız. "phrase" sahası zorunlu değildir. "lang" sahası, mesajın
+                    hangi dilde okunacağını belirtir. Zorunlu değildir. Geçerli diller:
+                    "tr-TR", "en-US" ve "ar-XA".'
+                is_commercial:
+                  type: boolean
+                  example: false
+                  description: Opsiyonel. true | false değeri alır. Varsayılan false.
+                    Ticari gönderimlerde true olarak belirlemelisiniz.
+                iys_recipient_type:
+                  type: string
+                  example: BIREYSEL
+                  description: '"BIREYSEL" ya da "TACIR" olmalıdır. Ticari gönderimlerde
+                    bu alanı zorunlu olarak göndermelisiniz.'
+                iys_brand_code:
+                  type: string
+                  example: BRAND123
+                  description: Sistemde kayıtlı ve onaylı başlıklarınızdan birinin
+                    "İYS Marka Kodu" değeri olmalıdır. Ticari gönderimlerde bu alanı
+                    zorunlu olarak göndermelisiniz.
+                recording_enabled:
+                  type: boolean
+                  example: true
+                  description: Arama başlar başlamaz kayıt yapılmasını istiyorsanız
+                    bu parametreye "true" (String) ya da "t" vermelisiniz.
+              required:
+              - call_type
+              - name
+              - phone_list
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                call_type:
+                  type: string
+                  example: ivr
+                  description: Otomatik aramanın tipi. "queue" ya da "ivr" olabilir.
+                queue_number:
+                  type: string
+                  example: '100'
+                  description: Kuyruk tipi otomatik aramalarda, çağrıların hangi kuyruğa
+                    aktarılacağını belirtir.
+                thread_multiplier:
+                  type: integer
+                  example: 2
+                  description: Kuyruk tipi otomatik aramalarda, eşzamanlı olarak,
+                    müsait temsilci sayısının kaç katı arama yapılacağını belirtir.
+                max_thread_count:
+                  type: integer
+                  example: 10
+                  description: Kampanya için, eşzamanlı maksimum çağrı sayısını belirtir.
+                    Bu parametre belirtilmezse, santralin değerleri referans alınır.
+                    (Santral ayarlarında, "Otomatik Arama Kanal Sayısı" değeri referans
+                    alınır. Bu ayar için "Otomatik Arama / Sesli Mesaj (Çoklu) modülü
+                    gereklidir.)
+                name:
+                  type: string
+                  example: Memnuniyet anketi
+                  description: Kampanyanın adı.
+                date_range_begin:
+                  type: string
+                  example: '2025-07-25'
+                  description: Opsiyonel. Kampanyanın aramaya başlayacağı tarih, YYYY-AA-GG
+                    formatında olmalıdır. Gönderilmezse o anki tarih kullanılır.
+                date_range_end:
+                  type: string
+                  example: '2025-07-26'
+                  description: Opsiyonel. Kampanyanın arama bitiş tarihi. YYYY-AA-GG
+                    formatında olmalıdır. Gönderilmezse date_range_begin değeri kullanılır.
+                time_range_begin:
+                  type: string
+                  example: '09:00'
+                  description: Opsiyonel. Kampanyanın çalışma saatlerinin başlangıcı.
+                    SS:DD (veya S:DD) formatında olmalı. Gönderilmezse "00:00" değeri
+                    kullanılır.
+                time_range_end:
+                  type: string
+                  example: '18:00'
+                  description: Opsiyonel. Kampanyanın çalışma saatlerinin bitişi.
+                    SS:DD (veya S:DD) formatında olmalı. Gönderilmezse "23:59" değeri
+                    kullanılır.
+                active_days:
+                  type: array
+                  items:
+                    type: integer
+                  example:
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  description: Kampanyanın çalışma günleri. 1=Pazartesi, 7=Pazar olacak
+                    şekilde integer array olarak verilir ve kampanyanın haftanın sadece
+                    belirli günleri çalışmasını sağlar.
+                ring_timeout:
+                  type: integer
+                  example: 30
+                  description: Aranan numara çalarken beklenecek süre (saniye), 25
+                    – 60 sn. arasında olabilir.
+                cli:
+                  type: string
+                  example: '908505320000'
+                  description: Arayan numara. Karşı taraf bu numarayı görür.
+                welcome_announcement_id:
+                  type: integer
+                  example: 123
+                  description: Aranan numaralara dinletilecek ses dosyasının ID’si.
+                    Bu ses dinletilip peşinden tuşlama beklenir. Ses dosyası ID’lerinizi
+                    API ile veya Online İşlem Merkezi üzerinden görebilirsiniz.
+                call_retries:
+                  type: integer
+                  example: 2
+                  description: Tekrar arama sayısı. Meşgul, ulaşılamıyor, cevap yok
+                    gibi durumlarda numaranın kaç defa daha aranacağını belirtir.
+                webhook_url:
+                  type: string
+                  example: https://webhook.site/xxxx
+                  description: Tuşlamaların bildirileceği URL. Doluysa tüm tuşlamalar
+                    bu URL’e gönderilir. Kampanya oluşturulurken bu URL’e boş bir
+                    POST request’i gönderilip 200 dönmesi beklenir, bu şekilde URL’i
+                    doğruluyoruz. Aranan kişi tuşlama yaptıktan sonra bir yere yönlenmeyecekse,
+                    sadece tuşlamayı kaydetmek istiyorsanız, tuşa hedef olarak anons
+                    verebilirsiniz.
+                digit_target_0:
+                  type: string
+                  example: queue:100
+                  description: 'Aranan kişi 0 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_1:
+                  type: string
+                  example: queue:101
+                  description: 'Aranan kişi 1 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_2:
+                  type: string
+                  example: queue:102
+                  description: 'Aranan kişi 2 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_3:
+                  type: string
+                  example: queue:103
+                  description: 'Aranan kişi 3 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_4:
+                  type: string
+                  example: queue:104
+                  description: 'Aranan kişi 4 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_5:
+                  type: string
+                  example: queue:105
+                  description: 'Aranan kişi 5 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_6:
+                  type: string
+                  example: queue:106
+                  description: 'Aranan kişi 6 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_7:
+                  type: string
+                  example: queue:107
+                  description: 'Aranan kişi 7 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_8:
+                  type: string
+                  example: queue:108
+                  description: 'Aranan kişi 8 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_9:
+                  type: string
+                  example: queue:109
+                  description: 'Aranan kişi 9 tuşuna bastığında yönlendirilecek hedef
+                    (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi: 0-9,
+                    star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_star:
+                  type: string
+                  example: queue:star
+                  description: 'Aranan kişi yıldız (*) tuşuna bastığında yönlendirilecek
+                    hedef (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi:
+                    0-9, star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                digit_target_square:
+                  type: string
+                  example: queue:square
+                  description: 'Aranan kişi kare (#) tuşuna bastığında yönlendirilecek
+                    hedef (gerçekleşecek eylem). Verebileceğiniz hedeflerin listesi:
+                    0-9, star, square, timeout, invalid. En az birisi için hedef verilmesi
+                    zorunludur.'
+                timeout_target:
+                  type: string
+                  example: queue:timeout
+                  description: 'Aranan kişi ses kaydını dinledikten sonra digit_timeout
+                    süresi içinde bir tuşa basmadığında ve retry_count adedi kadar
+                    tekrar denemenin sonunda yönlendirilecek hedef (gerçekleşecek
+                    eylem). Verebileceğiniz hedeflerin listesi: 0-9, star, square,
+                    timeout, invalid. En az birisi için hedef verilmesi zorunludur.'
+                invalid_target:
+                  type: string
+                  example: queue:invalid
+                  description: 'Aranan kişi ses kaydını dinledikten sonra hatalı bir
+                    tuşa bastığında ve retry_count adedi kadar tekrar denemenin sonunda
+                    yönlendirilecek hedef (gerçekleşecek eylem). Verebileceğiniz hedeflerin
+                    listesi: 0-9, star, square, timeout, invalid. En az birisi için
+                    hedef verilmesi zorunludur.'
+                digit_retries:
+                  type: integer
+                  example: 2
+                  description: Tuşlama tekrar sayısı. Geçersiz tuşlama yapıldığında
+                    veya hiç tuşlama yapılmayıp digit_timeout süresi dolduğunda, ilgili
+                    uyarı okunup Menü baştan okunur.
+                digit_timeout:
+                  type: integer
+                  example: 4
+                  description: Opsiyonel. Min:1, Maks:10, Varsayılan 4'tür. Ses kaydı
+                    dinletildikten sonra burada belirtilen süre kadar bekletilip senaryoya
+                    göre ya zaman aşımı hedefine aktarılır ya da menü baştan okutulur.
+                phone_list:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      phone:
+                        type: string
+                        example: '05321234567'
+                        description: Aranacak numara.
+                      phrase:
+                        type: string
+                        example: "#429 12/05/2017 #430 102.45 #431"
+                        description: Bu numaraya okunacak özel mesaj.
+                      lang:
+                        type: string
+                        example: tr-TR
+                        description: Mesajın dili. Gönderilmediği durumda varsayılan
+                          olarak "tr-TR" kabul edilir.
+                  example:
+                  - phone: '05321234567'
+                    phrase: "#429 12/05/2017 #430 102.45 #431"
+                    lang: tr-TR
+                  - phone: '05329876543'
+                    phrase: "#429 12/05/2017 #430 65.12 #431"
+                    lang: tr-TR
+                  description: 'Aranacak numara listesi (zorunlu). "phone" aranacak
+                    numaradır, "905321234567" veya "05321234567" veya "5321234567"
+                    veya uluslararası için "00491234567" şeklinde olmalıdır, "phone"
+                    sahası zorunludur. "phrase" sahası bu numaraya okunacak özel mesajı
+                    belirtir, formatı için aşağıda Cümle (phrase) Formatı başlığına
+                    bakınız. "phrase" sahası zorunlu değildir. "lang" sahası, mesajın
+                    hangi dilde okunacağını belirtir. Zorunlu değildir. Geçerli diller:
+                    "tr-TR", "en-US" ve "ar-XA".'
+                is_commercial:
+                  type: boolean
+                  example: false
+                  description: Opsiyonel. true | false değeri alır. Varsayılan false.
+                    Ticari gönderimlerde true olarak belirlemelisiniz.
+                iys_recipient_type:
+                  type: string
+                  example: BIREYSEL
+                  description: '"BIREYSEL" ya da "TACIR" olmalıdır. Ticari gönderimlerde
+                    bu alanı zorunlu olarak göndermelisiniz.'
+                iys_brand_code:
+                  type: string
+                  example: BRAND123
+                  description: Sistemde kayıtlı ve onaylı başlıklarınızdan birinin
+                    "İYS Marka Kodu" değeri olmalıdır. Ticari gönderimlerde bu alanı
+                    zorunlu olarak göndermelisiniz.
+                recording_enabled:
+                  type: boolean
+                  example: true
+                  description: Arama başlar başlamaz kayıt yapılmasını istiyorsanız
+                    bu parametreye "true" (String) ya da "t" vermelisiniz.
+              required:
+              - call_type
+              - name
+              - phone_list
+        required: true
   "/ivr_campaigns/{id}.json":
     parameters:
     - name: id
@@ -3969,7 +4267,7 @@ paths:
                 KEY_REQUIRED:
                   value: Anahtar (key) gerekli
                 INVALID_KEY:
-                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71e'
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
                 description: Kimlik doğrulama hatası mesajı
@@ -4028,7 +4326,7 @@ paths:
                 KEY_REQUIRED:
                   value: Anahtar (key) gerekli
                 INVALID_KEY:
-                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edv'
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
                 description: Kimlik doğrulama hatası mesajı
@@ -4431,7 +4729,7 @@ paths:
                 KEY_REQUIRED:
                   value: Anahtar (key) gerekli
                 INVALID_API_KEY:
-                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edv'
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
                 description: Kimlik doğrulama hatası mesajı
@@ -4908,7 +5206,7 @@ paths:
                 KEY_REQUIRED:
                   value: Anahtar (key) gerekli
                 INVALID_API_KEY:
-                  value: 'Gecersiz anahtar: K7432ee86-7d70-477f-a7bb-f72ee1ab71edc'
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
