@@ -131,6 +131,82 @@ webhooks:
         '200':
           description: Response içeriğinin bir önemi yoktur, sadece HTTP 200 OK dönmesi
             yeterlidir.
+  IVRKampanyaRaporAlimi:
+    post:
+      security: []
+      tags:
+      - Webhooks
+      summary: Otomatik Arama Kampanyası Raporu Alımı
+      description: |-
+        Kampanyadaki numaralar arandığında, aramanın durumu ve varsa tuşlama bilgisi, kampanya oluşturulurken (OİM arayüzünden ya da API ile) verilen webhook_url adresine bir HTTP POST request’i ile gönderilir.
+
+        BİLDİRİM ÖRNEĞİ:
+        POST https://sizin.adresiniz.com.tr/bildirim/yolu
+        Host: sizin.adresiniz.com.tr
+        notification_id=5&notification_date=2017-05-10 13:18:56 UTC&domain_id=429&ivr_campaign_id=131&ivr_campaign_name=Memnuniyet anketi&ivr_lead_id=1878&phone=905321234567&digit=2&status=Başarılı&call_uuid=aacdb242-364b-11e7-8bed-c9aec7093786
+
+        BİLDİRİM SAHALARI:
+        - notification_id: Bu bildirime ait unique id.
+        - notification_date: Bildirimi yapılan olayın gerçekleştiği tarih saat.
+        - domain_id: Bulutsantral ID’si
+        - ivr_campaign_id: Otomatik IVR arama kampanyasının ID’si
+        - ivr_campaign_name: Otomatik IVR arama kampanyasının adı
+        - ivr_lead_id: Kampanyadaki numaranın ID’si
+        - phone: Aranan telefon numarası
+        - digit: Aranan kişinin yaptığı tuşlama. Şu değerleri alabilir:
+          Boş string (): Çağrı başlamadı (numara meşgul, ulaşılamıyor, hatalı numara vs.). Bu durumda status sahasında ilgili hata yazar.
+          0-9 arası bir rakam: Geçerli bir tuşlama yapıldı.
+          tire (-) işareti: tuşlama yapılmadı ve timeout oluştu.
+          ünlem (!) işareti ve rakam (örn: !4): Geçerli olmayan (tuşlama ayarlarında karşılığı olmayan) bir tuşa basıldı.
+        - call_uuid: Tuşlama için yapılan çağrının UUID’si. Yukarıdaki olay bildirme API’sini de kullanıyorsanız, orada gelen UUID ile eşleştirebilirsiniz.
+        - status: Çağrı durumu. “Cevaplandı”, “Cevapsız”, “Reddedildi”, “Hata” gibi açıklamaları içerir. “Cevaplandı” hariç her durum hata olarak yorumlanabilir.
+      requestBody:
+        description: API’nize gönderilecek parametreler aşağıdakilerdir.
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              example: notification_id=5&notification_date=2017-05-10 13:18:56 UTC&domain_id=429&ivr_campaign_id=131&ivr_campaign_name=Memnuniyet
+                anketi&ivr_lead_id=1878&phone=905321234567&digit=2&status=Başarılı&call_uuid=aacdb242-364b-11e7-8bed-c9aec7093786
+              properties:
+                notification_id:
+                  type: integer
+                  description: Bu bildirime ait unique id.
+                notification_date:
+                  type: string
+                  format: date_time
+                  description: Bildirimi yapılan olayın gerçekleştiği tarih saat.
+                domain_id:
+                  type: string
+                  description: Bulutsantral ID’si.
+                ivr_campaign_id:
+                  type: integer
+                  description: Otomatik IVR arama kampanyasının ID’si.
+                ivr_campaign_name:
+                  type: string
+                  description: Otomatik IVR arama kampanyasının adı.
+                ivr_lead_id:
+                  type: integer
+                  description: Kampanyadaki numaranın ID’si.
+                phone:
+                  type: string
+                  description: Aranan telefon numarası.
+                digit:
+                  type: string
+                  description: 'Aranan kişinin yaptığı tuşlama. Boş string (""): Çağrı
+                    başlamadı. 0-9: Geçerli tuşlama. -: timeout. !4: Geçersiz tuşlama.'
+                call_uuid:
+                  type: string
+                  description: Tuşlama için yapılan çağrının UUID’si.
+                status:
+                  type: string
+                  description: Çağrı durumu. 'Cevaplandı', 'Cevapsız', 'Reddedildi',
+                    'Hata' gibi açıklamaları içerir. 'Cevaplandı' hariç her durum
+                    hata olarak yorumlanabilir.
+      responses:
+        '200':
+          description: Response içeriğinin bir önemi yoktur, sadece HTTP 200 OK dönmesi
+            yeterlidir.
 components:
   securitySchemes:
     api_key:
