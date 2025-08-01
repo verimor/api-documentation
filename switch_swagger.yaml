@@ -137,29 +137,26 @@ webhooks:
       tags:
       - Webhooks
       summary: Otomatik Arama Kampanyası Raporu Alımı
-      description: |-
-        Kampanyadaki numaralar arandığında, aramanın durumu ve varsa tuşlama bilgisi, kampanya oluşturulurken (OİM arayüzünden ya da API ile) verilen webhook_url adresine bir HTTP POST request’i ile gönderilir.
-
-        BİLDİRİM ÖRNEĞİ:
-        POST https://sizin.adresiniz.com.tr/bildirim/yolu
-        Host: sizin.adresiniz.com.tr
-        notification_id=5&notification_date=2017-05-10 13:18:56 UTC&domain_id=429&ivr_campaign_id=131&ivr_campaign_name=Memnuniyet anketi&ivr_lead_id=1878&phone=905321234567&digit=2&status=Başarılı&call_uuid=aacdb242-364b-11e7-8bed-c9aec7093786
-
-        BİLDİRİM SAHALARI:
-        - notification_id: Bu bildirime ait unique id.
-        - notification_date: Bildirimi yapılan olayın gerçekleştiği tarih saat.
-        - domain_id: Bulutsantral ID’si
-        - ivr_campaign_id: Otomatik IVR arama kampanyasının ID’si
-        - ivr_campaign_name: Otomatik IVR arama kampanyasının adı
-        - ivr_lead_id: Kampanyadaki numaranın ID’si
-        - phone: Aranan telefon numarası
-        - digit: Aranan kişinin yaptığı tuşlama. Şu değerleri alabilir:
-          Boş string (): Çağrı başlamadı (numara meşgul, ulaşılamıyor, hatalı numara vs.). Bu durumda status sahasında ilgili hata yazar.
-          0-9 arası bir rakam: Geçerli bir tuşlama yapıldı.
-          tire (-) işareti: tuşlama yapılmadı ve timeout oluştu.
-          ünlem (!) işareti ve rakam (örn: !4): Geçerli olmayan (tuşlama ayarlarında karşılığı olmayan) bir tuşa basıldı.
-        - call_uuid: Tuşlama için yapılan çağrının UUID’si. Yukarıdaki olay bildirme API’sini de kullanıyorsanız, orada gelen UUID ile eşleştirebilirsiniz.
-        - status: Çağrı durumu. “Cevaplandı”, “Cevapsız”, “Reddedildi”, “Hata” gibi açıklamaları içerir. “Cevaplandı” hariç her durum hata olarak yorumlanabilir.
+      description: "Kampanyadaki numaralar arandığında, aramanın durumu ve varsa tuşlama
+        bilgisi, kampanya oluşturulurken (OİM arayüzünden ya da API ile) verilen webhook_url
+        adresine bir HTTP POST request’i ile gönderilir.\n\nBİLDİRİM ÖRNEĞİ: \n\nPOST
+        https://sizin.adresiniz.com.tr/bildirim/yolu \n\nHost: sizin.adresiniz.com.tr
+        \n\nnotification_id=5&notification_date=2017-05-10 13:18:56 UTC&domain_id=429&ivr_campaign_id=131&ivr_campaign_name=Memnuniyet
+        anketi&ivr_lead_id=1878&phone=905321234567&digit=2&status=Başarılı&call_uuid=aacdb242-364b-11e7-8bed-c9aec7093786
+        \n\nBİLDİRİM SAHALARI:\n- notification_id: Bu bildirime ait unique id.\n-
+        notification_date: Bildirimi yapılan olayın gerçekleştiği tarih saat.\n- domain_id:
+        Bulutsantral ID’si\n- ivr_campaign_id: Otomatik IVR arama kampanyasının ID’si\n-
+        ivr_campaign_name: Otomatik IVR arama kampanyasının adı\n- ivr_lead_id: Kampanyadaki
+        numaranın ID’si\n- phone: Aranan telefon numarası\n- digit: Aranan kişinin
+        yaptığı tuşlama. Şu değerleri alabilir:\n  Boş string (): Çağrı başlamadı
+        (numara meşgul, ulaşılamıyor, hatalı numara vs.). Bu durumda status sahasında
+        ilgili hata yazar.\n  0-9 arası bir rakam: Geçerli bir tuşlama yapıldı.\n
+        \ tire (-) işareti: tuşlama yapılmadı ve timeout oluştu.\n  ünlem (!) işareti
+        ve rakam (örn: !4): Geçerli olmayan (tuşlama ayarlarında karşılığı olmayan)
+        bir tuşa basıldı.\n- call_uuid: Tuşlama için yapılan çağrının UUID’si. Yukarıdaki
+        olay bildirme API’sini de kullanıyorsanız, orada gelen UUID ile eşleştirebilirsiniz.\n-
+        status: Çağrı durumu. “Cevaplandı”, “Cevapsız”, “Reddedildi”, “Hata” gibi
+        açıklamaları içerir. “Cevaplandı” hariç her durum hata olarak yorumlanabilir."
       requestBody:
         description: API’nize gönderilecek parametreler aşağıdakilerdir.
         content:
@@ -2938,112 +2935,6 @@ paths:
                   value: 'Gecersiz anahtar: invalid_key'
               schema:
                 type: string
-  "/webhook-payload-examples":
-    get:
-      summary: CRM Webhook Payload Örnekleri
-      tags:
-      - CRM Entegrasyonu
-      description: CRM entegrasyonu aktif olduğunda gönderilen webhook payload örnekleri.
-        Bu endpoint gerçek bir API değildir, sadece dokümantasyon amaçlıdır.
-      operationId: webhookPayloadExamples
-      responses:
-        '200':
-          description: Webhook payload örnekleri
-          content:
-            application/json:
-              examples:
-                SUCCESS:
-                  value:
-                    event: ringing
-                    call_id: call-789012
-                    caller_number: "+905551234567"
-                    called_number: "+905551234568"
-                    timestamp: '2023-01-01T12:00:00Z'
-                RINGING_EVENT:
-                  value:
-                    event: ringing
-                    call_id: call-789012
-                    caller_number: "+905551234567"
-                    called_number: "+905551234568"
-                    timestamp: '2023-01-01T12:00:00Z'
-                ANSWERED_EVENT:
-                  value:
-                    event: answered
-                    call_id: call-789012
-                    caller_number: "+905551234567"
-                    called_number: "+905551234568"
-                    answer_time: '2023-01-01T12:00:05Z'
-                HANGUP_EVENT:
-                  value:
-                    event: hangup
-                    call_id: call-789012
-                    caller_number: "+905551234567"
-                    called_number: "+905551234568"
-                    duration: 120
-                    hangup_cause: NORMAL_CLEARING
-              schema:
-                type: object
-                properties:
-                  ringing_event:
-                    type: object
-                    description: Çağrı çalmaya başladığında gönderilen payload
-                    properties:
-                      event:
-                        type: string
-                        example: ringing
-                      call_id:
-                        type: string
-                        example: call-123456
-                      caller_number:
-                        type: string
-                        example: "+905551234567"
-                      called_number:
-                        type: string
-                        example: "+905551234568"
-                      timestamp:
-                        type: string
-                        example: '2023-01-01T12:00:00Z'
-                  answered_event:
-                    type: object
-                    description: Çağrı cevaplandığında gönderilen payload
-                    properties:
-                      event:
-                        type: string
-                        example: answered
-                      call_id:
-                        type: string
-                        example: call-123456
-                      caller_number:
-                        type: string
-                        example: "+905551234567"
-                      called_number:
-                        type: string
-                        example: "+905551234568"
-                      answer_time:
-                        type: string
-                        example: '2023-01-01T12:00:05Z'
-                  hangup_event:
-                    type: object
-                    description: Çağrı sonlandığında gönderilen payload
-                    properties:
-                      event:
-                        type: string
-                        example: hangup
-                      call_id:
-                        type: string
-                        example: call-123456
-                      caller_number:
-                        type: string
-                        example: "+905551234567"
-                      called_number:
-                        type: string
-                        example: "+905551234568"
-                      duration:
-                        type: integer
-                        example: 120
-                      hangup_cause:
-                        type: string
-                        example: NORMAL_CLEARING
   "/dnd/{id}":
     parameters:
     - name: id

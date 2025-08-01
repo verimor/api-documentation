@@ -33,17 +33,14 @@ webhooks:
       tags:
       - Webhooks
       summary: Gönderim Raporu Alımı (PUSH)
-      description: |-
-        PUSH ile Gönderim Raporu Alımı
-
-        Push yönteminde mesajın durumu ile ilgili bilgi (teslim edildi, zaman aşımı, numara hatalı vb.) alınır alınmaz [OİM](https://oim.verimor.com.tr/sms_settings/edit) üzerinden daha önce belirlediğiniz bir URL tetiklenir. Aşağıdaki gibi bir JSON POST edilir:
-
-        POST https://sizin.adresiniz.com.tr/sms_push
-        Host: sizin.adresiniz.com.tr
-        Content-Type: application/json
-        Accept: */*
-
-        Not: API, sisteminize PUSH bildirimi yaptığında “HTTP/1.1 200 OK” cevabı bekler. Bu cevabı alamadığı zaman 5’er dakika bekleyerek 3 kere daha dener. Hala cevap alamazsa bu mesajı tekrar bildirmez.
+      description: "PUSH ile Gönderim Raporu Alımı\n\nPush yönteminde mesajın durumu
+        ile ilgili bilgi (teslim edildi, zaman aşımı, numara hatalı vb.) alınır alınmaz
+        [OİM](https://oim.verimor.com.tr/sms_settings/edit) üzerinden daha önce belirlediğiniz
+        bir URL tetiklenir. Aşağıdaki gibi bir JSON POST edilir:\n\nPOST https://sizin.adresiniz.com.tr/sms_push
+        \n\nHost: sizin.adresiniz.com.tr \n\nContent-Type: application/json \n\nAccept:
+        */*\n\nNot: API, sisteminize PUSH bildirimi yaptığında “HTTP/1.1 200 OK” cevabı
+        bekler. Bu cevabı alamadığı zaman 5’er dakika bekleyerek 3 kere daha dener.
+        Hala cevap alamazsa bu mesajı tekrar bildirmez."
       requestBody:
         description: 'Sisteminize gönderilecek JSON örneği ve alan açıklamaları:'
         content:
@@ -136,15 +133,13 @@ webhooks:
       tags:
       - Webhooks
       summary: Gelen SMS Alımı (PUSH)
-      description: |-
-        Push yönteminde hesabınıza bir mesaj gelir gelmez [OİM](https://oim.verimor.com.tr/sms_settings/edit) üzerinden daha önce belirlediğiniz bir URL tetiklenir. Aşağıdaki gibi bir JSON POST edilir:
-
-        POST https://sizin.adresiniz.com.tr/sms_push
-        Host: sizin.adresiniz.com.tr
-        Content-Type: application/json
-        Accept: */*
-
-        Not: API, sisteminize PUSH bildirimi yaptığında “HTTP/1.1 200 OK” cevabı bekler. Bu cevabı alamadığı zaman 5’er dakika bekleyerek 3 kere daha dener. Hala cevap alamazsa bu mesajı tekrar bildirmez.
+      description: "Push yönteminde hesabınıza bir mesaj gelir gelmez [OİM](https://oim.verimor.com.tr/sms_settings/edit)
+        üzerinden daha önce belirlediğiniz bir URL tetiklenir. Aşağıdaki gibi bir
+        JSON POST edilir: \n\nPOST https://sizin.adresiniz.com.tr/sms_push \n\nHost:
+        sizin.adresiniz.com.tr \n\nContent-Type: application/json \n\nAccept: */*
+        \n\nNot: API, sisteminize PUSH bildirimi yaptığında “HTTP/1.1 200 OK” cevabı
+        bekler. Bu cevabı alamadığı zaman 5’er dakika bekleyerek 3 kere daha dener.
+        Hala cevap alamazsa bu mesajı tekrar bildirmez."
       requestBody:
         description: 'Sisteminize gönderilecek JSON örneği ve alan açıklamaları:'
         content:
@@ -206,17 +201,14 @@ webhooks:
       tags:
       - Webhooks
       summary: İYS Günlük Vatandaş Raporu Alımı (PUSH)
-      description: |-
-        Hergün gün sonunda vatandaşın İYS kanalları (E-Devlet, İYS Web/Mobil/Çağrı merkezi) üzerinden oluşturduğu hareketler için bir kampanya oluşturulur. Oluşturulan bu kampanya ile ilgili bilgiler, [OİM](https://oim.verimor.com.tr/sms_settings/edit) üzerinden daha önce belirlediğiniz bir URL'ye (İYS Push URL) gönderilir.
-
-        Aşağıdaki örnekte olduğu gibi bir JSON string POST edilir.
-
-        POST https://sizin.adresiniz.com.tr/iys_campaign_push
-        Host: sizin.adresiniz.com.tr
-        Content-Type: application/json
-        Accept: */*
-
-        Daha sonra istenirse, 'İYS İZİNLERİ RAPORU' başlığı altındaki dökümandan faydalanılarak, oluşturulan kampanya detayları alınabilir.
+      description: "Hergün gün sonunda vatandaşın İYS kanalları (E-Devlet, İYS Web/Mobil/Çağrı
+        merkezi) üzerinden oluşturduğu hareketler için bir kampanya oluşturulur. Oluşturulan
+        bu kampanya ile ilgili bilgiler, [OİM](https://oim.verimor.com.tr/sms_settings/edit)
+        üzerinden daha önce belirlediğiniz bir URL'ye (İYS Push URL) gönderilir.\n\nAşağıdaki
+        örnekte olduğu gibi bir JSON string POST edilir. \n\nPOST https://sizin.adresiniz.com.tr/iys_campaign_push
+        \n\nHost: sizin.adresiniz.com.tr \n\nContent-Type: application/json \n\n Accept:
+        */* \n\n Daha sonra istenirse, 'İYS İZİNLERİ RAPORU' başlığı altındaki dökümandan
+        faydalanılarak, oluşturulan kampanya detayları alınabilir."
       requestBody:
         description: 'Sisteminize gönderilecek JSON örneği ve alan açıklamaları:'
         content:
@@ -1054,8 +1046,10 @@ paths:
       description: "<p>Bu API, gelen SMS’lerinizi sorgulamak için kullanılır.</p><p>Smsapi
         hesabınıza gelen sms’leri iki farklı yöntemle teslim edebilir. Bunlar PUSH
         ve GET yöntemleridir.</p><p>Bu servis&nbsp;<strong>HTTP GET ile Gelen SMS
-        Alımı</strong>&nbsp;hizmetini sağlar<br></p><p>Sorgulama, belirli bir zaman
-        aralığında veya belirli bir message_id’den büyük mesajları almak için yapılabilir.</p>"
+        Alımı</strong>&nbsp;hizmetini sağlar. PUSH ile Gelen SMS Alımı konusu için
+        Webhooks Bölümü altındaki ilgili başlğıa bakabilirsiniz.<br></p><p>Sorgulama,
+        belirli bir zaman aralığında veya belirli bir message_id’den büyük mesajları
+        almak için yapılabilir.</p>"
       parameters:
       - name: username
         in: query
