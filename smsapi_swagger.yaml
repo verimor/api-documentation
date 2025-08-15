@@ -36,11 +36,10 @@ webhooks:
       description: "PUSH ile Gönderim Raporu Alımı\n\nPush yönteminde mesajın durumu
         ile ilgili bilgi (teslim edildi, zaman aşımı, numara hatalı vb.) alınır alınmaz
         [OİM](https://oim.verimor.com.tr/sms_settings/edit) üzerinden daha önce belirlediğiniz
-        bir URL tetiklenir. Aşağıdaki gibi bir JSON POST edilir:\n\nPOST https://sizin.adresiniz.com.tr/sms_push
-        \n\nHost: sizin.adresiniz.com.tr \n\nContent-Type: application/json \n\nAccept:
-        */*\n\nNot: API, sisteminize PUSH bildirimi yaptığında “HTTP/1.1 200 OK” cevabı
-        bekler. Bu cevabı alamadığı zaman 5’er dakika bekleyerek 3 kere daha dener.
-        Hala cevap alamazsa bu mesajı tekrar bildirmez."
+        bir URL tetiklenir. Aşağıdaki gibi bir JSON POST edilir:\n\nContent-Type:
+        application/json \n\nAccept: */*\n\nNot: API, sisteminize PUSH bildirimi yaptığında
+        “HTTP/1.1 200 OK” cevabı bekler. Bu cevabı alamadığı zaman 5’er dakika bekleyerek
+        3 kere daha dener. Hala cevap alamazsa bu mesajı tekrar bildirmez."
       requestBody:
         description: 'Sisteminize gönderilecek JSON örneği ve alan açıklamaları:'
         content:
@@ -102,7 +101,7 @@ webhooks:
                   campaign_custom_id: '123456789'
                   message_id: '13582302'
                   message_custom_id: '1234'
-                  dest: '905319876543'
+                  dest: '905111111111'
                   size: 1
                   international_multiplier: 1
                   credits: 1
@@ -115,7 +114,7 @@ webhooks:
                   campaign_custom_id: '123456789'
                   message_id: '13582303'
                   message_custom_id: '1235'
-                  dest: '905319876544'
+                  dest: '905111111112'
                   size: 1
                   international_multiplier: 1
                   credits: 1
@@ -135,11 +134,10 @@ webhooks:
       summary: Gelen SMS Alımı (PUSH)
       description: "Push yönteminde hesabınıza bir mesaj gelir gelmez [OİM](https://oim.verimor.com.tr/sms_settings/edit)
         üzerinden daha önce belirlediğiniz bir URL tetiklenir. Aşağıdaki gibi bir
-        JSON POST edilir: \n\nPOST https://sizin.adresiniz.com.tr/sms_push \n\nHost:
-        sizin.adresiniz.com.tr \n\nContent-Type: application/json \n\nAccept: */*
-        \n\nNot: API, sisteminize PUSH bildirimi yaptığında “HTTP/1.1 200 OK” cevabı
-        bekler. Bu cevabı alamadığı zaman 5’er dakika bekleyerek 3 kere daha dener.
-        Hala cevap alamazsa bu mesajı tekrar bildirmez."
+        JSON POST edilir: \n\nContent-Type: application/json \n\nAccept: */* \n\nNot:
+        API, sisteminize PUSH bildirimi yaptığında “HTTP/1.1 200 OK” cevabı bekler.
+        Bu cevabı alamadığı zaman 5’er dakika bekleyerek 3 kere daha dener. Hala cevap
+        alamazsa bu mesajı tekrar bildirmez."
       requestBody:
         description: 'Sisteminize gönderilecek JSON örneği ve alan açıklamaları:'
         content:
@@ -186,7 +184,7 @@ webhooks:
                   type: inbound
                   created_at: '2017-01-01 09:00:00'
                   network: TURKCELL
-                  source_addr: '905319876543'
+                  source_addr: '905111111112'
                   destination_addr: '908501234567'
                   keyword: ''
                   content: verimor deneme
@@ -205,10 +203,9 @@ webhooks:
         merkezi) üzerinden oluşturduğu hareketler için bir kampanya oluşturulur. Oluşturulan
         bu kampanya ile ilgili bilgiler, [OİM](https://oim.verimor.com.tr/sms_settings/edit)
         üzerinden daha önce belirlediğiniz bir URL'ye (İYS Push URL) gönderilir.\n\nAşağıdaki
-        örnekte olduğu gibi bir JSON string POST edilir. \n\nPOST https://sizin.adresiniz.com.tr/iys_campaign_push
-        \n\nHost: sizin.adresiniz.com.tr \n\nContent-Type: application/json \n\n Accept:
-        */* \n\n Daha sonra istenirse, 'İYS İZİNLERİ RAPORU' başlığı altındaki dökümandan
-        faydalanılarak, oluşturulan kampanya detayları alınabilir."
+        örnekte olduğu gibi bir JSON string POST edilir. \n\nContent-Type: application/json
+        \n\n Accept: */* \n\n Daha sonra istenirse, 'İYS İZİNLERİ RAPORU' başlığı
+        altındaki dökümandan faydalanılarak, oluşturulan kampanya detayları alınabilir."
       requestBody:
         description: 'Sisteminize gönderilecek JSON örneği ve alan açıklamaları:'
         content:
@@ -494,7 +491,7 @@ paths:
                       dest:
                         type: string
                         description: Hedef telefon numaraları (virgülle ayrılmış)
-                        example: '905312345678,905551234568'
+                        example: '905111111111,905111111112'
                       msg:
                         type: string
                         description: Gönderilecek mesaj
@@ -565,7 +562,7 @@ paths:
       summary: SMS Kalan Kredi Sorgulama
       tags:
       - Bakiye Sorgulamaları
-      description: SMS kalan kredi sorgulama için bu servis kullanılıe. İşlem için
+      description: SMS kalan kredi sorgulama için bu servis kullanılır. İşlem için
         kullanıcı adı ve şifre gereklidir.
       parameters:
       - name: username
@@ -659,10 +656,10 @@ paths:
                   total: 2
                   records:
                   - created_at: '2019-11-25T11:13:24.988+03:00'
-                    phone: '905444876543'
+                    phone: '905111111111'
                     source: ret_web
                   - created_at: '2020-06-02T16:59:56.957+03:00'
-                    phone: '905335876543'
+                    phone: '905111111112'
                     source: oim
         '400':
           description: Bad request
@@ -700,7 +697,7 @@ paths:
       - name: phones
         in: query
         description: 'Karalisteye eklenmeleri istenen numaralar, virgülle ayrılmış
-          liste olarak girilmelidir. Örnek: 905444876543,905335876543'
+          liste olarak girilmelidir. Örnek: 905111111111,905111111112'
         schema:
           type: string
       responses:
@@ -748,7 +745,7 @@ paths:
       - name: phones
         in: path
         description: 'Karalisteden silinmesi istenen numaralar, virgülle ayrılmış
-          liste olarak girilmelidir. Örnek: 905444876543,905335876543'
+          liste olarak girilmelidir. Örnek: 905111111111,905111111112'
         required: true
         schema:
           type: string
@@ -780,7 +777,7 @@ paths:
             text/plain:
               schema:
                 type: string
-                example: 905450123456 is not blacklisted
+                example: 905111111111 is not blacklisted
   "/v2/status?id":
     get:
       summary: Gönderilen SMSlerden API’nin ürettiği ID ile sorma
@@ -871,7 +868,7 @@ paths:
                   campaign_custom_id: 
                   message_id: 23009861
                   message_custom_id: 
-                  dest: '905539235763'
+                  dest: '905111111111'
                   size: 1
                   international_multiplier: 1
                   credits: 1
@@ -1000,7 +997,7 @@ paths:
                   campaign_custom_id: 
                   message_id: 23009861
                   message_custom_id: 
-                  dest: '905539235763'
+                  dest: '905111111111'
                   size: 1
                   international_multiplier: 1
                   credits: 1
@@ -1246,13 +1243,13 @@ paths:
                   status: ONAY
                   recipient_type: BIREYSEL
                   consent_date: '2022-04-14 13:30:30'
-                  recipient: '905311234567'
+                  recipient: '905111111111'
                 - type: ARAMA
                   source: HS_MESAJ
                   status: RET
                   recipient_type: BIREYSEL
                   consent_date: '2022-04-14 13:30:30'
-                  recipient: '905311234568'
+                  recipient: '905111111112'
                 - type: EPOSTA
                   source: HS_MESAJ
                   status: RET
@@ -1450,14 +1447,14 @@ paths:
                   records:
                   - type: MESAJ
                     source: HS_WEB
-                    recipient: '905331001727'
+                    recipient: '905111111114'
                     status: ONAY
                     consent_date: '2020-06-11T22:14:00.000+03:00'
                     recipient_type: BIREYSEL
                     request_status: Başarılı
                   - type: MESAJ
                     source: HS_WEB
-                    recipient: '905331001017'
+                    recipient: '905111111111'
                     status: RET
                     consent_date: '2020-06-11T22:14:00.000+03:00'
                     recipient_type: BIREYSEL
