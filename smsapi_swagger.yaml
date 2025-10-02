@@ -22,22 +22,20 @@ info:
     veri kabul eder ve yanıt döner. Raporlama gibi <strong>GET</strong> işlemleri
     ise parametreleri URL üzerinden alır ve yanıtı, isteğe bağlı olarak, varsayılan
     olarak <strong>boşluklarla ayrılmış düz metin (plain text)</strong> veya belirtilirse
-    <strong>JSON</strong> formatında döndürebilir. <p><a href ="https://god.gw.postman.com/run-collection/14669756-4e4aa0c8-f4e2-4e7d-b5ad-d99c62a45b28?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D14669756-4e4aa0c8-f4e2-4e7d-b5ad-d99c62a45b28%26entityType%3Dcollection%26workspaceId%3De4084846-4b47-49e8-81bc-3d20f047ba0e"><img
-    src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px;
-    height: 32px;"></a></p></div><div class="markdown-heading" dir="auto"><h3 tabindex="-1"
-    class="heading-element" dir="auto">GENEL NOTLAR</h3></div><ul dir="auto"><li>API
-    üzerinden dakikada 240 sms gönderim isteği yapabilirsiniz. 1 isteğin büyüklüğü
-    10 MB geçemez. Bu limitler dahilinde, isteğin yapısına bağlı olmakla birlikte
-    dakikada 100.000.000 mesaj gönderilebilir.</li><li>Yoğun OTP gönderimleri için
-    kendi tarafınızda istekleri biriktirip saniyede bir post yöntemiyle sms gönderim
-    isteği (çok kişiye çok mesaj isteği) yapmalısınız.</li><li>Request limitlerini
-    aştığınızda 429 (Too Many Requests) hatası döner.</li><li>Paket boyutu limitini
-    aştığınızda 413 (Request Entity Too Large) hatası döner.</li><li>API üzerinden
-    sms raporu sorgulama isteği dakikada 20 istekle sınırlandırılmıştır. Önerimiz
-    Push yöntemini kullanmanızdır.</li><li>HTTPS olarak API’mizi kullanırken SSL bağlanıtısı
-    için kullandığınız kütüphane sisteminizde kök sertifikalar yüklü olmadığından
-    sertifikamızı doğrulamayabilir. Bu sorunu çözmek için lets-encrypt-r3.crt kök
-    sertifika dosyasını&nbsp;<a href="https://github.com/verimor/SMS-API/blob/master/lets-encrypt-r3.crt">buraya</a>&nbsp;tıklayarak
+    <strong>JSON</strong> formatında döndürebilir.</div><div class="markdown-heading"
+    dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">GENEL NOTLAR</h3></div><ul
+    dir="auto"><li>API üzerinden dakikada 240 sms gönderim isteği yapabilirsiniz.
+    1 isteğin büyüklüğü 10 MB geçemez. Bu limitler dahilinde, isteğin yapısına bağlı
+    olmakla birlikte dakikada 100.000.000 mesaj gönderilebilir.</li><li>Yoğun OTP
+    gönderimleri için kendi tarafınızda istekleri biriktirip saniyede bir post yöntemiyle
+    sms gönderim isteği (çok kişiye çok mesaj isteği) yapmalısınız.</li><li>Request
+    limitlerini aştığınızda 429 (Too Many Requests) hatası döner.</li><li>Paket boyutu
+    limitini aştığınızda 413 (Request Entity Too Large) hatası döner.</li><li>API
+    üzerinden sms raporu sorgulama isteği dakikada 20 istekle sınırlandırılmıştır.
+    Önerimiz Push yöntemini kullanmanızdır.</li><li>HTTPS olarak API’mizi kullanırken
+    SSL bağlanıtısı için kullandığınız kütüphane sisteminizde kök sertifikalar yüklü
+    olmadığından sertifikamızı doğrulamayabilir. Bu sorunu çözmek için lets-encrypt-r3.crt
+    kök sertifika dosyasını&nbsp;<a href="https://github.com/verimor/SMS-API/blob/master/lets-encrypt-r3.crt">buraya</a>&nbsp;tıklayarak
     indirip sisteminize kurmalısınız.</li><li>Mesaj metninde yeni satıra geçiş yapabilmek
     için json''da (new line) "\n" kullanımı gerekmektedir.</li></ul><div class="markdown-heading"
     dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto">HATA KODLARI</h3></div><p
