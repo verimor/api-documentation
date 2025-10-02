@@ -1411,6 +1411,138 @@ paths:
               schema:
                 type: string
                 description: Kimlik doğrulama hata mesajı
+  "/answer/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Cevaplamak istediğiniz (manual_answer=true ile başlatılmış) çağrının
+        UUID'si.
+      example: 736eaf7e-4cc4-44ab-8dbe-16b18e9618b1
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Bir Çağrıyı Cevapla
+      tags:
+      - Çağrı Yönetimi
+      security:
+      - api_key: []
+      description: manual_answer=true parametresi ile başlatılmış ve dahili telefonda
+        çalmakta olan bir çağrıyı API üzerinden cevaplamak için kullanılır. HTTP GET
+        metodu ile /answer/{id} çağrılır. Başarılı olduğunda çağrı cevaplanır ve HTTP
+        200 ile +OK veya çağrıya ilişkin bilgi döner. Başarısız olduğunda ilgili hata
+        mesajı body'de döner.
+      operationId: answerCall
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Cevaplanacak çağrının UUID'si
+        example: 736eaf7e-4cc4-44ab-8dbe-16b18e9618b1
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              examples:
+                SUCCESS:
+                  value: "+OK"
+              schema:
+                type: string
+                description: Çağrı cevaplandı onayı (+OK veya Job-UUID bilgisi).
+        '400':
+          description: Hatalı istek
+          content:
+            text/plain:
+              examples:
+                ID_REQUIRED:
+                  value: id is required
+                INVALID_ID:
+                  value: invalid uuid
+              schema:
+                type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim
+          content:
+            text/plain:
+              examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
+  "/answer":
+    post:
+      summary: Bir Çağrıyı Cevapla (POST)
+      tags:
+      - Çağrı Yönetimi
+      security:
+      - api_key: []
+      description: manual_answer=true parametresi ile başlatılmış bir çağrıyı cevaplamak
+        için HTTP POST metodu ile /answer endpoint'i id parametresi ile çağrılır.
+        Başarılı olduğunda çağrı cevaplanır ve HTTP 200 döner.
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              examples:
+                SUCCESS:
+                  value: "+OK"
+              schema:
+                type: string
+                description: Çağrı cevaplandı onayı
+        '400':
+          description: Hatalı istek
+          content:
+            text/plain:
+              examples:
+                ID_REQUIRED:
+                  value: id is required
+              schema:
+                type: string
+                description: Hata mesajı
+        '401':
+          description: Yetkisiz erişim
+          content:
+            text/plain:
+              examples:
+                KEY_REQUIRED:
+                  value: Anahtar (key) gerekli
+                INVALID_API_KEY:
+                  value: 'Gecersiz anahtar: K12345678-1234-5678-4321-123456789012'
+              schema:
+                type: string
+                description: Kimlik doğrulama hata mesajı
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Cevaplanacak çağrının UUID'si
+                  example: 736eaf7e-4cc4-44ab-8dbe-16b18e9618b1
+              required:
+              - id
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Cevaplanacak çağrının UUID'si
+                  example: 736eaf7e-4cc4-44ab-8dbe-16b18e9618b1
+              required:
+              - id
+        required: true
   "/cdrs":
     get:
       summary: Çağrı Detay Kayıtları (CDR) listesini getirir
