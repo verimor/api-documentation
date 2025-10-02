@@ -1121,8 +1121,11 @@ paths:
       - Çağrı Yönetimi
       security:
       - api_key: []
-      description: Geçersiz istek. Gerekli bir parametre eksik veya geçersiz olabilir
-        (örneğin, eksik dahili numara, geçersiz hedef).
+      description: |-
+        Uygulamalarınız üzerinden santraldeki bir dahiliye çağrı başlatmak için kullanılır. Bunun için HTTP GET metodu ile api.bulutsantralim.com adresi aşağıdaki parametrelerle çağrılır. İstek başarılı olduğunda HTTP 200 Status kodu ile mesajın Body'sinde call_uuid döner. İstek başarısız olduğunda ise ilgili HTTP Status kodu ile mesajın Body'sinde hata mesajı döner.
+
+        HAZIRLIK:
+        Online İşlem Merkezi => Bulut Santralim => Santral Ayarlarım menüsü altından API Anahtarınızı (key) öğrenmelisiniz.
       operationId: originateCall
       parameters:
       - name: extension
@@ -1184,7 +1187,7 @@ paths:
           content:
             text/plain:
               examples:
-                success:
+                SUCCESS:
                   value: 358c20bc-fd86-11e5-87a2-157d41a07454
               schema:
                 type: string
@@ -1194,10 +1197,18 @@ paths:
           content:
             text/plain:
               examples:
-                EXTENSION_MISSING:
-                  value: extension is missing
+                EXTENSION_REQUIRED:
+                  value: extension required
                 EXTENSION_NOT_FOUND:
                   value: extension 1005 not found
+                DESTINATION_REQUIRED:
+                  value: destination required
+                NOT_REGISTERED:
+                  value: extension 1001 is not registered
+                INVALID_DESTINATION:
+                  value: 'invalid destination: 123'
+                INVALID_CALLER_ID:
+                  value: 'invalid caller_id: 9999'
               schema:
                 type: string
                 description: Hata mesajı
@@ -1217,28 +1228,36 @@ paths:
       summary: Bir Çağrı Başlat (POST)
       tags:
       - Çağrı Yönetimi
-      description: Invalid request. A required parameter might be missing or invalid.
+      description: Uygulamalarınız üzerinden santraldeki bir dahiliye çağrı başlatmak
+        için kullanılır. Bunun için HTTP POST metodu ile api.bulutsantralim.com adresi
+        aşağıdaki parametrelerle çağrılır. İstek başarılı olduğunda HTTP 200 Status
+        kodu ile mesajın Body&#39;sinde call_uuid döner. İstek başarısız olduğunda
+        ise ilgili HTTP Status kodu ile mesajın Body&#39;sinde hata mesajı döner.
       security:
       - api_key: []
       parameters: []
       responses:
         '200':
-          description: successful
+          description: OK
           content:
             text/plain:
               examples:
-                success:
+                SUCCESS:
                   value: a1b2c3d4-e5f6-7890-1234-567890abcdef
               schema:
                 type: string
-                description: Çağrı UUID'si
+                description: Çağrı UUID'si (başarılı başlatma)
         '400':
-          description: bad request
+          description: Hatalı istek
           content:
             text/plain:
               examples:
-                MISSING_EXTENSION:
-                  value: extension parameter is required
+                EXTENSION_REQUIRED:
+                  value: extension required
+                DESTINATION_REQUIRED:
+                  value: destination required
+                INVALID_CALLER_ID:
+                  value: 'invalid caller_id: 9999'
               schema:
                 type: string
                 description: Hata mesajı
