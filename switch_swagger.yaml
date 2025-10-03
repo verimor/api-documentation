@@ -5008,11 +5008,15 @@ paths:
                 description: Kimlik doğrulama hata mesajı
   "/webphone_tokens":
     post:
-      summary: Dahili için token (anahtar) alma
+      summary: Dahili için token (anahtar) alma (IFrame Embed için)
       tags:
       - Kullanıcı Yönetimi
-      description: Web telefonunu kendi uygulamanızda kullanmak için token oluşturur.
-        Her açılışta ilgili dahili için token alınmalıdır. Token 1 gün geçerlidir.
+      description: |-
+        Web telefonunu kendi uygulamanızda kullanmak için token oluşturur. Her açılışta ilgili dahili için token alınmalıdır. Token 1 gün geçerlidir.
+
+        Bulutsantralim web telefonunu kendi web uygulamanızın içine iframe ile gömmek için kullanılır. Böylece kullanıcılarınız tek pencereyle çalışır ve iki ayrı sisteme login olmak zorunda kalmazlar.
+
+        Online İşlem Merkezi => Abonelik İşlemleri => Personel Hesapları sayfasında, web telefonunu kullanacak her dahili için bir personel hesabı açıp ilgili dahiliyi seçmiş olmalısınız. Karşılığında personel hesabı olmayan dahililer web telefonunu kullanamaz.
       operationId: createWebphoneToken
       security:
       - api_key: []
