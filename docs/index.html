@@ -1,13 +1,861 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>verimor</title>
-    <meta http-equiv="refresh" content="0; url=https://www.verimor.com.tr/entegrasyonlar" />
+    <title>Verimor API - Geliştirici Platformu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            background: #ffffff;
+        }
+
+        .header {
+            background: #f86709;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 50%, #ffffff 100%);
+            padding: 5rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(248, 103, 9, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(41, 101, 219, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 3rem;
+            line-height: 1.8;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            background: linear-gradient(135deg, #f86709 0%, #ff8534 100%);
+            border-radius: 50px;
+            font-size: 0.95rem;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(248, 103, 9, 0.3);
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        /* --- REDESIGNED CODE SECTION START --- */
+        .code-example {
+            background: #282c34; /* Koyu tema arka planı container'a taşındı */
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            overflow: hidden;
+            margin: 2rem auto;
+            max-width: 900px;
+            text-align: left;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #21252b;
+            padding: 0 1rem;
+            border-bottom: 1px solid #181a1f;
+        }
+
+        .code-tabs {
+            display: flex;
+            gap: 2px;
+        }
+
+        .code-tab {
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: #9da5b4;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            font-family: 'Segoe UI', sans-serif;
+            border-bottom: 3px solid transparent;
+        }
+
+        .code-tab:hover {
+            color: #d7dae0;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .code-tab.active {
+            color: #f86709; /* Marka rengi */
+            border-bottom: 3px solid #f86709;
+            background: rgba(248, 103, 9, 0.05);
+        }
+
+        .copy-btn-wrapper {
+            position: relative;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #abb2bf;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .copy-btn i {
+            font-size: 0.9rem;
+        }
+
+        .code-content {
+            display: none;
+            position: relative;
+        }
+
+        .code-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .code-content pre {
+            margin: 0;
+            padding: 1.5rem;
+            overflow-x: auto;
+            background: #282c34;
+        }
+
+        .code-content code {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #abb2bf;
+            display: block;
+        }
+
+        /* Scrollbar özelleştirme (Webkit) */
+        .code-content pre::-webkit-scrollbar {
+            height: 8px;
+            background: #21252b;
+        }
+        
+        .code-content pre::-webkit-scrollbar-thumb {
+            background: #4b5362;
+            border-radius: 4px;
+        }
+
+        .code-content pre::-webkit-scrollbar-thumb:hover {
+            background: #5c6370;
+        }
+        /* --- REDESIGNED CODE SECTION END --- */
+
+        .section {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 3rem;
+        }
+
+        .api-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .api-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .api-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #f86709 0%, #2965db 100%);
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+
+        .api-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .api-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+        }
+
+        .api-card-title {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .api-card-desc {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .api-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .feature-tag {
+            padding: 0.3rem 0.8rem;
+            background: #f8f8f8;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .api-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #2965db;
+            text-decoration: none;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        .api-link:hover {
+            color: #f86709;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-item {
+            background: #ffffff;
+            padding: 2.5rem;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            transition: all 0.3s;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #f86709 0%, #ff8534 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 15px rgba(248, 103, 9, 0.3);
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .feature-desc {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #f86709 0%, #ff8534 100%);
+            padding: 4rem 0;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .cta-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-desc {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: #ffffff;
+            color: #f86709;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .footer {
+            background: #2965da;
+            color: #ffffff;
+            padding: 4rem 0 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-logo-section {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .footer-logo-section img {
+            width: 160px;
+            height: auto;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .social-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .footer-section a:hover {
+            color: #ffffff;
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .code-tab {
+                padding: 0.8rem 1rem;
+                font-size: 0.8rem;
+            }
+            
+            .code-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 10px;
+            }
+            
+            .copy-btn-wrapper {
+                width: 100%;
+                text-align: right;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">
+                    <img src="https://www.verimor.com.tr/wp-content/uploads/2025/06/Verimor-Main-Logo-White.svg" alt="Verimor">
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#switch-api">Switch API</a></li>
+                    <li><a href="#sms-api">SMS API</a></li>
+                    <li><a href="#entegrasyonlar">Entegrasyonlar</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="badge">
+                    <i class="fas fa-check-circle"></i> Saniyeler içinde entegre olun!
+                </div>
+                <h1>SMS ve Bulut Santral API ile Uygulamalarınıza Güçlü İletişim</h1>
+                <p>Kolay entegrasyon, yüksek güvenilirlik, 7/24 destek. SMS gönderimi ve bulut santral özelliklerinizi tek bir API'de birleştirin.</p>
+            </div>
+
+            <div class="code-example">
+                <div class="code-header">
+                    <div class="code-tabs">
+                        <button class="code-tab active" data-tab="curl">CURL</button>
+                        <button class="code-tab" data-tab="python">PYTHON</button>
+                        <button class="code-tab" data-tab="nodejs">NODEJS</button>
+                        <button class="code-tab" data-tab="php">PHP</button>
+                    </div>
+                    <div class="copy-btn-wrapper">
+                        <button class="copy-btn" id="copyBtn" onclick="copyCode()">
+                            <i class="fas fa-copy"></i> <span>Kopyala</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="code-content active" data-content="curl">
+                    <pre><code>curl --request GET \
+  --url 'https://sms.verimor.com.tr/v2/headers?username=KULLANICI_ADI&password=SIFRE' \
+  --header 'accept: application/json'</code></pre>
+                </div>
+                <div class="code-content" data-content="python">
+                    <pre><code>import requests
+
+url = 'https://sms.verimor.com.tr/v2/headers'
+params = {
+    'username': 'KULLANICI_ADI',
+    'password': 'SIFRE'
+}
+headers = {
+    'accept': 'application/json'
+}
+
+response = requests.get(url, params=params, headers=headers)
+print(response.json())</code></pre>
+                </div>
+                <div class="code-content" data-content="nodejs">
+                    <pre><code>const axios = require('axios');
+
+const url = 'https://sms.verimor.com.tr/v2/headers';
+const params = {
+  username: 'KULLANICI_ADI',
+  password: 'SIFRE'
+};
+
+const response = await axios.get(url, {
+  params: params,
+  headers: {
+    'accept': 'application/json'
+  }
+});
+
+console.log(response.data);</code></pre>
+                </div>
+                <div class="code-content" data-content="php">
+                    <pre><code>&lt;?php
+$curl = curl_init();
+$url = 'https://sms.verimor.com.tr/v2/headers?username=KULLANICI_ADI&password=SIFRE';
+
+curl_setopt_array($curl, [
+  CURLOPT_URL => $url,
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_HTTPHEADER => [
+    'accept: application/json'
+  ]
+]);
+
+$response = curl_exec($curl);
+curl_close($curl);
+echo $response;</code></pre>
+                </div>
+            </div>
+            </div>
+    </section>
+
+    <section class="section" id="api-section">
+        <div class="container">
+            <h2 class="section-title">Güçlü API'ler</h2>
+            <p class="section-subtitle">İhtiyacınız olan her şey, tek bir platformda</p>
+
+            <div class="api-cards">
+                <div class="api-card">
+                    <div class="api-card-title">
+                        <i class="fas fa-phone-alt" style="color: #f86709;"></i>
+                        SWITCH API
+                    </div>
+                    <p class="api-card-desc">Toplu SMS gönderimi, OTP doğrulama, kampanya yönetimi ve detaylı raporlama özellikleri</p>
+                    <div class="api-features">
+                        <span class="feature-tag">Çağrı Kaydet</span>
+                        <span class="feature-tag">VR</span>
+                        <span class="feature-tag">Yönlendirme</span>
+                        <span class="feature-tag">Kuyruklar</span>
+                    </div>
+                    <a href="https://developer.verimor.com.tr/smsapi" class="api-link">Dokümantasyona Git <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="api-card">
+                    <div class="api-card-title">
+                        <i class="fas fa-comment-alt" style="color: #2965db;"></i>
+                        SMS API
+                    </div>
+                    <p class="api-card-desc">Sesli arama yönetimi, IVR entegrasyonu, çağrı kaydı ve gelişmiş santral özellikleri</p>
+                    <div class="api-features">
+                        <span class="feature-tag">Tek Mesaj</span>
+                        <span class="feature-tag">OTP</span>
+                        <span class="feature-tag">Raporlama</span>
+                        <span class="feature-tag">WebHook</span>
+                    </div>
+                    <a href="https://developer.verimor.com.tr/switch" class="api-link">Dokümantasyona Git <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" style="background: #f8f8f8;">
+        <div class="container">
+            <h2 class="section-title">Neden Verimor?</h2>
+            <p class="section-subtitle">Geliştiriciler için optimize edilmiş platform</p>
+
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="feature-title">Hızlı Entegrasyon</div>
+                    <div class="feature-desc">RESTful API ile 5 dakikada entegre edin. Kapsamlı dokümantasyon ve örnekler.</div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="feature-title">Yüksek Güvenilirlik</div>
+                    <div class="feature-desc">%99,9 uptime garantisi. Redundant altyapı ve otomatik failover.</div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="feature-title">Gerçek Zamanlı</div>
+                    <div class="feature-desc">Webhook desteği ile anlık bildirimler. Gerçek zamanlı durum güncellemeleri.</div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="feature-title">Güvenli & Uyumlu</div>
+                    <div class="feature-desc">SSL/TLS şifreleme, KVKK uyumlu. API key ve OAuth2 desteği.</div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="feature-title">Developer Friendly</div>
+                    <div class="feature-desc">SDK'lar, kod örnekleri ve Postman kolleksiyonları. 7/24 teknik destek.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <h2 class="cta-title">Bugün Başlayın!</h2>
+            <p class="cta-desc">1000 ücretsiz SMS kredisi ile hemen test edin. Kredi kartı gerekmez.</p>
+            <a href="https://oim.verimor.com.tr/abonelik-basvurusu" class="btn">Ücretsiz Hesap Oluşturun!</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo-section">
+                    <img src="https://www.verimor.com.tr/wp-content/uploads/2025/06/Verimor-Main-Logo-White.svg" alt="Verimor">
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/verimor_telekom/" target="_blank" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/company/2148559" target="_blank" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="https://www.facebook.com/verimor.telekomunikasyon/" target="_blank" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://www.youtube.com/channel/UCwX6ta3U089X0VFuVxv4Jtw" target="_blank" aria-label="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="https://twitter.com/Verimor_Telekom/" target="_blank" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Ürünler</h3>
+                    <ul>
+                        <li><a href="#">SMS API</a></li>
+                        <li><a href="#">Bulut Santral API</a></li>
+                        <li><a href="#">Dokümantasyon</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Kaynaklar</h3>
+                    <ul>
+                        <li><a href="#">Dokümantasyon</a></li>
+                        <li><a href="#">Referanslar</a></li>
+                        <li><a href="#">Durum Sayfası</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Hakkımızda</h3>
+                    <ul>
+                        <li><a href="#">Teknik Altyapı</a></li>
+                        <li><a href="#">İletişim</a></li>
+                        <li><a href="#">Destek</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p style="color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">Verimor - İletişimin Güçlü Hali</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Code tab switching
+        const tabs = document.querySelectorAll('.code-tab');
+        const contents = document.querySelectorAll('.code-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.querySelector(`[data-content="${tabName}"]`).classList.add('active');
+                
+                // Reset copy button text when switching tabs
+                const copyBtn = document.getElementById('copyBtn');
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i> <span>Kopyala</span>';
+                copyBtn.style.color = '#abb2bf';
+                copyBtn.style.borderColor = 'rgba(255,255,255,0.2)';
+            });
+        });
+
+        // Copy Functionality
+        function copyCode() {
+            const activeContent = document.querySelector('.code-content.active code');
+            const copyBtn = document.getElementById('copyBtn');
+            
+            if(activeContent) {
+                navigator.clipboard.writeText(activeContent.innerText).then(() => {
+                    // Success feedback
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> <span>Kopyalandı!</span>';
+                    copyBtn.style.color = '#4BB543'; // Success Green
+                    copyBtn.style.borderColor = '#4BB543';
+                    
+                    // Revert after 2 seconds
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<i class="fas fa-copy"></i> <span>Kopyala</span>';
+                        copyBtn.style.color = '#abb2bf';
+                        copyBtn.style.borderColor = 'rgba(255,255,255,0.2)';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+            }
+        }
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
