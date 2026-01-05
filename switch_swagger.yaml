@@ -4552,7 +4552,7 @@ paths:
             text/plain:
               examples:
                 SUCCESS:
-                  value: https://api.bulutsantralim.net/recording/Re9a6e998-821c-4f00-b420-7a521b1ad480
+                  value: https://api.bulutsantralim.com/recording/Re9a6e998-821c-4f00-b420-7a521b1ad480
               schema:
                 type: string
                 description: 1 saat geçerli olan geçici ses kaydı dinleme/indirme
@@ -5069,6 +5069,4 @@ paths:
 security:
 - api_key: []
 servers:
-- url: https://api.bulutsantralim.net/
-- url: https://api.bulutsantralim.com/
-- url: http://dev.switch.com:3003
+- url: https://api.bulutsantralim.com
